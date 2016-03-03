@@ -12,8 +12,8 @@ summary(data.use)
 # reducing the amount of data for the test runs
 sites.use <- c("Harvard", "Howland", "Morgan Monroe State Park", "Oak Openings Toledo", "Missouri Ozark")
 
-test <- data.use[data.use$Site %in% sites.use  & data.use$Year > 1980,]
- summary(test)
+test <- data.use[data.use$Site %in% sites.use,]
+summary(test)
 
 # Get a list of what predictors & responses I'm using
 predictors.all <- c("RW", "tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "Site")
@@ -52,7 +52,8 @@ summary(test$Canopy.Class)
 
 gam1 <- gamm(RW ~ s(tmean, k=3, by=Species) +
                   s(precip, k=3, by=Species) +
-                  s(dbh.recon, k=3, by=spp.plot),
+                  s(dbh.recon, k=3, by=spp.plot)+
+                  Canopy.Class, by=spp.plot,
                   random=list(Site=~1, PlotID=~1),
                   data=test)
 
