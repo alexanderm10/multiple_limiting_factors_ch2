@@ -1,0 +1,8 @@
+raw_input_files/*
+RWL/*
+processed_data/*
+climate_data/*
+figures/*
+
+*.Rdata
+*.pdf
