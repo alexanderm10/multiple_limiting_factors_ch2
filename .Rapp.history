@@ -594,7 +594,6 @@ test <- data.use[data.use$Site==c("Harvard", "Oak Openings") & data.use$Year > 1
 summary(test)
 test <- data.use[data.use$Site==c("Harvard", "Oak Openings") & data.use$Year > 1980,]
 data.use$Site==c("Harvard", "Oak Openings")
-data.use$Site==c("Harvard", "Oak Openings")
 test <- data.use[data.use$Site==c("Harvard", "Oak Openings", "Missouri Ozarks") & data.use$Year > 1980,]
 unique(data.use$Site)
 test <- data.use[data.use$Site==c("Harvard", "Oak Openings Toledo", "Missouri Ozark", "Morgan Monroe State Park") & data.use$Year > 1980,]
