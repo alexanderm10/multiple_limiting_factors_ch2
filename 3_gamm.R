@@ -155,8 +155,7 @@ ggplot(data=mean.rw) + facet_wrap(group ~ Site, scales="fixed") + theme_bw() +
 	geom_line(data=mean.model, aes(x=Year, y=rw.mean), color="red3", alpha=0.8, size=1) +
 	labs(title="Gamm Model vs. Data", x="Year", y="RW")
 dev.off()
-# running scripts to get the weights
-source("0_Calculate_GAMM_Weights.R")
+
 
 # Sanity Check #2
 # Pulling random trees from both the data.use and the model.pred2 to see how they compare
@@ -170,27 +169,28 @@ summary(sanity2.trees)
 
 summary(mean.rw)
 summary(data.use)
-
+summary(model.pred2)
 
 # Sanity Check #2 graph
-
+pdf("figures/gam1_sanitycheck2.pdf", width= 13, height = 8.5)
 ggplot(data=data.use[data.use$TreeID %in% sanity2.trees,]) + facet_wrap(TreeID~ Site, scales="fixed") + theme_bw() +
 	# plot the data
 	#geom_ribbon(aes(x=Year, ymin=rw.lwr, ymax=rw.upr), alpha=0.5) +
 	geom_line(aes(x=Year, y=RW, size=1)) +
 	# Plot our model
 	#geom_ribbon(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, ymin=rw.lwr, ymax=rw.upr), fill="red3", alpha=0.3) +
-	geom_line(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, y=RW), color="red3", alpha=0.8, size=1) +
+	geom_line(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, y=mean), color="red3", alpha=0.8, size=1) +
 	labs(title="Gamm Model vs. Data", x="Year", y="RW")
+dev.off()
 
 
 
-
-
+# running scripts to get the weights
+source("0_Calculate_GAMM_Weights.R")
 
 gam1.weights <- factor.weights(model.gam = gam1, model.name = "species_response", newdata = test, extent = "", vars = predictors.all)
 
-
+summary(gam1)
 
 
 
