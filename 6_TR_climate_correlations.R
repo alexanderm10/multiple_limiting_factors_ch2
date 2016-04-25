@@ -1,6 +1,8 @@
 library(mgcv)
 library(ggplot2)
 library(car)
+library(reshape)
+library(dplR)
 # Christy's GAMM code
 
 # gam1 <- gamm(Y ~  s(Biomass, bs="cr", k=3, by=PFT) + s(tair, k=k, by=PFT) + s(precipf, k=k, by=PFT) + s(CO2, k=k, by=PFT), random=list(PlotID=~1), data=data) 
@@ -116,7 +118,8 @@ sites.crn <- data.frame(Harvard = harvard.crn[, "Harres"],
 						Howland = howland.crn[,"Howres"], 
 						Missouri = misso.crn[,"Misres"],
 						Morgan_Monroe = mmf.crn[,"Morres"], 
-						Oak_openings = oakop.crn[,"Oakres"])
+						Oak_openings = oakop.crn[,"Oakres"]
+						)
 
 summary(sites.crn)
 
@@ -234,7 +237,7 @@ clim.cor4$type <- as.factor(clim.cor4$type)
 clim.cor4$cor <- as.numeric(clim.cor4$cor)
 
 # Sig value for 61 df = 0.209
-clim.cor4$sig <- ifelse(clim.cor4$cor < -0.209 | clim.cor4$cor > 0.209, "Y", "N")
+clim.cor4$sig <- ifelse(clim.cor4$cor < -0.246 | clim.cor4$cor > 0.246, "Y", "N")
 clim.cor4$sig <- factor(clim.cor4$sig, levels = c("Y", "N"))
 
 clim.cor4$site <- factor(clim.cor4$site, levels = c("Missouri", "Morgan-Monroe", "Oak-Openings", "Harvard", "Howland"))
@@ -256,5 +259,290 @@ ggplot(data=clim.cor4[clim.cor4$type=="std",]) + facet_grid(var~. , scales="free
 	 
 dev.off()
 
+######################################################################
+# Gettign correlations for all for all of the available climate data data
+######################################################################
+
+
+# Loading in climate data
+t.mean <- read.csv("processed_data/ch2_tmean.csv", header=T)
+t.min <- read.csv("processed_data/ch2_tmin.csv", header=T)
+t.max <- read.csv("processed_data/ch2_tmax.csv", header=T)
+precip <- read.csv("processed_data/ch2_precip.csv", header=T)
+
+
+summary(t.mean)
+
+# Limiting time frame--1950-2012
+t.mean <- t.mean[t.mean$Year >= 1951 & t.mean$Year <= 2012,]
+t.min <- t.min[t.min$Year >= 1951 & t.min$Year <= 2012,]
+t.max <- t.max[t.max$Year >= 1951 & t.max$Year <= 2012,]
+precip <- precip[precip$Year >= 1951 & precip$Year <= 2012,]
+summary(t.mean)
+summary(t.min)
+summary(t.max)
+summary(precip)
+
+head(t.mean)
+unique(t.mean$Site.Name)
+
+t.mean$Site.Name <- recode(t.mean$Site.Name, "'Missouri Ozark' = 'Missouri'; 'Morgan Monroe State Park'='Morgan_Monroe'; 'Oak Openings Toledo' = 'Oak_openings'")
+
+t.min$Site.Name <- recode(t.min$Site.Name, "'Missouri Ozark' = 'Missouri'; 'Morgan Monroe State Park'='Morgan_Monroe'; 'Oak Openings Toledo' = 'Oak_openings'")
+
+
+t.max$Site.Name <- recode(t.max$Site.Name, "'Missouri Ozark' = 'Missouri'; 'Morgan Monroe State Park'='Morgan_Monroe'; 'Oak Openings Toledo' = 'Oak_openings'")
+
+
+precip$Site.Name <- recode(precip$Site.Name, "'Missouri Ozark' = 'Missouri'; 'Morgan Monroe State Park'='Morgan_Monroe'; 'Oak Openings Toledo' = 'Oak_openings'")
+
+
+
+# getting the ring widths in a data frame
+summary(sites.crn)
+sites.crn$Year <- site.chron[[1]][,"Year"]
+head(sites.crn)
+sites.crn <- sites.crn[sites.crn$Year > 1950,]
+
+
+#--------------------------------------------
+# Tmean correlation
+#--------------------------------------------
+
+sites <- c("Harvard", "Howland", "Missouri", "Morgan_Monroe", "Oak_openings")
+
+tmean.corr<-list()
+
+for(i in sites){
+	tmean.corr[[i]] <- cor(sites.crn[,i], t.mean[t.mean$Site.Name %in% i,!names(t.mean) %in% c("Site.Name", "Year")], method="pearson")
+}
+summary(tmean.corr)
+
+# Making each site it's own dataframe
+harvard.tmean <- as.data.frame(tmean.corr[[1]])
+
+harvard.tmean.stack <- stack(harvard.tmean)
+names(harvard.tmean.stack)<- c("cor", "month")
+harvard.tmean.stack$Site <- as.factor("Harvard")
+harvard.tmean.stack$type <- as.factor("tmean")
+
+howland.tmean <- as.data.frame(tmean.corr[[2]])
+
+howland.tmean.stack <- stack(howland.tmean)
+names(howland.tmean.stack)<- c("cor", "month")
+howland.tmean.stack$Site <- as.factor("Howland")
+howland.tmean.stack$type <- as.factor("tmean")
+
+mo.tmean <- as.data.frame(tmean.corr[[3]])
+
+mo.tmean.stack <- stack(mo.tmean)
+names(mo.tmean.stack)<- c("cor", "month")
+mo.tmean.stack$Site <- as.factor("Missouri")
+mo.tmean.stack$type <- as.factor("tmean")
+
+mmf.tmean <- as.data.frame(tmean.corr[[4]])
+
+mmf.tmean.stack <- stack(mmf.tmean)
+names(mmf.tmean.stack)<- c("cor", "month")
+mmf.tmean.stack$Site <- as.factor("MMF")
+mmf.tmean.stack$type <- as.factor("tmean")
+
+oakop.tmean <- as.data.frame(tmean.corr[[5]])
+
+oakop.tmean.stack <- stack(oakop.tmean)
+names(oakop.tmean.stack)<- c("cor", "month")
+oakop.tmean.stack$Site <- as.factor("Oak_openings")
+oakop.tmean.stack$type <- as.factor("tmean")
+
+all.sites.tmean <- rbind(harvard.tmean.stack, howland.tmean.stack, mo.tmean.stack, mmf.tmean.stack, oakop.tmean.stack)
+
+summary(all.sites.tmean)
+
+#--------------------------------------------
+# Tmin correlation
+#--------------------------------------------
+
+sites <- c("Harvard", "Howland", "Missouri", "Morgan_Monroe", "Oak_openings")
+
+tmin.corr<-list()
+
+for(i in sites){
+	tmin.corr[[i]] <- cor(sites.crn[,i], t.min[t.min$Site.Name %in% i,!names(t.min) %in% c("Site.Name", "Year")], method="pearson")
+}
+summary(tmin.corr)
+
+# Making each site it's own dataframe
+harvard.tmin <- as.data.frame(tmin.corr[[1]])
+
+harvard.tmin.stack <- stack(harvard.tmin)
+names(harvard.tmin.stack)<- c("cor", "month")
+harvard.tmin.stack$Site <- as.factor("Harvard")
+harvard.tmin.stack$type <- as.factor("tmin")
+
+howland.tmin <- as.data.frame(tmin.corr[[2]])
+
+howland.tmin.stack <- stack(howland.tmin)
+names(howland.tmin.stack)<- c("cor", "month")
+howland.tmin.stack$Site <- as.factor("Howland")
+howland.tmin.stack$type <- as.factor("tmin")
+
+mo.tmin <- as.data.frame(tmin.corr[[3]])
+
+mo.tmin.stack <- stack(mo.tmin)
+names(mo.tmin.stack)<- c("cor", "month")
+mo.tmin.stack$Site <- as.factor("Missouri")
+mo.tmin.stack$type <- as.factor("tmin")
+
+mmf.tmin <- as.data.frame(tmin.corr[[4]])
+
+mmf.tmin.stack <- stack(mmf.tmin)
+names(mmf.tmin.stack)<- c("cor", "month")
+mmf.tmin.stack$Site <- as.factor("MMF")
+mmf.tmin.stack$type <- as.factor("tmin")
+
+oakop.tmin <- as.data.frame(tmin.corr[[5]])
+
+oakop.tmin.stack <- stack(oakop.tmin)
+names(oakop.tmin.stack)<- c("cor", "month")
+oakop.tmin.stack$Site <- as.factor("Oak_openings")
+oakop.tmin.stack$type <- as.factor("tmin")
+
+all.sites.tmin <- rbind(harvard.tmin.stack, howland.tmin.stack, mo.tmin.stack, mmf.tmin.stack, oakop.tmin.stack)
+
+summary(all.sites.tmin)
+
+
+
+#--------------------------------------------
+# Tmax correlation
+#--------------------------------------------
+
+sites <- c("Harvard", "Howland", "Missouri", "Morgan_Monroe", "Oak_openings")
+
+tmax.corr<-list()
+
+for(i in sites){
+	tmax.corr[[i]] <- cor(sites.crn[,i], t.max[t.max$Site.Name %in% i,!names(t.max) %in% c("Site.Name", "Year")], method="pearson")
+}
+summary(tmax.corr)
+
+# Making each site it's own dataframe
+harvard.tmax <- as.data.frame(tmax.corr[[1]])
+
+harvard.tmax.stack <- stack(harvard.tmax)
+names(harvard.tmax.stack)<- c("cor", "month")
+harvard.tmax.stack$Site <- as.factor("Harvard")
+harvard.tmax.stack$type <- as.factor("tmax")
+
+howland.tmax <- as.data.frame(tmax.corr[[2]])
+
+howland.tmax.stack <- stack(howland.tmax)
+names(howland.tmax.stack)<- c("cor", "month")
+howland.tmax.stack$Site <- as.factor("Howland")
+howland.tmax.stack$type <- as.factor("tmax")
+
+mo.tmax <- as.data.frame(tmax.corr[[3]])
+
+mo.tmax.stack <- stack(mo.tmax)
+names(mo.tmax.stack)<- c("cor", "month")
+mo.tmax.stack$Site <- as.factor("Missouri")
+mo.tmax.stack$type <- as.factor("tmax")
+
+mmf.tmax <- as.data.frame(tmax.corr[[4]])
+
+mmf.tmax.stack <- stack(mmf.tmax)
+names(mmf.tmax.stack)<- c("cor", "month")
+mmf.tmax.stack$Site <- as.factor("MMF")
+mmf.tmax.stack$type <- as.factor("tmax")
+
+oakop.tmax <- as.data.frame(tmax.corr[[5]])
+
+oakop.tmax.stack <- stack(oakop.tmax)
+names(oakop.tmax.stack)<- c("cor", "month")
+oakop.tmax.stack$Site <- as.factor("Oak_openings")
+oakop.tmax.stack$type <- as.factor("tmax")
+
+all.sites.tmax <- rbind(harvard.tmax.stack, howland.tmax.stack, mo.tmax.stack, mmf.tmax.stack, oakop.tmax.stack)
+
+summary(all.sites.tmax)
+
+
+
+
+#--------------------------------------------
+# Precip correlation
+#--------------------------------------------
+sites <- c("Harvard", "Howland", "Missouri", "Morgan_Monroe", "Oak_openings")
+
+precip.corr<-list()
+
+for(i in sites){
+	precip.corr[[i]] <- cor(sites.crn[,i], precip[precip$Site.Name %in% i,!names(precip) %in% c("Site.Name", "Year")], method="pearson")
+}
+summary(precip.corr)
+
+# Making each site it's own dataframe
+harvard.precip <- as.data.frame(precip.corr[[1]])
+
+harvard.precip.stack <- stack(harvard.precip)
+names(harvard.precip.stack)<- c("cor", "month")
+harvard.precip.stack$Site <- as.factor("Harvard")
+harvard.precip.stack$type <- as.factor("precip")
+
+howland.precip <- as.data.frame(precip.corr[[2]])
+
+howland.precip.stack <- stack(howland.precip)
+names(howland.precip.stack)<- c("cor", "month")
+howland.precip.stack$Site <- as.factor("Howland")
+howland.precip.stack$type <- as.factor("precip")
+
+mo.precip <- as.data.frame(precip.corr[[3]])
+
+mo.precip.stack <- stack(mo.precip)
+names(mo.precip.stack)<- c("cor", "month")
+mo.precip.stack$Site <- as.factor("Missouri")
+mo.precip.stack$type <- as.factor("precip")
+
+mmf.precip <- as.data.frame(precip.corr[[4]])
+
+mmf.precip.stack <- stack(mmf.precip)
+names(mmf.precip.stack)<- c("cor", "month")
+mmf.precip.stack$Site <- as.factor("MMF")
+mmf.precip.stack$type <- as.factor("precip")
+
+oakop.precip <- as.data.frame(precip.corr[[5]])
+
+oakop.precip.stack <- stack(oakop.precip)
+names(oakop.precip.stack)<- c("cor", "month")
+oakop.precip.stack$Site <- as.factor("Oak_openings")
+oakop.precip.stack$type <- as.factor("precip")
+
+all.sites.precip <- rbind(harvard.precip.stack, howland.precip.stack, mo.precip.stack, mmf.precip.stack, oakop.precip.stack)
+
+summary(all.sites.precip)
+
+# Merging all stacked dataframes together to make plotting easier
+
+all.sites.climate <- rbind(all.sites.precip, all.sites.tmax, all.sites.tmin, all.sites.tmean)
+summary(all.sites.climate)
+
+# Sig value for 61 df = 0.209
+all.sites.climate$sig <- ifelse(all.sites.climate$cor < -0.25 | all.sites.climate$cor > 0.25, "Y", "N")
+all.sites.climate$sig <- factor(all.sites.climate$sig, levels = c("Y", "N"))
+
+
+all.sites.climate$month <- factor(all.sites.climate$month, levels = c("pJan", "pFeb", "pMar", "pApr", "pMay", "pJun", "pJul", "pAug", "pSep", "pOct", "pNov", "pDec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "pfall", "winter", "spring", "summer", "grow.seas"))
+
+all.sites.climate$Site <- factor(all.sites.climate$Site, levels = c("Missouri", "MMF", "Oak_openings", "Harvard", "Howland"))
+
+pdf("figures/site_correlations_allmonths.pdf", width= 13, height = 8.5)
+ggplot(data=all.sites.climate) + facet_grid(Site ~ type ) +
+	geom_bar(aes(x=month, y=cor, fill=sig), stat="identity", position="dodge", colour="black") +
+	geom_hline(yintercept=0.25, linetype="dashed") + 
+	geom_hline(yintercept=-0.25, linetype="dashed") + 	
+	geom_hline(yintercept=0, linetype="solid") +
+	scale_fill_manual(values= c("green", "grey50"))+
+	theme(axis.text.x = element_text(angle = 45, hjust = 1))
+dev.off()
 
 
