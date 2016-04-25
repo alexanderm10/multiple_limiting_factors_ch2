@@ -7,8 +7,7 @@ library(car)
 
 # Loading in my data
 
-data.use <- read.csv("processed_data/AllSites_tree_plus_climate.csv", header=T)
-summary(data.use)
+data.use <- read.csv("processed_data/AllSites_tree_plus_climate_and_BA.csv", header=T)
 
 data.use$group <- data.use$Species
 data.use$group <- recode(data.use$group, "'CAOV' = 'CARYA'; 'CACO' = 'CARYA'; 
@@ -16,15 +15,22 @@ data.use$group <- recode(data.use$group, "'CAOV' = 'CARYA'; 'CACO' = 'CARYA';
 
 data.use$group.plot <- as.factor(paste(data.use$group, data.use$PlotID, sep="."))
 
+data.use$Canopy.Class <- recode(data.use$Canopy.Class, "'C' = 'D'")
+summary(data.use)
+
 
 # reducing the amount of data for the test runs
 sites.use <- c("Harvard", "Howland", "Morgan Monroe State Park", "Oak Openings Toledo", "Missouri Ozark")
 
-test <- data.use[data.use$Site %in% sites.use,]
+test <- data.use[data.use$Site %in% sites.use & !is.na(data.use$RW) & !is.na(data.use$BA.inc),]
 summary(test)
 
+test$group.cc <- as.factor(paste(test$group, test$Canopy.Class, sep="."))
+summary(test)
+
+
 # Get a list of what predictors & responses I'm using
-predictors.all <- c("RW", "tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "Site", "group", "group.plot")
+predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc")
 
 # Getting rid of observations that have NAs in the important variables
 test <- test[complete.cases(test[,predictors.all]),]
@@ -36,10 +42,10 @@ group.use <- c("ACRU", "ACSA", "BETULA", "CARYA", "FAGR", "FRAX", "PIST", "QUAL"
 
 test <- test[test$group %in% group.use,]
 
+summary(test)
 
-
-
-
+par(new=F)
+plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], type="l")
 
 
 summary(test)
@@ -62,28 +68,61 @@ summary(test$Canopy.Class)
 
 # hist(test$dbh.recon)
 
+
+# test2 <- test[test$group %in% c("QURU", "ACRU") & test$Year>=1980,]
+test2 <- test[test$group %in% c("QURU", "ACRU"),]
+
+summary(test)
+
+# test.gam3 <- test
+# test.gam3$Canopy.Class <- recode(test.gam3$Canopy.Class, "'C' = 'D'")
+# summary(test.gam3)
 ################################################### 
 # HERE'S THE GAMM!!!
 ################################################### 
 # RW ~ CLIMATE(Species) + Size
-gam1 <- gamm(RW ~ s(tmean, k=3, by=group) + # tmean*Species 
+                  
+gam1 <- gamm(BA.inc~ s(tmean, k=3, by=group) +
                   s(precip, k=3, by=group) +
-                  s(dbh.recon, k=3, by=group.plot) +
-                  Canopy.Class, 
+                  s(dbh.recon, k=3, by=group) +
+                   Canopy.Class,
                   random=list(Site=~1, PlotID=~1),
                   data=test)
 
-save(gam1, file="processed_data/gam1_climate_by_species.Rdata")
+
+                  
+gam1.test <- gamm(BA.inc ~ s(tmean, k=3, by=group) + # tmean*Species 
+                  s(precip, k=3, by=group) +
+                  s(dbh.recon, k=3, by=group.plot) +
+                  Canopy.Class, 
+                  random=list(Site =~1, PlotID=~1),
+                  data=test2)
+             
+
+save(gam1, file="processed_data/gam_results/gam1_climate_by_species.Rdata")
 
 # s(tmean, by=Spp.Can) + s(tmean, by=Canopy)
 # s(tmean, by=Spp) + s(tmean, by=Canopy) + s(tmean, by=Spp.Can)
 
-gam2 <- gamm(RW ~ s(tmean, k=3, by=Canopy.Class) +
+                  
+gam2 <- gamm(BA.inc~ s(tmean, k=3, by=Canopy.Class) +
                   s(precip, k=3, by=Canopy.Class) +
-                  s(dbh.recon, k=3, by=Canopy.Class)+
-                  Species,
+                  s(dbh.recon, k=3, by=group) +
+                  group,
                   random=list(Site=~1, PlotID=~1),
-                  data=test)
+                  data=test)                  
+                  
+
+ 
+gam3 <- gamm(BA.inc~ s(tmean, k=3, by=group.cc) +
+                  s(precip, k=3, by=group.cc) +
+                  s(dbh.recon, k=3, by=group.cc) +
+                  Canopy.Class + group,
+                  random=list(Site=~1, PlotID=~1),
+                  data=test, control=list(niterEM=0, sing.tol=1e-20, opt="optim"))
+
+ save(gam2, file="processed_data/gam_results/gam2_climate_by_canopyclass.Rdata") 
+ save(gam3, file="processed_data/gam_results/gam3_climate_by_canopyclass_interactions.Rdata")
  
 
  par(mfrow=c(4,2)); plot(gam1$gam, ylim=c(-0.025, 0.025))
@@ -94,105 +133,6 @@ gam2 <- gamm(RW ~ s(tmean, k=3, by=Canopy.Class) +
 # Random effects are hierarchical 
  
  
-################################################### 
-# Copied over from 0_process_gamm.R
-# This will give us the sensitivities of RW in a pretty format.
-
-# Set up a dummy dataset for the script to run correctly
-# number of simulations to run
-
-load("processed_data/gam1_climate_by_species.Rdata")
-
-n <- 100
-source("0_Calculate_GAMM_Posteriors.R")
-# Fitting our model to the data to see if we're doing a pasable job of capturing the variance
-# If things don't match, we shoudl take our sensitiivty curves with a grain of salt
-model.pred <- post.distns(model.gam=gam1, model.name="species_response", newdata=test, vars=predictors.all, n=n, terms=F)
-summary(model.pred$ci)
-
-# Need help dealing with the list that is set up here.  Need help with the aggregation
-model.pred2 <- model.pred$ci
-summary(model.pred2)
-dim(model.pred2)
-
-
-# Aggregating to the group level in teh same way we do below with the ring widths
-# We can then compare our modeled RW to our measured RW and see how things look
-# Sanity Check #1
-mean.model <- aggregate(model.pred2$RW, by = model.pred2[, c("group", "Site", "Year")], FUN=mean, na.rm=T)
-names(mean.model)[names(mean.model)=="x"] <- c("rw.mean") 
-mean.model[,"rw.lwr"] <- aggregate(model.pred2$RW, by=model.pred2[,c("group", "Site", "Year")], FUN=quantile, probs=0.025, na.rm=T)[,"x"]
-mean.model[,"rw.upr"] <- aggregate(model.pred2$RW, by=model.pred2[,c("group", "Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
-head(mean.model)
-
-
-
-# aggregating the raw data for graphing
-mean.rw <- aggregate(data.use$RW, by=data.use[, c("group", "Site", "Year")], FUN=mean, na.rm=T)
-names(mean.rw)[names(mean.rw)=="x"]<- c("rw.mean")                  
-mean.rw[,"rw.lwr"] <- aggregate(data.use$RW, by=data.use[,c("group", "Site", "Year")], FUN=quantile, probs=0.025, na.rm=T)[,"x"]
-mean.rw[,"rw.upr"] <- aggregate(data.use$RW, by=data.use[,c("group", "Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
-head(mean.rw)
-
-mean.rw <- mean.rw[mean.rw$Site %in% sites.use,]
-
-#mean.rw$Species <- mean.rw$group
-
-
-
-
-
-summary(model.pred$ci)
-
-# Sanity Check #1 graph
-pdf("figures/gam1_sanitycheck1.pdf", width= 13, height = 8.5)
-ggplot(data=mean.rw) + facet_wrap(group ~ Site, scales="fixed") + theme_bw() +
-	# plot the data
-	geom_ribbon(aes(x=Year, ymin=rw.lwr, ymax=rw.upr), alpha=0.5) +
-	geom_line(aes(x=Year, y=rw.mean), size=1) +
-	# Plot our model
-	geom_ribbon(data=mean.model, aes(x=Year, ymin=rw.lwr, ymax=rw.upr), fill="red3", alpha=0.3) +
-	geom_line(data=mean.model, aes(x=Year, y=rw.mean), color="red3", alpha=0.8, size=1) +
-	labs(title="Gamm Model vs. Data", x="Year", y="RW")
-dev.off()
-
-
-# Sanity Check #2
-# Pulling random trees from both the data.use and the model.pred2 to see how they compare
-
-n <- 100
-data.use2 <- data.use[data.use$Site %in% sites.use,]
-data.use2 <- data.use2[data.use2$group %in% group.use,]
-
-sanity2.trees <- sample(data.use2$TreeID, size=n, replace=F) 
-summary(sanity2.trees)
-
-summary(mean.rw)
-summary(data.use)
-summary(model.pred2)
-
-# Sanity Check #2 graph
-pdf("figures/gam1_sanitycheck2.pdf", width= 13, height = 8.5)
-ggplot(data=data.use[data.use$TreeID %in% sanity2.trees,]) + facet_wrap(TreeID~ Site, scales="fixed") + theme_bw() +
-	# plot the data
-	#geom_ribbon(aes(x=Year, ymin=rw.lwr, ymax=rw.upr), alpha=0.5) +
-	geom_line(aes(x=Year, y=RW, size=1)) +
-	# Plot our model
-	#geom_ribbon(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, ymin=rw.lwr, ymax=rw.upr), fill="red3", alpha=0.3) +
-	geom_line(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, y=mean), color="red3", alpha=0.8, size=1) +
-	labs(title="Gamm Model vs. Data", x="Year", y="RW")
-dev.off()
-
-
-
-# running scripts to get the weights
-source("0_Calculate_GAMM_Weights.R")
-
-gam1.weights <- factor.weights(model.gam = gam1, model.name = "species_response", newdata = test, extent = "", vars = predictors.all)
-
-summary(gam1)
-
-
 
 #----------------------------------------------
 # Gam1 graphs
@@ -212,14 +152,21 @@ data <- test
 		}
 		
 		# Getting the unique values of our factor variables and adding them to the data frame
-		for(v in predictors.all[!predictors.all %in% vars.num & !predictors.all=="Species"]){
+		# need to skip group & group.cc so we aren't trying to match Carya & Quercus etc
+		predictors.all <- predictors.all[!predictors.all %in% c("Species", "spp.plot")]
+		for(v in predictors.all[!predictors.all %in% vars.num & !(predictors.all %in% c("group", "group.cc"))]){
 			# if v is a factor, merge all unique values into the dataframe
 			var.temp <- data.frame(x=unique(data[,v])) 
 			names(var.temp) <- v
 			new.dat <- merge(new.dat, var.temp, all.x=T, all.y=T)
 		}
 		# getting species from species.plot
-		new.dat$Species <- as.factor(substr(new.dat$spp.plot, 1, 4))
+		new.dat$group <- as.factor(substr(new.dat$group.plot, 1, 4))
+		
+		# Adding in the group.canopy class then getting rid of combinations we don't actually have in our data
+		new.dat$group.cc <- as.factor(paste(new.dat$group, new.dat$Canopy.Class, sep="."))
+		new.dat <- new.dat[new.dat$group.cc %in% unique(test$group.cc),]
+		summary(new.dat)
 		
 		# Putting the numerical variables into an array and adding it in 
 		var.temp <- data.frame(array(dim=c(n.out, length(vars.num))))
@@ -230,98 +177,135 @@ data <- test
 		new.dat <- merge(new.dat, var.temp, all.x=T, all.y=T)
 		summary(new.dat)
 								
+write.csv(new.dat, file="processed_data/sensitivity_extaction_dataframe.csv", row.names=F)								
+# Change which gamm you look at here!
+n <- 100						
 		# SOurce & run the function
 		source("0_Calculate_GAMM_Posteriors.R")
-		ci.terms.pred <- post.distns(model.gam=gam1, model.name="species_response", n=n, newdata=new.dat, vars=predictors.all, terms=T)
+		g1.ci.terms.pred <- post.distns(model.gam=gam1, model.name="species_response", n=n, newdata=new.dat, vars=predictors.all, terms=T)
 		
-		ci.out <- ci.terms.pred$ci # separting out the confidence interval 
-		ci.out[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
-		ci.out$x <- as.numeric(ci.out$x) # making x numeric; will make factors NA
-		summary(ci.out)
+		g1.ci.out <- g1.ci.terms.pred$ci # separting out the confidence interval 
+		g1.ci.out[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
+		g1.ci.out$x <- as.numeric(g1.ci.out$x) # making x numeric; will make factors NA
+		summary(g1.ci.out)
 		
 spp.colors <- read.csv("spp.Colors.csv", header=T)	
 summary(spp.colors)	
 
-spp.fig <- unique(ci.out$Species)
-spp.fig <- spp.fig[order(spp.fig)]
-colors.use <- as.vector(c(paste(spp.colors[spp.colors$Species %in% spp.fig, "color"])))
+group.fig <- unique(g1.ci.out$group)
+group.fig <- group.fig[order(group.fig)]
+colors.use <- as.vector(c(paste(spp.colors[spp.colors$Species %in% group.fig, "color"])))
 		
 		
-		ggplot(data=ci.out[ci.out$Effect %in% c("tmean", "precip"), ]) + 
-			facet_wrap(Species~Effect, scales="free_x") +
-			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=Species), alpha=0.5) +
-			geom_line(aes(x=x, y=mean, color=Species)) +
+		ggplot(data=g1.ci.out[g1.ci.out$Effect %in% c("tmean", "precip"), ]) + 
+			facet_grid(Canopy.Class~Effect, scales="free_x") +
+			geom_line(aes(x=x, y=0), linetype="dashed")+
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group)) +
 			scale_color_manual(values=colors.use) +
 			scale_fill_manual(values=colors.use)
 		
-		ci.out$PlotID <- as.factor(substr(ci.out$spp.plot, 6, nchar(paste(ci.out$spp.plot)))) # adding a plotID factor
-		summary(ci.out)
+		ggplot(data=ci.out[ci.out$Effect %in% c("tmean", "precip"), ]) + 
+			facet_grid(Canopy.Class~Effect, scales="free_x") +
+			geom_line(aes(x=x, y=0), linetype="dashed")+
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group)) +
+			scale_color_manual(values=colors.use) +
+			scale_fill_manual(values=colors.use)
 		
-		ggplot(data=ci.out[ci.out$Effect == "dbh.recon", ]) + 
+		
+		
+		g1.ci.out$PlotID <- as.factor(substr(g1.ci.out$group.plot, 6, nchar(paste(g1.ci.out$group.plot)))) # adding a plotID factor
+		summary(g1.ci.out)
+		
+		ggplot(data=g1.ci.out[g1.ci.out$Effect == "dbh.recon", ]) + 
 			facet_wrap(~PlotID) +
-			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=Species), alpha=0.5) +
-			geom_line(aes(x=x, y=mean, color=Species)) +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group)) +
 			scale_color_manual(values=colors.use) +
 			scale_fill_manual(values=colors.use)
 
 #----------------------------------------------
-# Gam2 graphs
-n <- 100 
-data <- test
- 
-
-		n.out = n
-
-		new.dat <- data.frame(Model="harv_mmf_cc.test",
-							  Extent=as.factor(paste(min(data$Year), max(data$Year), sep="-")))
-		
-		# Figure out which vars are numeric vs. factor
-		vars.num <- vector()
-		for(v in predictors.all){
-			if(class(data[,v]) %in% c("numeric", "integer")) vars.num <- c(vars.num, v)
-		}
-		
-		# Getting the unique values of our factor variables and adding them to the data frame
-		for(v in predictors.all[!predictors.all %in% vars.num & !predictors.all=="Species"]){
-			# if v is a factor, merge all unique values into the dataframe
-			var.temp <- data.frame(x=unique(data[,v])) 
-			names(var.temp) <- v
-			new.dat <- merge(new.dat, var.temp, all.x=T, all.y=T)
-		}
-		# getting species from species.plot
-		new.dat$Species <- as.factor(substr(new.dat$spp.plot, 1, 4))
-		
-		# Putting the numerical variables into an array and adding it in 
-		var.temp <- data.frame(array(dim=c(n.out, length(vars.num))))
-		names(var.temp) <- vars.num
-		for(v in vars.num){
-			var.temp[,v] <- seq(min(data[,v], na.rm=T), max(data[,v], na.rm=T), length.out=n.out)
-		}								
-		new.dat <- merge(new.dat, var.temp, all.x=T, all.y=T)
-		summary(new.dat)
-								
+# GAM 2								
 		# SOurce & run the function
 		source("0_Calculate_GAMM_Posteriors.R")
-		ci.terms.pred2 <- post.distns(model.gam=gam2, model.name="harv_mmf_cc.test", n=n, newdata=new.dat, vars=predictors.all, terms=T)
+		g2.ci.terms.pred2 <- post.distns(model.gam=gam2, model.name="harv_mmf_cc.test", n=n, newdata=new.dat, vars=predictors.all, terms=T)
 		
-		ci.out2 <- ci.terms.pred2$ci # separting out the confidence interval 
-		ci.out2[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
-		ci.out2$x <- as.numeric(ci.out$x) # making x numeric; will make factors NA
-		summary(ci.out2)
+		g2.ci.out2 <- g2.ci.terms.pred2$ci # separting out the confidence interval 
+		g2.ci.out2[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
+		g2.ci.out2$x <- as.numeric(g2.ci.out2$x) # making x numeric; will make factors NA
+		summary(g2.ci.out2)
 		
-		ggplot(data=ci.out2[ci.out2$Effect %in% c("tmean", "precip"), ]) + 
+		ggplot(data=g2.ci.out2[g2.ci.out2$Effect %in% c("tmean", "precip"), ]) + 
 			facet_wrap(~Effect, scales="free_x") +
 			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=Canopy.Class), alpha=0.5) +
 			geom_line(aes(x=x, y=mean, color=Canopy.Class))
 		
-		ci.out2$PlotID <- as.factor(substr(ci.out$spp.plot, 6, nchar(paste(ci.out$spp.plot)))) # adding a plotID factor
-		summary(ci.out2)
+		g2.ci.out2$PlotID <- as.factor(substr(g2.ci.out2$group.plot, 6, nchar(paste(g2.ci.out2$group.plot)))) # adding a plotID factor
+		summary(g2.ci.out2)
 		
-		ggplot(data=ci.out2[ci.out2$Effect == "dbh.recon", ]) + 
-			#facet_wrap(~PlotID) +
-			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=Canopy.Class), alpha=0.5) +
-			geom_line(aes(x=x, y=mean, color=Canopy.Class))
+		ggplot(data=g2.ci.out2[g2.ci.out2$Effect == "dbh.recon", ]) + 
+			facet_wrap(Canopy.Class~PlotID) +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group))
 
 
- 
- 
+ #----------------------------------------------
+# GAM 3								
+		# SOurce & run the function
+"processed_data/gam_results/gam3_climate_by_canopyclass_interactions.Rdata"
+load("processed_data/gam_results/gam3_climate_by_canopyclass_interactions.Rdata")		
+		source("0_Calculate_GAMM_Posteriors.R")
+		g3.ci.terms.pred <- post.distns(model.gam=gam3, model.name="harv_mmf_cc.test", n=n, newdata=new.dat, vars=predictors.all, terms=T)
+		
+		g3.ci.out <- g3.ci.terms.pred$ci # separting out the confidence interval 
+		g3.ci.out[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
+		g3.ci.out$x <- as.numeric(g3.ci.out$x) # making x numeric; will make factors NA
+		summary(g3.ci.out)
+		
+		ggplot(data=g3.ci.out[g3.ci.out$Effect %in% c("tmean", "precip"), ]) + 
+			facet_wrap(Canopy.Class~Effect, scales="free_x") +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group))
+
+ci.terms.graph <- g3.ci.out
+ci.terms.graph[ci.terms.graph$mean<(-13),"mean"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr<(-13),"lwr"] <- -13
+ci.terms.graph[ci.terms.graph$upr<(-13),"upr"] <- -13 
+ci.terms.graph[which(ci.terms.graph$mean>8),"mean"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr>(8),"lwr"] <- 8 
+ci.terms.graph[ci.terms.graph$upr>(8),"upr"] <- 8 
+
+			
+# Oaks only
+			
+pdf("figures/oak_climate_effects.pdf", width= 13, height = 8.5)		
+		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean", "precip") & substr(ci.terms.graph$group.cc, 1,2)=="QU", ]) + 
+			facet_grid(Canopy.Class~Effect, scales="free_x") +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group))+
+			scale_color_manual(values=c("#E69F00", "#0072B2", "#009E73")) +
+			scale_fill_manual(values=c("#E69F00", "#0072B2", "#009E73")) +
+			poster.theme2+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", "y"^"-1",")"))))
+dev.off()			
+			
+		
+		g3.ci.out$PlotID <- as.factor(substr(g3.ci.out$group.plot, 6, nchar(paste(g3.ci.out$group.plot)))) # adding a plotID factor
+		summary(g3.ci.out)
+		
+		ggplot(data=g3.ci.out[g3.ci.out$Effect == "dbh.recon", ]) + 
+			facet_wrap(~PlotID) +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group))
+
+pdf("figures/oak_size_effects.pdf", width= 13, height = 8.5)		
+	ggplot(data=g3.ci.out[g3.ci.out$Effect == "dbh.recon" & substr(g3.ci.out$group.cc, 1,2)=="QU", ]) + 
+			facet_grid(~Canopy.Class) +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group)) +
+			scale_color_manual(values=c("#E69F00", "#0072B2", "#009E73")) +
+			scale_fill_manual(values=c("#E69F00", "#0072B2", "#009E73")) +
+			poster.theme2+
+			labs(x = "DBH (cm)", y = expression(bold(paste("Effect on BAI (mm"^"2", "y"^"-1",")"))))
+ dev.off()

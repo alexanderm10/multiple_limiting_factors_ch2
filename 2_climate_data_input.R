@@ -37,7 +37,7 @@ climate.use <- data.frame(Site = t.mean2$Site.Name,
 						  Year = t.mean2$Year)
 summary(climate.use)
 
-write.csv(climate.use, file="processed_data/climate_use.csv", row.names=F)						  
+write.csv(climate.use, file="processed_data/climate_growing_season.csv", row.names=F)						  
 
 
 ####################################################
