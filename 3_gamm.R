@@ -30,7 +30,7 @@ summary(test)
 
 
 # Get a list of what predictors & responses I'm using
-predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc")
+predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc") 
 
 # Getting rid of observations that have NAs in the important variables
 test <- test[complete.cases(test[,predictors.all]),]
@@ -47,6 +47,9 @@ summary(test)
 par(new=F)
 plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], type="l")
 
+
+test$log.dbh <- log(test$dbh.recon)
+summary(test)
 
 summary(test)
 summary(test$Live.Dead)
@@ -70,10 +73,14 @@ summary(test$Canopy.Class)
 
 
 # test2 <- test[test$group %in% c("QURU", "ACRU") & test$Year>=1980,]
-test2 <- test[test$group %in% c("QURU", "ACRU"),]
+# test2 <- test[test$group %in% c("QURU", "ACRU"),]
+test2 <- test[test$Site %in% "Morgan Monroe State Park",]
+# test2$log.dbh <- log(test2$dbh.recon)
+# summary(test2)
+
 
 summary(test)
-
+test[test$BA.inc==0, "BA.inc"] <- 1e-6
 # test.gam3 <- test
 # test.gam3$Canopy.Class <- recode(test.gam3$Canopy.Class, "'C' = 'D'")
 # summary(test.gam3)
@@ -82,21 +89,21 @@ summary(test)
 ################################################### 
 # RW ~ CLIMATE(Species) + Size
                   
-gam1 <- gamm(BA.inc~ s(tmean, k=3, by=group) +
+gam1 <- gamm(log(BA.inc)~ s(tmean, k=3, by=group) +
                   s(precip, k=3, by=group) +
                   s(dbh.recon, k=3, by=group) +
                    Canopy.Class,
                   random=list(Site=~1, PlotID=~1),
-                  data=test)
+                  data=test, control=list(niterEM=0, sing.tol=1e-20, opt="optim"))
 
 
                   
-gam1.test <- gamm(BA.inc ~ s(tmean, k=3, by=group) + # tmean*Species 
-                  s(precip, k=3, by=group) +
-                  s(dbh.recon, k=3, by=group.plot) +
-                  Canopy.Class, 
-                  random=list(Site =~1, PlotID=~1),
-                  data=test2)
+# # gam1.test <- gamm(BA.inc ~ s(tmean, k=3, by=group) + # tmean*Species 
+                  # s(precip, k=3, by=group) +
+                  # s(log.dbh, k=3, by=group.plot) +
+                  # Canopy.Class, 
+                  # random=list(Site =~1, PlotID=~1),
+                  # data=test2)
              
 
 save(gam1, file="processed_data/gam_results/gam1_climate_by_species.Rdata")
@@ -105,16 +112,21 @@ save(gam1, file="processed_data/gam_results/gam1_climate_by_species.Rdata")
 # s(tmean, by=Spp) + s(tmean, by=Canopy) + s(tmean, by=Spp.Can)
 
                   
-gam2 <- gamm(BA.inc~ s(tmean, k=3, by=Canopy.Class) +
+gam2 <- gamm(log(BA.inc)~ s(tmean, k=3, by=Canopy.Class) +
                   s(precip, k=3, by=Canopy.Class) +
                   s(dbh.recon, k=3, by=group) +
                   group,
                   random=list(Site=~1, PlotID=~1),
                   data=test)                  
                   
-
+# # gam2.test <- gamm(BA.inc~ s(tmean, k=3, by=Canopy.Class) +
+                  # s(precip, k=3, by=Canopy.Class) +
+                  # s(log.dbh, k=3, by=group) +
+                  # group,
+                  # random=list(Site=~1, PlotID=~1),
+                  # data=test2)  
  
-gam3 <- gamm(BA.inc~ s(tmean, k=3, by=group.cc) +
+gam3 <- gamm(log(BA.inc)~ s(tmean, k=3, by=group.cc) +
                   s(precip, k=3, by=group.cc) +
                   s(dbh.recon, k=3, by=group.cc) +
                   Canopy.Class + group,
@@ -195,24 +207,76 @@ summary(spp.colors)
 group.fig <- unique(g1.ci.out$group)
 group.fig <- group.fig[order(group.fig)]
 colors.use <- as.vector(c(paste(spp.colors[spp.colors$Species %in% group.fig, "color"])))
+
+ci.terms.graph <- g1.ci.out
+ci.terms.graph[ci.terms.graph$mean<(-15),"mean"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr<(-15),"lwr"] <- -15
+ci.terms.graph[ci.terms.graph$upr<(-15),"upr"] <- -15 
+ci.terms.graph[which(ci.terms.graph$mean>10),"mean"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr>(10),"lwr"] <- 10 
+ci.terms.graph[ci.terms.graph$upr>(10),"upr"] <- 10 
 		
-		
-		ggplot(data=g1.ci.out[g1.ci.out$Effect %in% c("tmean", "precip"), ]) + 
+pdf("figures/gam1_sensitivities.pdf", width= 13, height = 8.5)		
+		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean", "precip", "dbh.recon"), ]) + 
+			facet_grid(~Effect, scales="free_x") +
+			geom_line(aes(x=x, y=0), linetype="dashed")+
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group)) +
+			scale_color_manual(values=colors.use) +
+			scale_fill_manual(values=colors.use)+
+			poster.theme2+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", 							"y"^"-1",")"))))
+dev.off()
+
+pdf("figures/gam1_sensitivities_Size.pdf", width= 13, height = 8.5)		
+		ggplot(data=ci.terms.graph[ (ci.terms.graph$Effect=="dbh.recon" & ci.terms.graph$x<=50),]) + 
+			facet_wrap(~group, scales="free_x") +
+			geom_line(aes(x=x, y=0), linetype="dashed")+
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group)) +
+			scale_color_manual(values=colors.use) +
+			scale_fill_manual(values=colors.use)+
+			poster.theme2+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", 							"y"^"-1",")"))))
+dev.off()
+
+
+
+pdf("figures/gam1_sensitivities_ACRU.pdf", width= 13, height = 8.5)					
+	ggplot(data=ci.terms.graph[ci.terms.graph$group %in% "ACRU" & (ci.terms.graph$Effect %in% c("tmean", "precip") | (ci.terms.graph$Effect=="dbh.recon" & ci.terms.graph$x<=50)),]) + 
+			facet_grid(~Effect, scales="free_x") +
+			geom_line(aes(x=x, y=0), linetype="dashed")+
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=Effect), alpha=0.4) +
+			geom_line(aes(x=x, y=mean, color=Effect)) +
+			scale_color_manual(values= c("red", "blue", "green")) +
+			scale_fill_manual(values=c("red", "blue", "green"))+
+			poster.theme2+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", 							"y"^"-1",")"))))
+dev.off()
+
+
+
+
+
+ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% "tmean", ]) + 
+			facet_grid(~Effect, scales="free_x") +
+			geom_line(aes(x=x, y=0), linetype="dashed")+
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group)) +
+			scale_color_manual(values=colors.use) +
+			scale_fill_manual(values=colors.use)
+			
+			ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% "precip", ]) + 
 			facet_grid(Canopy.Class~Effect, scales="free_x") +
 			geom_line(aes(x=x, y=0), linetype="dashed")+
 			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
 			geom_line(aes(x=x, y=mean, color=group)) +
 			scale_color_manual(values=colors.use) +
 			scale_fill_manual(values=colors.use)
+
+			
 		
-		ggplot(data=ci.out[ci.out$Effect %in% c("tmean", "precip"), ]) + 
-			facet_grid(Canopy.Class~Effect, scales="free_x") +
-			geom_line(aes(x=x, y=0), linetype="dashed")+
-			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
-			geom_line(aes(x=x, y=mean, color=group)) +
-			scale_color_manual(values=colors.use) +
-			scale_fill_manual(values=colors.use)
-		
+				
 		
 		
 		g1.ci.out$PlotID <- as.factor(substr(g1.ci.out$group.plot, 6, nchar(paste(g1.ci.out$group.plot)))) # adding a plotID factor
@@ -235,20 +299,28 @@ colors.use <- as.vector(c(paste(spp.colors[spp.colors$Species %in% group.fig, "c
 		g2.ci.out2[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
 		g2.ci.out2$x <- as.numeric(g2.ci.out2$x) # making x numeric; will make factors NA
 		summary(g2.ci.out2)
-		
+
+pdf("figures/gam2_sensitivities.pdf", width= 13, height = 8.5)		
 		ggplot(data=g2.ci.out2[g2.ci.out2$Effect %in% c("tmean", "precip"), ]) + 
 			facet_wrap(~Effect, scales="free_x") +
 			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=Canopy.Class), alpha=0.5) +
-			geom_line(aes(x=x, y=mean, color=Canopy.Class))
-		
+			geom_line(aes(x=x, y=mean, color=Canopy.Class))+
+			scale_color_manual(values=c("#0072B2", "#009E73", "#E69F00")) +
+			scale_fill_manual(values=c("#0072B2", "#009E73",  "#E69F00")) +
+			poster.theme2+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", 							"y"^"-1",")"))))
+dev.off()		
 		g2.ci.out2$PlotID <- as.factor(substr(g2.ci.out2$group.plot, 6, nchar(paste(g2.ci.out2$group.plot)))) # adding a plotID factor
 		summary(g2.ci.out2)
-		
-		ggplot(data=g2.ci.out2[g2.ci.out2$Effect == "dbh.recon", ]) + 
-			facet_wrap(Canopy.Class~PlotID) +
+pdf("figures/gam2_sensitivities_size.pdf", width = 13, height= 8.5)		
+		ggplot(data=g2.ci.out2[g2.ci.out2$Effect == "dbh.recon" & g2.ci.out2$x<=50, ]) + 
+			facet_wrap(~group) +
 			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
-			geom_line(aes(x=x, y=mean, color=group))
-
+			geom_line(aes(x=x, y=mean, color=group)) +
+			scale_color_manual(values=colors.use) +
+			scale_fill_manual(values=colors.use)+
+			poster.theme2
+dev.off()
 
  #----------------------------------------------
 # GAM 3								
@@ -263,10 +335,35 @@ load("processed_data/gam_results/gam3_climate_by_canopyclass_interactions.Rdata"
 		g3.ci.out$x <- as.numeric(g3.ci.out$x) # making x numeric; will make factors NA
 		summary(g3.ci.out)
 		
-		ggplot(data=g3.ci.out[g3.ci.out$Effect %in% c("tmean", "precip"), ]) + 
-			facet_wrap(Canopy.Class~Effect, scales="free_x") +
+ci.terms.graph <- g3.ci.out
+ci.terms.graph[ci.terms.graph$mean<(-2.5),"mean"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr<(-2.5),"lwr"] <- -2.5
+ci.terms.graph[ci.terms.graph$upr<(-2.5),"upr"] <- -2.5 
+ci.terms.graph[which(ci.terms.graph$mean>2.5),"mean"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr>(2.5),"lwr"] <- 2.5 
+ci.terms.graph[ci.terms.graph$upr>(2.5),"upr"] <- 2.5 
+
+pdf("figures/gam3_sensitivities.pdf", width= 13, height = 8.5)
+		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean", "precip"), ]) + 
+			facet_grid(Canopy.Class~Effect, scales="free_x") +
 			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
-			geom_line(aes(x=x, y=mean, color=group))
+			geom_line(aes(x=x, y=mean, color=group))+
+			poster.theme2+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", 							"y"^"-1",")"))))
+dev.off()
+
+pdf("figures/gam3_sensitivities_size.pdf", width= 13, height = 8.5)
+		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% "dbh.recon" & ci.terms.graph$x<=50, ]) + 
+			facet_wrap(~group.cc, scales="free_x") +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=group), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=group))+
+			#poster.theme2+
+			scale_color_manual(values=colors.use) +
+			scale_fill_manual(values=colors.use)+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", 							"y"^"-1",")"))))
+dev.off()
+
+
 
 ci.terms.graph <- g3.ci.out
 ci.terms.graph[ci.terms.graph$mean<(-13),"mean"] <- NA 

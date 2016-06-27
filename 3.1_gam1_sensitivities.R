@@ -140,7 +140,7 @@ source("0_Calculate_GAMM_Weights.R")
 # summary(test2)
 # gam1.test <- gamm(RW ~ s(tmean, k=3, by=group) + # tmean*Species 
 #                   s(precip, k=3, by=group) +
-#                   s(dbh.recon, k=3, by=group.plot) +
+#                   s(log.dbh, k=3, by=group.plot) +
 #                   Canopy.Class, 
 #                   random=list(Site=~1, PlotID=~1),
 #                   data=test2)

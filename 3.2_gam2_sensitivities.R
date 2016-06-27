@@ -1,4 +1,4 @@
-################################################### 
+ ################################################### 
 # Copied over from 0_process_gamm.R
 # This will give us the sensitivities of RW in a pretty format.
 
@@ -96,7 +96,7 @@ n <- 10
 data.use2 <- data.use[data.use$Site %in% sites.use,]
 data.use2 <- data.use2[data.use2$group %in% group.use,]
 
-sanity2.trees <- sample(test2$TreeID, size=n, replace=F) 
+sanity2.trees <- sample(st$TreeID, size=n, replace=F) 
 summary(sanity2.trees)
 
 summary(mean.rw)
@@ -112,6 +112,7 @@ ggplot(data=test[test$TreeID %in% sanity2.trees,]) + facet_wrap(TreeID~ Site, sc
 	# Plot our model
 	#geom_ribbon(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, ymin=rw.lwr, ymax=rw.upr), fill="red3", alpha=0.3) +
 	geom_line(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, y=mean), color="red3", alpha=0.8, size=1) +
+	geom_hline(yintercept=0, linetype="dashed")+
 	labs(title="Gamm Model vs. Data Indiv. Trees", x="Year", y="RW")
 dev.off()
 
@@ -151,7 +152,7 @@ vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group",
 gam2.weights <- factor.weights(model.gam = gam2, model.name = "species_response", newdata = test, extent = "", vars = vars, limiting=T)
 
 summary(gam2.weights)
-summary(test2)
+summary(test)
 gam2.weights[,c("BA.inc", "group", "Canopy.Class")] <- test[,c("BA.inc", "group", "Canopy.Class")] # Adding in factors we forgot
 
 

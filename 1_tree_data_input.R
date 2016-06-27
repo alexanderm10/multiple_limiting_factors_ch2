@@ -11,7 +11,7 @@ se <- function(x){
 
 #load in core details data sheet.  Has living/dead, pith info, measurement info.
 #loading the dplR to use the basal area reconstruction functions.
-core.data <- read.csv("raw_input_files/DOE_AllSites_core_data.csv", na.strings=c("", "NA", "#VALUE!", "*", " "), header=T)
+core.data <- read.csv("~/PhD/Carbon Research/Calloc_TreeRingNPP/processed_data/DOE_core_data_may2016_update.csv", na.strings=c("", "NA", "#VALUE!", "*", " "), header=T)
 summary(core.data)
 
 
@@ -19,7 +19,9 @@ summary(core.data)
 write.csv(core.data, file="processed_data/core_data.csv", row.names=F)
 
 #importing the diameter files of all trees sampled: includes tree id, spp, plot assignment, and DBH 
-tree.data <- read.csv("raw_input_files/DOE_AllSitesTreeData.csv", na.strings=c("", "NA", "#VALUE!", "*"), header=T)
+tree.data <- read.csv("~/PhD/Carbon Research/Calloc_TreeRingNPP/processed_data/DOE_tree_data_may2016_update.csv", na.strings=c("", "NA", "#VALUE!", "*"), header=T)
+
+write.csv(tree.data, file="processed_data/tree_data.csv", row.names=F)
 
 summary(tree.data)
 
@@ -30,7 +32,9 @@ summary(tree.data)
 # Load in Ross DOE ring widths from the east
 # importing ring widths of dated samples 
 
-tree.rw <- read.csv("raw_input_files/DOE_AllSites_Gapfilled.csv", header=T)
+tree.rw <- read.csv("~/PhD/Carbon Research/Calloc_TreeRingNPP/processed_data/DOE_AllSites_may2016_Gapfilled.csv", header=T)
+
+write.csv(tree.rw, file="processed_data/tree_rw.csv", row.names=F)
 
 summary(tree.rw)
 
@@ -38,7 +42,8 @@ summary(tree.rw)
 # Getting dbh reconstruction
 ##################################################################
 
-dbh.recon <- read.csv("processed_data/DOE_Allsites_GapFilling_DBHrecon_ALL.csv", header=T, row.names=1)
+dbh.recon <- read.csv("~/PhD/Carbon Research/Calloc_TreeRingNPP/processed_data/DOE_Allsites_may2016_updateGapFilling_DBHrecon_ALL.csv", header=T, row.names=1)
+write.csv(dbh.recon, file="processed_data/dbh_recon.csv", row.names=F)
 
 summary(dbh.recon)
 row.names(dbh.recon)

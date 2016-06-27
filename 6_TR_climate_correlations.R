@@ -53,8 +53,8 @@ plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], 
 summary(test)
 
 
-# Truncatign at 1950
-test <- test[test$Year >= 1950 & test$Year <= 2012,]
+# Truncatign at 1935; at 1935 the sample depth for the oak openings is only 1
+test <- test[test$Year >= 1935 & test$Year <= 2012,]
 
 tree.rw <- test
 summary(tree.rw)
@@ -63,7 +63,7 @@ summary(test)
 
 
 
-save(test, file="processed_data/test_tree_data_1950_2012.Rdata")
+save(test, file="processed_data/test_tree_data_1935_2012.Rdata")
 
 sites.rw <- list()
 
@@ -94,10 +94,10 @@ site.chron <- list()
 for(s in names(sites.i)){
 	
 	site.chron[[s]] <- chron(sites.i[[s]][,2:ncol(sites.i[[s]])], prefix = substr(s, 1, 3), prewhiten = T) 
-	site.chron[[s]][,"Year"]<- c(1950:2012) 
+	site.chron[[s]][,"Year"]<- c(1935:2012) 
 }
 
-summary(site.chron)
+summary(site.chron[[5]])
 
 
 # Making each site it's own dataframe
@@ -110,6 +110,36 @@ misso.crn <- as.data.frame(site.chron[[3]])
 mmf.crn <- as.data.frame(site.chron[[4]])
 
 oakop.crn <- as.data.frame(site.chron[[5]])
+
+
+# Plotting thigns for presentation
+par(cex=2 )
+plot(mmf.crn$Morres ~ mmf.crn$Year, type="l", lwd=5, axes=F, cex=6, col="white")
+abline(h=1,lty="dashed", col="white")
+axis(side =1,tck= 0.05) 
+axis(side=2,tck=0.05)
+
+#Plotting out mmfsites
+summary(test)
+
+mmf <- test[test$Site %in% "Morgan Monroe State Park",]
+
+summary(mmf)
+
+for(i in unique(mmf$Year)){
+  mmf[mmf$Year==i,"Mean"] <- mean(mmf[mmf$Year==i,"RW"])
+  mmf[mmf$Year==i,"UB"] <- quantile(mmf[mmf$Year==i,"RW"], 0.975)
+  mmf[mmf$Year==i,"LB"] <- quantile(mmf[mmf$Year==i,"RW"], 0.025)
+}
+
+summary(mmf)
+
+ggplot(data=mmf)+
+  # geom_line(aes(x=Year, y=RW))
+  geom_ribbon(aes(x=Year, ymin=LB, ymax=UB), alpha=0.5, fill="white")+
+  geom_line(aes(x=Year, y=Mean), size=2, color="white")+
+  poster.theme2
+  
 
 
 
@@ -137,7 +167,7 @@ climate.use <- read.csv("processed_data/climate_growing_season.csv")
 summary(climate.use)
 
 climate.use <- climate.use[climate.use$Site %in% sites.use,]
-climate.use <- climate.use[climate.use$Year>=1950 & climate.use$Year <=2012,]
+climate.use <- climate.use[climate.use$Year>=1935 & climate.use$Year <=2012,]
 
 climate.site <- list()
 
@@ -236,8 +266,8 @@ clim.cor4$site <- as.factor(clim.cor4$site)
 clim.cor4$type <- as.factor(clim.cor4$type)
 clim.cor4$cor <- as.numeric(clim.cor4$cor)
 
-# Sig value for 61 df = 0.209
-clim.cor4$sig <- ifelse(clim.cor4$cor < -0.246 | clim.cor4$cor > 0.246, "Y", "N")
+# Sig value for 81 df = 0.209
+clim.cor4$sig <- ifelse(clim.cor4$cor < -0.2245 | clim.cor4$cor > 0.2245, "Y", "N")
 clim.cor4$sig <- factor(clim.cor4$sig, levels = c("Y", "N"))
 
 clim.cor4$site <- factor(clim.cor4$site, levels = c("Missouri", "Morgan-Monroe", "Oak-Openings", "Harvard", "Howland"))
@@ -250,8 +280,8 @@ clim.cor4$Site <- factor(clim.cor4$Site, levels = c("MO", "IN", "OH", "MA", "ME"
 pdf("figures/site_correlations.pdf", width= 13, height = 8.5)
 ggplot(data=clim.cor4[clim.cor4$type=="std",]) + facet_grid(var~. , scales="free_x") +
 	geom_bar(aes(x=Site, y=cor, fill=sig), stat="identity", position="dodge", colour="black") +
-	geom_hline(yintercept=0.209, linetype="dashed") + 
-	geom_hline(yintercept=-0.209, linetype="dashed") + 	
+	geom_hline(yintercept=0.2245, linetype="dashed") + 
+	geom_hline(yintercept=-0.2245, linetype="dashed") + 	
 	geom_hline(yintercept=0, linetype="solid") +
 	scale_fill_manual(values= c("green", "grey50")) + 
 	poster.theme2
@@ -273,11 +303,11 @@ precip <- read.csv("processed_data/ch2_precip.csv", header=T)
 
 summary(t.mean)
 
-# Limiting time frame--1950-2012
-t.mean <- t.mean[t.mean$Year >= 1951 & t.mean$Year <= 2012,]
-t.min <- t.min[t.min$Year >= 1951 & t.min$Year <= 2012,]
-t.max <- t.max[t.max$Year >= 1951 & t.max$Year <= 2012,]
-precip <- precip[precip$Year >= 1951 & precip$Year <= 2012,]
+# Limiting time frame--1935-2012
+t.mean <- t.mean[t.mean$Year >= 1936 & t.mean$Year <= 2012,]
+t.min <- t.min[t.min$Year >= 1936 & t.min$Year <= 2012,]
+t.max <- t.max[t.max$Year >= 1936 & t.max$Year <= 2012,]
+precip <- precip[precip$Year >= 1936 & precip$Year <= 2012,]
 summary(t.mean)
 summary(t.min)
 summary(t.max)
@@ -302,7 +332,7 @@ precip$Site.Name <- recode(precip$Site.Name, "'Missouri Ozark' = 'Missouri'; 'Mo
 summary(sites.crn)
 sites.crn$Year <- site.chron[[1]][,"Year"]
 head(sites.crn)
-sites.crn <- sites.crn[sites.crn$Year > 1950,]
+sites.crn <- sites.crn[sites.crn$Year > 1935,]
 
 
 #--------------------------------------------
@@ -526,8 +556,8 @@ summary(all.sites.precip)
 all.sites.climate <- rbind(all.sites.precip, all.sites.tmax, all.sites.tmin, all.sites.tmean)
 summary(all.sites.climate)
 
-# Sig value for 61 df = 0.209
-all.sites.climate$sig <- ifelse(all.sites.climate$cor < -0.25 | all.sites.climate$cor > 0.25, "Y", "N")
+# Sig value for 75 df = 0.2245
+all.sites.climate$sig <- ifelse(all.sites.climate$cor < -0.2245 | all.sites.climate$cor > 0.2245, "Y", "N")
 all.sites.climate$sig <- factor(all.sites.climate$sig, levels = c("Y", "N"))
 
 
@@ -535,14 +565,35 @@ all.sites.climate$month <- factor(all.sites.climate$month, levels = c("pJan", "p
 
 all.sites.climate$Site <- factor(all.sites.climate$Site, levels = c("Missouri", "MMF", "Oak_openings", "Harvard", "Howland"))
 
-pdf("figures/site_correlations_allmonths.pdf", width= 13, height = 8.5)
-ggplot(data=all.sites.climate) + facet_grid(Site ~ type ) +
+pdf("figures/site_correlations_allmonths_short.pdf", width= 13, height = 8.5)
+ggplot(data=all.sites.climate[all.sites.climate$month %in% c("pOct", "pNov", "pDec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "spring", "summer", "pfall", "winter", "grow.seas"),]) + facet_grid(Site ~ type ) +
 	geom_bar(aes(x=month, y=cor, fill=sig), stat="identity", position="dodge", colour="black") +
-	geom_hline(yintercept=0.25, linetype="dashed") + 
-	geom_hline(yintercept=-0.25, linetype="dashed") + 	
+	geom_hline(yintercept=0.2245, linetype="dashed") + 
+	geom_hline(yintercept=-0.2245, linetype="dashed") + 	
 	geom_hline(yintercept=0, linetype="solid") +
 	scale_fill_manual(values= c("green", "grey50"))+
 	theme(axis.text.x = element_text(angle = 45, hjust = 1))
 dev.off()
 
+summary(all.sites.climate$month)
 
+cbbPalette <- c("#009E73", "#e79f00", "#9ad0f3", "#0072B2", "#D55E00")
+
+all.sites.climate$type <- factor(all.sites.climate$type, levels=c("tmean", "precip", "tmin", "tmax"))
+pdf("figures/site_correlations_growing season.pdf", width= 13, height = 8.5)
+ggplot(data=all.sites.climate[all.sites.climate$month %in% "grow.seas" & all.sites.climate$type %in% c("tmean", "precip"),]) + facet_grid(~type) +
+  geom_bar(aes(x=month, y=cor, color=Site), stat="identity", position="dodge", fill=NA) +
+  geom_bar(aes(x=month, y=cor, color=Site), stat="identity", position="dodge", fill=NA) +
+  geom_bar(aes(x=month, y=cor, fill=Site, alpha=sig), stat="identity", position="dodge") +
+  geom_hline(yintercept=0.2245, linetype="dashed") + 
+  geom_hline(yintercept=-0.2245, linetype="dashed") + 	
+  geom_hline(yintercept=0, linetype="solid") +
+ # scale_fill_manual(values= cbbPalette)+
+  scale_color_manual(values=cbbPalette) +
+  scale_fill_manual(values=cbbPalette) +
+  scale_alpha_manual(values = c(1, 0.2))+
+  poster.theme2 +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),panel.grid.major=element_blank(), panel.grid.minor= element_blank(), panel.border= element_blank(), panel.background= element_blank()) +
+  labs(title= "TR Site Climate Correlations", x="Seasons", y=expression(bold(paste("Correlation Value (r)"))))
+
+dev.off()

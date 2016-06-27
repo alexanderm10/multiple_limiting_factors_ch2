@@ -9,6 +9,11 @@ summary(gam3.weights)
 factors.fits <- c("fit.tmean", "fit.precip", "fit.dbh.recon", "fit.full", "BA.inc")
 factors.weights <- c("weight.tmean", "weight.dbh.recon", "weight.precip")
 
+# Transforming things back to BA.inc rather than log
+gam3.weights[,which(substr(names(gam3.weights),1,3)=="fit")] <- exp(gam3.weights[,which(substr(names(gam3.weights),1,3)=="fit")] )
+
+
+
 
 othervars <- c("Year", "Site", "group.cc", "Model")
 

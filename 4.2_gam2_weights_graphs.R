@@ -6,6 +6,10 @@ summary(gam2.weights)
 factors.fits <- c("fit.tmean", "fit.precip", "fit.dbh.recon", "fit.full", "BA.inc")
 factors.weights <- c("weight.tmean", "weight.dbh.recon", "weight.precip")
 
+# Transforming things back to BA.inc rather than log
+gam2.weights[,which(substr(names(gam2.weights),1,3)=="fit")] <- exp(gam2.weights[,which(substr(names(gam2.weights),1,3)=="fit")] )
+
+
 
 othervars <- c("Year", "Site", "Canopy.Class", "Model")
 
@@ -53,8 +57,8 @@ data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "M
 # Plotting the Obs and modeled with influence coloring
 pdf("figures/gam2_canopyclass_BAI_limiting_factors.pdf", width= 13, height = 8.5)
 ggplot(data.graph) + facet_grid(Canopy.Class~State) +
-	scale_x_continuous(expand=c(0,0), name="Year") +
-	scale_y_continuous(expand=c(0,0), name="BAI") +
+	scale_x_continuous(expand=c(0,0)) +
+	scale_y_continuous(expand=c(0,0)) +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
 	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
 	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
@@ -85,7 +89,9 @@ ggplot(data.graph) + facet_grid(Canopy.Class~State) +
 	plot.rgb("OH", "C", 3) +
 	plot.rgb("OH", "D", 3) +
 	plot.rgb("OH", "I", 3) +
-	plot.rgb("OH", "S", 3)
+	plot.rgb("OH", "S", 3)+
+	labs(title= "Canopy Class", x="Year", y = expression(bold(paste("BAI (mm"^"2", "y"^"-1",")")))) +
+	poster.theme2
 dev.off()		
 # Just plotting the BAI fits
 summary(data.graph)
