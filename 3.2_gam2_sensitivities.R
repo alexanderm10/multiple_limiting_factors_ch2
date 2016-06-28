@@ -66,14 +66,22 @@ summary(mean.model)
 mean.model2 <- mean.model
 names(mean.model2)[4:6] <- c("mod.mean", "mod.lwr", "mod.up")
 
-sanity.gam1.df <- merge(mean.model2, mean.rw, all.x=T, all.y=T)
-summary(sanity.gam1.df)
-summary(sanity.gam1.df[is.na(sanity.gam1.df$mod.mean),])
-head(sanity.gam1.df[is.na(sanity.gam1.df$mod.mean),])
+summary(mean.model2)
+
+sanity.gam2.df <- merge(mean.model2, mean.rw, all.x=T, all.y=T)
+summary(sanity.gam2.df)
+
+sanity.gam2.df$log.BAI <- log(sanity.gam2.df$BAI.mean)
+summary(sanity.gam2.df[is.na(sanity.gam1.df$mod.mean),])
+head(sanity.gam2.df[is.na(sanity.gam1.df$mod.mean),])
 
 # LM on aggregated BAI
-sanity.lm1 <- lm(mod.mean ~ BAI.mean, data=sanity.gam1.df)
-summary(sanity.lm1)
+sanity.lm2 <- lm(mod.mean ~ log.BAI, data=sanity.gam2.df)
+gam2.resid <- resid(sanity.lm2)
+summary(sanity.lm2)
+
+plot(sanity.gam2.df$log.BAI ~ gam2.resid, xlab="Log BAI", ylab="Residuals", main="Gam2 Residuals", ylim=c(-4,4))
+abline(0,0)
 
 
 # Sanity Check #1 graph
@@ -83,8 +91,8 @@ ggplot(data=mean.rw) + facet_wrap(Canopy.Class ~ Site, scales="fixed") + theme_b
 	geom_ribbon(aes(x=Year, ymin=BAI.lwr, ymax=BAI.upr), alpha=0.5) +
 	geom_line(aes(x=Year, y=BAI.mean), size=1) +
 	# Plot our model
-	geom_ribbon(data=mean.model, aes(x=Year, ymin=BAI.lwr, ymax=BAI.upr), fill="red3", alpha=0.3) +
-	geom_line(data=mean.model, aes(x=Year, y=BAI.mean), color="red3", alpha=0.8, size=1) +
+	geom_ribbon(data=mean.model, aes(x=Year, ymin=exp(BAI.lwr), ymax=exp(BAI.upr)), fill="red3", alpha=0.3) +
+	geom_line(data=mean.model, aes(x=Year, y=exp(BAI.mean)), color="red3", alpha=0.8, size=1) +
 	labs(title="Gamm Model vs. Data", x="Year", y="BAI")
 dev.off()
 
@@ -92,7 +100,7 @@ dev.off()
 # Sanity Check #2
 # Pulling random trees from both the data.use and the model.pred2 to see how they compare
 
-n <- 10
+n <- 20
 data.use2 <- data.use[data.use$Site %in% sites.use,]
 data.use2 <- data.use2[data.use2$group %in% group.use,]
 
@@ -111,9 +119,9 @@ ggplot(data=test[test$TreeID %in% sanity2.trees,]) + facet_wrap(TreeID~ Site, sc
 	geom_line(aes(x=Year, y=BA.inc), size=1) +
 	# Plot our model
 	#geom_ribbon(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, ymin=rw.lwr, ymax=rw.upr), fill="red3", alpha=0.3) +
-	geom_line(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, y=mean), color="red3", alpha=0.8, size=1) +
+	geom_line(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, y=exp(mean)), color="red3", alpha=0.8, size=1) +
 	geom_hline(yintercept=0, linetype="dashed")+
-	labs(title="Gamm Model vs. Data Indiv. Trees", x="Year", y="RW")
+	labs(title="Gamm Model vs. Data Indiv. Trees", x="Year", y="BAI")
 dev.off()
 
 

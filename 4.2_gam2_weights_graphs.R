@@ -105,74 +105,78 @@ ggplot(data.graph) + facet_wrap(group~Site) +
   geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)
 
 # Plotting the Effects
+data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "ME"))
 
 pdf("figures/gam2_influence_in_time.pdf", width= 13, height = 8.5)
-ggplot(data.graph) + facet_grid(Canopy.Class~Site) +
+ggplot(data.graph) + facet_grid(Canopy.Class~State) +
 	scale_x_continuous(expand=c(0,0), name="Year") +
 	scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
 	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	geom_line(aes(x=Year, y=fit.tmean), size=2, color="red") +
-	geom_line(aes(x=Year, y=fit.precip), size=2, color="blue") +
-	geom_line(aes(x=Year, y=fit.dbh.recon), size=2, color="green")
+	geom_line(aes(x=Year, y=fit.tmean), size=1, color="red") +
+	geom_line(aes(x=Year, y=fit.precip), size=1, color="blue") +
+	geom_line(aes(x=Year, y=fit.dbh.recon), size=1, color="green")+
+	ylim(c(0,3))
 	
 dev.off()	
 
 
 
-#---------------------------------------------------
-# Plotting just MMF and Harvard for Ameridendro
+# #---------------------------------------------------
+# # Plotting just MMF and Harvard for Ameridendro
 
-sites.use2 <- c("Harvard", "Morgan Monroe State Park")
+# sites.use2 <- c("Harvard", "Morgan Monroe State Park")
 
-# Plotting the Obs and modeled with influence coloring
-pdf("figures/gam2_canopyclass_BAI_limiting_factors_ameridendro.pdf", width= 13, height = 8.5)
-ggplot(data.graph[data.graph$Site %in% sites.use2,]) + facet_grid(Canopy.Class~Site) +
-	scale_x_continuous(expand=c(0,0), name="Year") +
-	scale_y_continuous(expand=c(0,0), name="BAI") +
-	# facet_wrap(~TreeID, scales="free_y", space="free") +
-	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
-	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3) +
+# # Plotting the Obs and modeled with influence coloring
+# pdf("figures/gam2_canopyclass_BAI_limiting_factors_ameridendro.pdf", width= 13, height = 8.5)
+# ggplot(data.graph[data.graph$Site %in% sites.use2,]) + facet_grid(Canopy.Class~Site) +
+	# scale_x_continuous(expand=c(0,0), name="Year") +
+	# scale_y_continuous(expand=c(0,0), name="BAI") +
+	# # facet_wrap(~TreeID, scales="free_y", space="free") +
+	# # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+	# geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	# geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3) +
 	
-	geom_line(aes(x=Year, y = 0), linetype="dashed") +
-	plot.rgb("Harvard", "C", 3) +
-	plot.rgb("Harvard", "D", 3) +
-	plot.rgb("Harvard", "I", 3) +
-	plot.rgb("Harvard", "S", 3) +
+	# geom_line(aes(x=Year, y = 0), linetype="dashed") +
+	# plot.rgb("Harvard", "C", 3) +
+	# plot.rgb("Harvard", "D", 3) +
+	# plot.rgb("Harvard", "I", 3) +
+	# plot.rgb("Harvard", "S", 3) +
 
 	
-	plot.rgb("Morgan Monroe State Park", "C", 3) +
-	plot.rgb("Morgan Monroe State Park", "D", 3) +
-	plot.rgb("Morgan Monroe State Park", "I", 3) +
-	plot.rgb("Morgan Monroe State Park", "S", 3) +
-	poster.theme2
+	# plot.rgb("Morgan Monroe State Park", "C", 3) +
+	# plot.rgb("Morgan Monroe State Park", "D", 3) +
+	# plot.rgb("Morgan Monroe State Park", "I", 3) +
+	# plot.rgb("Morgan Monroe State Park", "S", 3) +
+	# poster.theme2
 	
 
-dev.off()		
-# Just plotting the BAI fits
-summary(data.graph)
+# dev.off()		
+# # Just plotting the BAI fits
+# summary(data.graph)
 
-ggplot(data.graph) + facet_wrap(group~Site) +
-  scale_x_continuous(expand=c(0,0), name="Year") +
-  scale_y_continuous(expand=c(0,0), name="BAI") +
-  # facet_wrap(~TreeID, scales="free_y", space="free") +
-  # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)
+# ggplot(data.graph) + facet_wrap(group~Site) +
+  # scale_x_continuous(expand=c(0,0), name="Year") +
+  # scale_y_continuous(expand=c(0,0), name="BAI") +
+  # # facet_wrap(~TreeID, scales="free_y", space="free") +
+  # # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  # geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
+  # geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)
 
-# Plotting the Effects
+# # Plotting the Effects
 
-pdf("figures/gam2_influence_in_time_ameridendro.pdf", width= 13, height = 8.5)
-ggplot(data.graph[data.graph$Site %in% sites.use2,]) + facet_grid(Canopy.Class~Site) +
-	scale_x_continuous(expand=c(0,0), name="Year") +
-	scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
-	# facet_wrap(~TreeID, scales="free_y", space="free") +
-	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	geom_line(aes(x=Year, y=fit.tmean), size=2, color="red") +
-	geom_line(aes(x=Year, y=fit.precip), size=2, color="blue") +
-	geom_line(aes(x=Year, y=fit.dbh.recon), size=2, color="green") +
-	poster.theme2
+# pdf("figures/gam2_influence_in_time_ameridendro.pdf", width= 13, height = 8.5)
+# ggplot(data.graph[data.graph$Site %in% sites.use2,]) + facet_grid(Canopy.Class~Site) +
+	# scale_x_continuous(expand=c(0,0), name="Year") +
+	# scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
+	# # facet_wrap(~TreeID, scales="free_y", space="free") +
+	# # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+	# geom_line(aes(x=Year, y=fit.tmean), size=2, color="red") +
+	# geom_line(aes(x=Year, y=fit.precip), size=2, color="blue") +
+	# geom_line(aes(x=Year, y=fit.dbh.recon), size=2, color="green") +
+	# poster.theme2
 	
-dev.off()	
+# dev.off()	
 
+gam2.data.graph <- data.graph
+save(gam2.data.graph, file="processed_data/gam2_graph_data.Rdata")

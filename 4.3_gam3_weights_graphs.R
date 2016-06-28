@@ -673,11 +673,12 @@ ggplot(data = data.graph[data.graph$Canopy.Class=="D" & !data.graph$group.cc %in
 	labs(title= "Dominant Trees", x="Year", y = expression(bold(paste("BAI (mm"^"2", "y"^"-1",")"))))
 	
 dev.off()	
-	
+
+data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "ME"))	
 		
 # Just plotting the BAI fits
 summary(data.graph)
-ggplot(data.graph) + facet_wrap(group.cc~Site) +
+ggplot(data.graph[data.graph$Canopy.Class=="D" & !data.graph$group.cc %in% c("BETULA.D", "CARYA.D", "FAGR.D", "FRAX.D", "SAAL.D"),]) + facet_grid(group.cc~State) +
   scale_x_continuous(expand=c(0,0), name="Year") +
   scale_y_continuous(expand=c(0,0), name="BAI") +
   # facet_wrap(~TreeID, scales="free_y", space="free") +
@@ -692,9 +693,13 @@ ggplot(data.graph[data.graph$Canopy.Class=="D" & !data.graph$group.cc %in% c("BE
 	scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
 	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	geom_line(aes(x=Year, y=fit.tmean), size=2, color="red") +
-	geom_line(aes(x=Year, y=fit.precip), size=2, color="blue") +
-	geom_line(aes(x=Year, y=fit.dbh.recon), size=2, color="green")+
+	
+	#geom_ribbon(aes(x=Year, ymin=fit.dbh.recon.lwr, ymax=fit.dbh.recon.upr), alpha=0.4, fill="green")+
+	
+	geom_line(aes(x=Year, y=fit.tmean), size=1, color="red") +
+	geom_line(aes(x=Year, y=fit.precip), size=1, color="blue") +
+	geom_line(aes(x=Year, y=fit.dbh.recon), size=1, color="green")+
+	ylim(c(0,3)) +
 	labs(title= "Dominant Effects (group.cc)")
 dev.off()
 
@@ -801,7 +806,7 @@ dev.off()
 		
 # Just plotting the BAI fits
 summary(data.graph)
-ggplot(data.graph) + facet_wrap(group.cc~Site) +
+ggplot(data.graph[data.graph$Canopy.Class=="I" & !data.graph$group.cc %in% c("BETULA.I", "CARYA.I", "FAGR.I", "FRAX.I", "SAAL.I"),]) + facet_grid(group.cc~State) +
   scale_x_continuous(expand=c(0,0), name="Year") +
   scale_y_continuous(expand=c(0,0), name="BAI") +
   # facet_wrap(~TreeID, scales="free_y", space="free") +
@@ -816,9 +821,10 @@ ggplot(data.graph[data.graph$Canopy.Class=="I" & !data.graph$group.cc %in% c("BE
 	scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
 	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	geom_line(aes(x=Year, y=fit.tmean), size=2, color="red") +
-	geom_line(aes(x=Year, y=fit.precip), size=2, color="blue") +
-	geom_line(aes(x=Year, y=fit.dbh.recon), size=2, color="green")+
+	geom_line(aes(x=Year, y=fit.tmean), size=1, color="red") +
+	geom_line(aes(x=Year, y=fit.precip), size=1, color="blue") +
+	geom_line(aes(x=Year, y=fit.dbh.recon), size=1, color="green")+
+	ylim(c(0,3)) +
 	labs(title= "Intermediate Effects (group.cc)")
 dev.off()
 
@@ -927,13 +933,14 @@ dev.off()
 		
 # Just plotting the BAI fits
 summary(data.graph)
-ggplot(data.graph) + facet_wrap(group.cc~Site) +
+ggplot(data.graph[data.graph$Canopy.Class=="S" & !data.graph$group.cc %in% c("BETULA.S", "CARYA.S", "FAGR.S", "FRAX.S", "SAAL.S"),]) + facet_grid(group.cc~State) +
   scale_x_continuous(expand=c(0,0), name="Year") +
   scale_y_continuous(expand=c(0,0), name="BAI") +
   # facet_wrap(~TreeID, scales="free_y", space="free") +
   # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
   geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)
+  geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  ylim(c(-0.5,20))
 
 # Plotting the Effects
 pdf("figures/gam3/gam3_influence_in_time_S.pdf", width= 13, height = 8.5)
@@ -942,9 +949,10 @@ ggplot(data.graph[data.graph$Canopy.Class=="S" & !data.graph$group.cc %in% c("BE
 	scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
 	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	geom_line(aes(x=Year, y=fit.tmean), size=2, color="red") +
-	geom_line(aes(x=Year, y=fit.precip), size=2, color="blue") +
-	geom_line(aes(x=Year, y=fit.dbh.recon), size=2, color="green")+
+	geom_line(aes(x=Year, y=fit.tmean), size=1, color="red") +
+	geom_line(aes(x=Year, y=fit.precip), size=1, color="blue") +
+	geom_line(aes(x=Year, y=fit.dbh.recon), size=1, color="green")+
+	ylim(c(0,3)) +
 	labs(title= "Suppressed Effects (group.cc)")
 dev.off()
 
@@ -1420,3 +1428,6 @@ ggplot(data = data.graph[data.graph$State %in% "ME",]) + facet_grid(Canopy.Class
 	
 dev.off()	
 			
+			
+gam3.data.graph <- data.graph
+save(gam3.data.graph, file="processed_data/gam3_graph_data.Rdata")

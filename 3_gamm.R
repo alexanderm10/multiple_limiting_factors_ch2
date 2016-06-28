@@ -133,8 +133,8 @@ gam3 <- gamm(log(BA.inc)~ s(tmean, k=3, by=group.cc) +
                   random=list(Site=~1, PlotID=~1),
                   data=test, control=list(niterEM=0, sing.tol=1e-20, opt="optim"))
 
- save(gam2, file="processed_data/gam_results/gam2_climate_by_canopyclass.Rdata") 
- save(gam3, file="processed_data/gam_results/gam3_climate_by_canopyclass_interactions.Rdata")
+save(gam2, file="processed_data/gam_results/gam2_climate_by_canopyclass.Rdata") 
+save(gam3, file="processed_data/gam_results/gam3_climate_by_canopyclass_interactions.Rdata")
  
 
  par(mfrow=c(4,2)); plot(gam1$gam, ylim=c(-0.025, 0.025))

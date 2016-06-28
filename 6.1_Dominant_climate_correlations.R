@@ -48,7 +48,7 @@ test <- test[test$group %in% group.use,]
 summary(test)
 
 # Right now just looking at the dominant trees.  Not sure how to show this yet
-# test <- test[test$Canopy.Class=="D",]
+test <- test[test$Canopy.Class=="D",]
 
 par(new=F)
 plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], type="l")
@@ -766,7 +766,7 @@ summary(cor.all.stack)
 
 summary(cor.all.stack[is.na(cor.all.stack$cor),])
 
-pdf("figures/violin_climate_cor.pdf", height=8, width=13)
+pdf("figures/violin_climate_cor_D.pdf", height=8, width=13)
 ggplot(data=cor.all.stack) + facet_grid(~type)+
 
 	geom_violin(aes(x=State, y=cor, fill=State), adjust = 2, trim=T) + ylim(-0.6,0.6)+
@@ -787,13 +787,13 @@ ggplot(data=cor.all.stack) + facet_grid(~type)+
 dev.off()
 
 summary(cor.all.stack)
-cor.all.stack$Canopy.Class <- as.factor("All")
+cor.all.stack$Canopy.Class <- as.factor("D")
 
-all.cor.stack <- cor.all.stack
-save(all.cor.stack, file="processed_data/All_climate_corrs.Rdata")
+dom.cor.stack <- cor.all.stack
+save(dom.cor.stack, file="processed_data/Dominant_climate_corrs.Rdata")
 
 
 summary(all.sites.gs)
-all.sites.gs$Canopy.Class <- as.factor("All")
-
-save(all.sites.gs, file="processed_data/All_gs_chron_corrs.Rdata")
+all.sites.gs$Canopy.Class <- as.factor("D")
+dom.sites.gs <- all.sites.gs
+save(dom.sites.gs, file="processed_data/Dominant_gs_chron_corrs.Rdata")

@@ -10,7 +10,7 @@ summary(climate.site)
 load("processed_data/sites_rw.Rdata")
 summary(sites.rw)
 
-load("processed_data/test_tree_data_1950_2012.Rdata")
+load("processed_data/test_tree_data_1935_2012.Rdata")
 summary(test)
 
 # Creating lists for harvard and mmf species
@@ -130,5 +130,17 @@ ggplot(data = canopy.df[canopy.df$chr=="std",]) + facet_grid(Factor~Site) +
 	#theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 dev.off()
 	
+#####################################################################################
+# Looking at violin plots for the different canopy classes and climate correlations
+#####################################################################################
+
+summary(short.can.index)
 
 
+v.corr.can <- list()
+for(i in names(short.can.chr)){
+	site <- unlist(strsplit(i, "[.]"))[1]
+	corr.can[[i]] <- as.data.frame(cor(short.can.chr[[i]][, 1:2], climate.site[[site]][, c("tmean", 					"precip")], method="pearson"))
+	corr.can[[i]]$chr <- row.names(corr.can[[i]])
+}
+summary(corr.can[[1]])

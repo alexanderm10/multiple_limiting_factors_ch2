@@ -48,7 +48,7 @@ test <- test[test$group %in% group.use,]
 summary(test)
 
 # Right now just looking at the dominant trees.  Not sure how to show this yet
-# test <- test[test$Canopy.Class=="D",]
+test <- test[test$Canopy.Class=="S",]
 
 par(new=F)
 plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], type="l")
@@ -786,14 +786,15 @@ ggplot(data=cor.all.stack) + facet_grid(~type)+
   	labs(title= "TR Index Climate Correlations", x="State", y=expression(bold(paste("Correlation Value (r)"))))
 dev.off()
 
+
 summary(cor.all.stack)
-cor.all.stack$Canopy.Class <- as.factor("All")
+cor.all.stack$Canopy.Class <- as.factor("S")
 
-all.cor.stack <- cor.all.stack
-save(all.cor.stack, file="processed_data/All_climate_corrs.Rdata")
-
+sup.cor.stack <- cor.all.stack
+save(sup.cor.stack, file="processed_data/Suppressed_climate_corrs.Rdata")
 
 summary(all.sites.gs)
-all.sites.gs$Canopy.Class <- as.factor("All")
+all.sites.gs$Canopy.Class <- as.factor("S")
 
-save(all.sites.gs, file="processed_data/All_gs_chron_corrs.Rdata")
+sup.sites.gs <- all.sites.gs
+save(sup.sites.gs, file="processed_data/Suppressed_gs_chron_corrs.Rdata")

@@ -65,15 +65,23 @@ summary(mean.model)
 mean.model2 <- mean.model
 names(mean.model2)[4:6] <- c("mod.mean", "mod.lwr", "mod.up")
 
-sanity.gam1.df <- merge(mean.model2, mean.rw, all.x=T, all.y=T)
-summary(sanity.gam1.df)
-summary(sanity.gam1.df[is.na(sanity.gam1.df$mod.mean),])
-head(sanity.gam1.df[is.na(sanity.gam1.df$mod.mean),])
+sanity.gam3.df <- merge(mean.model2, mean.rw, all.x=T, all.y=T)
+summary(sanity.gam3.df)
+summary(sanity.gam3.df[is.na(sanity.gam3.df$mod.mean),])
+head(sanity.gam3.df[is.na(sanity.gam3.df$mod.mean),])
+
+sanity.gam3.df$log.BAI <- log(sanity.gam3.df$BAI.mean)
 
 # LM on aggregated BAI
-sanity.lm1 <- lm(mod.mean ~ BAI.mean, data=sanity.gam1.df)
-summary(sanity.lm1)
+sanity.lm3 <- lm(mod.mean ~ log.BAI, data=sanity.gam3.df)
+lm3.resid <- resid(sanity.lm3)
 
+summary(sanity.lm3)
+
+# Graphing residuals
+
+plot(sanity.gam3.df$log.BAI ~ lm3.resid, xlab="Log.BAI", ylab="Residuals", main="GAM3 residuals", ylim=c(-4,4))
+abline(0,0)
 
 # Sanity Check #1 graph
 pdf("figures/gam_sanity_check/gam3_sanitycheck1.pdf", width= 13, height = 8.5)
@@ -82,8 +90,8 @@ ggplot(data=mean.rw) + facet_wrap(group.cc ~ Site, scales="fixed") + theme_bw() 
 	geom_ribbon(aes(x=Year, ymin=BAI.lwr, ymax=BAI.upr), alpha=0.5) +
 	geom_line(aes(x=Year, y=BAI.mean), size=1) +
 	# Plot our model
-	geom_ribbon(data=mean.model, aes(x=Year, ymin=BAI.lwr, ymax=BAI.upr), fill="red3", alpha=0.3) +
-	geom_line(data=mean.model, aes(x=Year, y=BAI.mean), color="red3", alpha=0.8, size=1) +
+	geom_ribbon(data=mean.model, aes(x=Year, ymin=exp(BAI.lwr), ymax=exp(BAI.upr)), fill="red3", alpha=0.3) +
+	geom_line(data=mean.model, aes(x=Year, y=exp(BAI.mean)), color="red3", alpha=0.8, size=1) +
 	labs(title="Gamm Model vs. Data", x="Year", y="BAI")
 dev.off()
 
@@ -110,7 +118,7 @@ ggplot(data=test[test$TreeID %in% sanity2.trees,]) + facet_wrap(TreeID~ Site, sc
 	geom_line(aes(x=Year, y=BA.inc), size=1) +
 	# Plot our model
 	#geom_ribbon(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, ymin=rw.lwr, ymax=rw.upr), fill="red3", alpha=0.3) +
-	geom_line(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, y=mean), color="red3", alpha=0.8, size=1) +
+	geom_line(data=model.pred2[model.pred2$TreeID %in% sanity2.trees,], aes(x=Year, y= exp(mean)), color="red3", alpha=0.8, size=1) +
 	labs(title="Gamm Model vs. Data Indiv. Trees", x="Year", y="RW")
 dev.off()
 
