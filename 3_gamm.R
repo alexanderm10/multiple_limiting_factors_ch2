@@ -30,7 +30,7 @@ summary(test)
 
 
 # Get a list of what predictors & responses I'm using
-predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc") 
+predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc", "Site") 
 
 # Getting rid of observations that have NAs in the important variables
 test <- test[complete.cases(test[,predictors.all]),]
@@ -81,6 +81,7 @@ test2 <- test[test$Site %in% "Morgan Monroe State Park",]
 
 summary(test)
 test[test$BA.inc==0, "BA.inc"] <- 1e-6
+save(test, file="ch2_combined_data_use.Rdata")
 # test.gam3 <- test
 # test.gam3$Canopy.Class <- recode(test.gam3$Canopy.Class, "'C' = 'D'")
 # summary(test.gam3)
@@ -133,9 +134,18 @@ gam3 <- gamm(log(BA.inc)~ s(tmean, k=3, by=group.cc) +
                   random=list(Site=~1, PlotID=~1),
                   data=test, control=list(niterEM=0, sing.tol=1e-20, opt="optim"))
 
+gam4 <- gamm(log(BA.inc)~ s(tmean, k=3, by=Site) +
+                  s(precip, k=3, by=Site) +
+                  s(dbh.recon, k=3, by=Site) +
+                  group,
+                  random=list(PlotID=~1, Canopy.Class=~1),
+                  data=test)
+
+
+
 save(gam2, file="processed_data/gam_results/gam2_climate_by_canopyclass.Rdata") 
 save(gam3, file="processed_data/gam_results/gam3_climate_by_canopyclass_interactions.Rdata")
- 
+save(gam4, file="processed_data/gam_results/gam4_Site_level_model.Rdata") 
 
  par(mfrow=c(4,2)); plot(gam1$gam, ylim=c(-0.025, 0.025))
  par(mfrow=c(4,2)); plot(gam2$gam, ylim=c(-0.025, 0.025))
@@ -322,7 +332,7 @@ pdf("figures/gam2_sensitivities_size.pdf", width = 13, height= 8.5)
 			poster.theme2
 dev.off()
 
- #----------------------------------------------
+#----------------------------------------------
 # GAM 3								
 		# SOurce & run the function
 "processed_data/gam_results/gam3_climate_by_canopyclass_interactions.Rdata"
@@ -406,3 +416,55 @@ pdf("figures/oak_size_effects.pdf", width= 13, height = 8.5)
 			poster.theme2+
 			labs(x = "DBH (cm)", y = expression(bold(paste("Effect on BAI (mm"^"2", "y"^"-1",")"))))
  dev.off()
+ 
+#----------------------------------------------
+# GAM 4								
+# SOurce & run the function
+
+load("processed_data/gam_results/gam4_Site_level_model.Rdata")		
+
+source("0_Calculate_GAMM_Posteriors.R")
+g4.ci.terms.pred <- post.distns(model.gam=gam4, model.name="Site_level", n=n, newdata=new.dat, vars=predictors.all, terms=T)
+		
+		g4.ci.out <- g4.ci.terms.pred$ci # separting out the confidence interval 
+		g4.ci.out[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
+		g4.ci.out$x <- as.numeric(g4.ci.out$x) # making x numeric; will make factors NA
+		summary(g4.ci.out)
+		
+ci.terms.graph <- g4.ci.out
+ci.terms.graph[ci.terms.graph$mean<(-2.5),"mean"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr<(-2.5),"lwr"] <- -2.5
+ci.terms.graph[ci.terms.graph$upr<(-2.5),"upr"] <- -2.5 
+ci.terms.graph[which(ci.terms.graph$mean>2.5),"mean"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr>(2.5),"lwr"] <- 2.5 
+ci.terms.graph[ci.terms.graph$upr>(2.5),"upr"] <- 2.5 
+
+pdf("figures/gam4_sensitivities.pdf", width= 13, height = 8.5)
+		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean", "precip"), ]) + 
+			facet_grid(~Effect, scales="free_x") +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=Site), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=Site))+
+			geom_hline(yintercept=0, linetype="dashed") +
+			poster.theme2+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
+			 theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))
+dev.off()
+
+pdf("figures/gam4_sensitivities_size.pdf", width= 13, height = 8.5)
+		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% "dbh.recon" & ci.terms.graph$x<=50, ]) + 
+			#facet_wrap(~Site, scales="free_x") +
+			geom_ribbon(aes(x=x, ymin=lwr, ymax=upr, fill=Site), alpha=0.5) +
+			geom_line(aes(x=x, y=mean, color=Site))+
+			geom_hline(yintercept=0, linetype="dashed") +
+			#poster.theme2+
+			# scale_color_manual(values=colors.use) +
+			# scale_fill_manual(values=colors.use)+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
+				poster.theme2+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
+			 theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))
+dev.off()
+ 
+ 

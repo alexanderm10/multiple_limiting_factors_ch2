@@ -587,7 +587,7 @@ summary(all.sites.gs)
 cbbPalette <- c("#009E73", "#e79f00", "#9ad0f3", "#0072B2", "#D55E00")
 
 all.sites.climate$type <- factor(all.sites.climate$type, levels=c("tmean", "precip", "tmin", "tmax"))
-pdf("figures/site_correlations_growing season.pdf", width= 13, height = 8.5)
+pdf("figures/Prelim_Figures/site_correlations_growing season.pdf", width= 13, height = 8.5)
 ggplot(data=all.sites.climate[all.sites.climate$month %in% "grow.seas" & all.sites.climate$type %in% c("tmean", "precip"),]) + facet_grid(~type) +
   geom_bar(aes(x=month, y=cor, color=Site), stat="identity", position="dodge", fill=NA) + ylim(-0.6,0.6)+
   geom_bar(aes(x=month, y=cor, color=Site), stat="identity", position="dodge", fill=NA) +ylim(-0.6,0.6)+
@@ -600,8 +600,10 @@ ggplot(data=all.sites.climate[all.sites.climate$month %in% "grow.seas" & all.sit
   scale_fill_manual(values=cbbPalette) +
   scale_alpha_manual(values = c(1, 0.2))+
   poster.theme2 +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1),panel.grid.major=element_blank(), panel.grid.minor= element_blank(), panel.border= element_blank(), panel.background= element_blank()) +
-  labs(title= "TR Site Climate Correlations", x="Seasons", y=expression(bold(paste("Correlation Value (r)"))))
+  theme(panel.grid.major=element_blank(), panel.grid.minor= element_blank(), panel.border= element_blank(), panel.background= element_blank()) +
+  labs(title= "TR Site Climate Correlations", x="Seasons", y=expression(bold(paste("Correlation Value (r)"))))+
+   theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))
 
 dev.off()
 

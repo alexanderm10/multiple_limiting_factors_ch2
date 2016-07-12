@@ -48,7 +48,7 @@ cc.mean.rw <- merge(cc.mean.rw, cc.ci.rw, all.x=T, all.y=F)
 summary(cc.mean.rw)
 sites.use <- c("Harvard", "Howland", "Morgan Monroe State Park", "Oak Openings Toledo", "Missouri Ozark")
 
-ggplot(data=cc.mean.rw[cc.mean.rw$Site %in% sites.use,]) + facet_wrap(Canopy.Class~Site, scales="free_x") +
+ggplot(data=cc.mean.rw[cc.mean.rw$Site %in% sites.use,]) + facet_grid(Canopy.Class~Site, scales="free_x") +
   geom_ribbon(aes(x=Year, ymin=lwr, ymax=upr), alpha=0.5) +
   geom_line(aes(x=Year, y=rw.mean))+
   poster.theme2
@@ -64,7 +64,7 @@ ggplot(data=cc.mean.rw[cc.mean.rw$Site %in% sites.use,]) + facet_wrap(Canopy.Cla
 
 mean.rw <- aggregate(data.use$RW, by=data.use[, c("Site", "group", "Canopy.Class", "Year")], FUN=mean, na.rm=T)
 
-names(mean.rw)[names(mean.rw)=="x"]<- c("rw.mean")                  
+names(mean.rw)[names(mean.rw)=="x"]<- "rw.mean"     
 summary(mean.rw)
 
 
@@ -119,7 +119,7 @@ ggplot(data=mean.rw) + facet_grid(Canopy.Class~Site, scales="free_x") +
 
 mean.rw <- aggregate(data.use$RW, by=data.use[, c("Site", "group", "Year")], FUN=mean, na.rm=T)
 
-names(mean.rw)[names(mean.rw)=="x"]<- c("rw.mean")                  
+names(mean.rw)[names(mean.rw)=="x"]<- "rw.mean"
 summary(mean.rw)
 
 
@@ -172,7 +172,7 @@ ggplot(data=mean.rw) + facet_grid(group~Site, scales="free_x") +
 
 mean.rw <- aggregate(data.use$RW, by=data.use[, c("Site", "Year")], FUN=mean, na.rm=T)
 
-names(mean.rw)[names(mean.rw)=="x"]<- c("rw.mean")                  
+names(mean.rw)[names(mean.rw)=="x"]<- "rw.mean"                  
 summary(mean.rw)
 
 
