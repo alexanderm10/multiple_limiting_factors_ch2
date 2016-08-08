@@ -21,6 +21,9 @@ model.pred2 <- model.pred$ci
 summary(model.pred2)
 dim(model.pred2)
 
+# Change predicted CI to BAI units
+model.pred2[,c("mean.bai", "lwr.bai", "upr.bai")] <- exp(model.pred2[,c("mean", "lwr", "upr")])
+summary(model.pred2)
 
 # Aggregating to the group level in teh same way we do below with the ring widths
 # We can then compare our modeled RW to our measured RW and see how things look
@@ -81,7 +84,7 @@ summary(sanity.lm3)
 # Graphing residuals
 
 plot(sanity.gam3.df$log.BAI ~ lm3.resid, xlab="Log.BAI", ylab="Residuals", main="GAM3 residuals", ylim=c(-4,4))
-abline(0,0)
+abline(0,0, col="red", lwd=2)
 
 # Sanity Check #1 graph
 pdf("figures/gam_sanity_check/gam3_sanitycheck1.pdf", width= 13, height = 8.5)
@@ -154,23 +157,26 @@ source("0_Calculate_GAMM_Weights.R")
 #                   data=test2)
 
 predictors.all
-vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
+# vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
+vars <- c("tmean", "precip", "dbh.recon")
 gam3.weights <- factor.weights(model.gam = gam3, model.name = "species_response", newdata = test, extent = "", vars = vars, limiting=T)
 
 summary(gam3.weights)
 summary(test2)
 gam3.weights[,c("BA.inc", "group", "group.cc")] <- test[,c("BA.inc", "group", "group.cc")] # Adding in factors we forgot
 
+gam3.weights[,c("fit.full.bai", "tmean.bai", "precip.bai", "dbh.bai")] <- exp(gam3.weights[,c("fit.full", "fit.tmean", "fit.precip", "fit.dbh.recon")])
+summary(gam3.weights)
 
 # Just the weights of tmean and Precip, ignoring size
-vars2 <- c("fit.tmean", "fit.precip")
+vars2 <- c("tmean.bai", "precip.bai")
 fit.spline2 <- rowSums(abs(gam3.weights[,vars2]), na.rm=T)
 for(v in vars2){
 	gam3.weights[,paste("weight", v, "2", sep=".")] <- gam3.weights[,v]/fit.spline2
 }
 summary(gam3.weights)
 
-cols.weights <- c("weight.fit.tmean.2", "weight.fit.precip.2")
+cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2")
 for(i in 1:nrow(gam3.weights)){
 	fweight <- abs(gam3.weights[i,cols.weights])
 	gam3.weights[i,"max2"] <- max(fweight, na.rm=T)

@@ -21,6 +21,9 @@ model.pred2 <- model.pred$ci
 summary(model.pred2)
 dim(model.pred2)
 
+# Change predicted CI to BAI units
+model.pred2[,c("mean.bai", "lwr.bai", "upr.bai")] <- exp(model.pred2[,c("mean", "lwr", "upr")])
+summary(model.pred2)
 
 # Aggregating to the group level in teh same way we do below with the ring widths
 # We can then compare our modeled RW to our measured RW and see how things look
@@ -32,7 +35,11 @@ mean.model[,"BAI.lwr"] <- aggregate(model.pred2$mean, by=model.pred2[,c("group",
 mean.model[,"BAI.upr"] <- aggregate(model.pred2$mean, by=model.pred2[,c("group", "Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
 head(mean.model)
 
-
+mean.modelB <- aggregate(model.pred2$mean.bai, by = model.pred2[, c("Site", "Year")], FUN=mean, na.rm=T)
+names(mean.modelB)[names(mean.modelB)=="x"] <- c("BAI.mean") 
+mean.modelB[,"BAI.lwr"] <- aggregate(model.pred2$mean.bai, by=model.pred2[,c("Site", "Year")], FUN=quantile, probs=0.025, na.rm=T)[,"x"]
+mean.modelB[,"BAI.upr"] <- aggregate(model.pred2$mean.bai, by=model.pred2[,c("Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
+head(mean.modelB)
 
 # aggregating the raw data for graphing
 mean.rw <- aggregate(test$BA.inc, by=test[, c("group", "Site", "Year")], FUN=mean, na.rm=T)
@@ -136,7 +143,7 @@ model.pred2$RW <- test$RW
 model.pred2$BAI <- test$BA.inc
 
 # LM for indiv. trees
-sanity.lm2 <- lm(BAI ~ mean, data=model.pred2)
+sanity.lm2 <- lm(log(BAI) ~ mean, data=model.pred2)
 summary(sanity.lm2)
 
 # sanity.lm2.quru <- lm(RW ~ mean, data=model.pred2[model.pred2$group=="quru",])
@@ -158,23 +165,26 @@ source("0_Calculate_GAMM_Weights.R")
 #                   data=test2)
 
 predictors.all
-vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
+# vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
+vars <- c("tmean", "precip", "dbh.recon") # This should be your splines for those splines
 gam1.weights <- factor.weights(model.gam = gam1, model.name = "species_response", newdata = test, extent = "", vars = vars, limiting=T)
 
 summary(gam1.weights)
 summary(test)
 gam1.weights[,c("BA.inc", "group")] <- test[,c("BA.inc", "group")] # Adding in factors we forgot
 
+gam1.weights[,c("fit.full.bai", "tmean.bai", "precip.bai", "dbh.bai")] <- exp(gam1.weights[,c("fit.full", "fit.tmean", "fit.precip", "fit.dbh.recon")])
+summary(gam1.weights)
 
 # Just the weights of tmean and Precip, ignoring size
-vars2 <- c("fit.tmean", "fit.precip")
+vars2 <- c("tmean.bai", "precip.bai")
 fit.spline2 <- rowSums(abs(gam1.weights[,vars2]), na.rm=T)
 for(v in vars2){
 	gam1.weights[,paste("weight", v, "2", sep=".")] <- gam1.weights[,v]/fit.spline2
 }
 summary(gam1.weights)
 
-cols.weights <- c("weight.fit.tmean.2", "weight.fit.precip.2")
+cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2")
 for(i in 1:nrow(gam1.weights)){
 	fweight <- abs(gam1.weights[i,cols.weights])
 	gam1.weights[i,"max2"] <- max(fweight, na.rm=T)

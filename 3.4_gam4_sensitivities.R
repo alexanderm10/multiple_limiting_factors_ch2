@@ -21,6 +21,9 @@ model.pred2 <- model.pred$ci
 summary(model.pred2)
 dim(model.pred2)
 
+# Change predicted CI to BAI units
+model.pred2[,c("mean.bai", "lwr.bai", "upr.bai")] <- exp(model.pred2[,c("mean", "lwr", "upr")])
+summary(model.pred2)
 
 # Aggregating to the group level in teh same way we do below with the ring widths
 # We can then compare our modeled RW to our measured RW and see how things look
@@ -32,6 +35,11 @@ mean.model[,"BAI.lwr"] <- aggregate(model.pred2$mean, by=model.pred2[,c("Site", 
 mean.model[,"BAI.upr"] <- aggregate(model.pred2$mean, by=model.pred2[,c("Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
 head(mean.model)
 
+mean.modelB <- aggregate(model.pred2$mean.bai, by = model.pred2[, c("Site", "Year")], FUN=mean, na.rm=T)
+names(mean.modelB)[names(mean.modelB)=="x"] <- c("BAI.mean") 
+mean.modelB[,"BAI.lwr"] <- aggregate(model.pred2$mean.bai, by=model.pred2[,c("Site", "Year")], FUN=quantile, probs=0.025, na.rm=T)[,"x"]
+mean.modelB[,"BAI.upr"] <- aggregate(model.pred2$mean.bai, by=model.pred2[,c("Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
+head(mean.modelB)
 
 
 # aggregating the raw data for graphing
@@ -74,7 +82,7 @@ sanity.gam4.df$log.BAI <- log(sanity.gam4.df$BAI.mean)
 
 # LM on aggregated BAI
 sanity.lm4 <- lm(mod.mean ~ log.BAI, data=sanity.gam4.df)
-lm4.resid <- resid(sanity.lm3)
+lm4.resid <- resid(sanity.lm4)
 
 summary(sanity.lm4)
 
@@ -94,6 +102,15 @@ ggplot(data=mean.rw) + facet_grid(Site~., scales="fixed") + theme_bw() +
 	geom_line(data=mean.model, aes(x=Year, y=exp(BAI.mean)), color="red3", alpha=0.8, size=1) +
 	labs(title="Gamm Model vs. Data", x="Year", y="BAI")
 dev.off()
+
+ggplot(data=mean.rw) + facet_grid(Site~., scales="fixed") + theme_bw() +
+  # plot the data
+  geom_ribbon(aes(x=Year, ymin=BAI.lwr, ymax=BAI.upr), alpha=0.5) +
+  geom_line(aes(x=Year, y=BAI.mean), size=1) +
+  # Plot our model
+  geom_ribbon(data=mean.modelB, aes(x=Year, ymin=BAI.lwr, ymax=BAI.upr), fill="red3", alpha=0.3) +
+  geom_line(data=mean.modelB, aes(x=Year, y=BAI.mean), color="red3", alpha=0.8, size=1) +
+  labs(title="Gamm Model vs. Data", x="Year", y="BAI")
 
 
 # Sanity Check #2
@@ -154,23 +171,29 @@ source("0_Calculate_GAMM_Weights.R")
 #                   data=test2)
 
 predictors.all
-vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
+# vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc", "Site")
+vars <- c("tmean", "precip", "dbh.recon") # This should be your splines for those splines
+test$BAI.orig <- test$BA.inc
+# test$BA.inc <- log(test$BA.inc)
 gam4.weights <- factor.weights(model.gam = gam4, model.name = "species_response", newdata = test, extent = "", vars = vars, limiting=T)
 
 summary(gam4.weights)
 summary(test2)
 gam4.weights[,c("BA.inc", "group", "group.cc")] <- test[,c("BA.inc", "group", "group.cc")] # Adding in factors we forgot
 
+gam4.weights[,c("fit.full.bai", "tmean.bai", "precip.bai", "dbh.bai")] <- exp(gam4.weights[,c("fit.full", "fit.tmean", "fit.precip", "fit.dbh.recon")])
+summary(gam4.weights)
 
 # Just the weights of tmean and Precip, ignoring size
-vars2 <- c("fit.tmean", "fit.precip")
+# Switching to use the BAI-corrected effects
+vars2 <- c("tmean.bai", "precip.bai")
 fit.spline2 <- rowSums(abs(gam4.weights[,vars2]), na.rm=T)
 for(v in vars2){
 	gam4.weights[,paste("weight", v, "2", sep=".")] <- gam4.weights[,v]/fit.spline2
 }
 summary(gam4.weights)
 
-cols.weights <- c("weight.fit.tmean.2", "weight.fit.precip.2")
+cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2")
 for(i in 1:nrow(gam4.weights)){
 	fweight <- abs(gam4.weights[i,cols.weights])
 	gam4.weights[i,"max2"] <- max(fweight, na.rm=T)

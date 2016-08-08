@@ -47,8 +47,11 @@ test <- test[test$group %in% group.use,]
 
 summary(test)
 
+########################################################################################
 # Right now just looking at the dominant trees.  Not sure how to show this yet
 test <- test[test$Canopy.Class=="D",]
+########################################################################################
+
 
 par(new=F)
 plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], type="l")
@@ -57,8 +60,8 @@ plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], 
 summary(test)
 
 
-# Truncatign at 1950; at 1950 the sample depth for the oak openings is only 1
-test <- test[test$Year >= 1950 & test$Year <= 2012,]
+# Truncatign at 1930; at 1930 the sample depth for the oak openings is only 1
+test <- test[test$Year >= 1930 & test$Year <= 2012,]
 
 tree.rw <- test
 summary(tree.rw)
@@ -67,7 +70,7 @@ summary(test)
 
 
 
-save(test, file="processed_data/test_tree_data_1950_2012.Rdata")
+save(test, file="processed_data/test_tree_data_1930_2012.Rdata")
 
 sites.rw <- list()
 
@@ -98,7 +101,7 @@ site.chron <- list()
 for(s in names(sites.i)){
 	
 	site.chron[[s]] <- chron(sites.i[[s]][,2:ncol(sites.i[[s]])], prefix = substr(s, 1, 3), prewhiten = T) 
-	site.chron[[s]][,"Year"]<- c(1950:2012) 
+	site.chron[[s]][,"Year"]<- c(1930:2012) 
 }
 
 summary(site.chron[[5]])
@@ -171,7 +174,7 @@ climate.use <- read.csv("processed_data/climate_growing_season.csv")
 summary(climate.use)
 
 climate.use <- climate.use[climate.use$Site %in% sites.use,]
-climate.use <- climate.use[climate.use$Year>=1950 & climate.use$Year <=2012,]
+climate.use <- climate.use[climate.use$Year>=1930 & climate.use$Year <=2012,]
 
 climate.site <- list()
 
@@ -307,11 +310,11 @@ precip <- read.csv("processed_data/ch2_precip.csv", header=T)
 
 summary(t.mean)
 
-# Limiting time frame--1950-2012
-t.mean <- t.mean[t.mean$Year >= 1951 & t.mean$Year <= 2012,]
-t.min <- t.min[t.min$Year >= 1951 & t.min$Year <= 2012,]
-t.max <- t.max[t.max$Year >= 1951 & t.max$Year <= 2012,]
-precip <- precip[precip$Year >= 1951 & precip$Year <= 2012,]
+# Limiting time frame--1930-2012
+t.mean <- t.mean[t.mean$Year >= 31 & t.mean$Year <= 2012,]
+t.min <- t.min[t.min$Year >= 31 & t.min$Year <= 2012,]
+t.max <- t.max[t.max$Year >= 31 & t.max$Year <= 2012,]
+precip <- precip[precip$Year >= 31 & precip$Year <= 2012,]
 summary(t.mean)
 summary(t.min)
 summary(t.max)
@@ -336,7 +339,7 @@ precip$Site.Name <- recode(precip$Site.Name, "'Missouri Ozark' = 'Missouri'; 'Mo
 summary(sites.crn)
 sites.crn$Year <- site.chron[[1]][,"Year"]
 head(sites.crn)
-sites.crn <- sites.crn[sites.crn$Year > 1950,]
+sites.crn <- sites.crn[sites.crn$Year > 1930,]
 
 
 #--------------------------------------------

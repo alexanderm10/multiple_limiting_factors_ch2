@@ -46,7 +46,7 @@ summary(data.graph)
 data.graph<- data.graph[order(data.graph$Year, data.graph$group.cc, data.graph$Site, decreasing=F),]
 
 
-plot.rgb <- function(STATE, GC, SIZE){	geom_line(data=data.graph[data.graph$State==STATE & data.graph$group.cc==GC,],aes(x=Year, y=fit.full), size=SIZE,
+plot.rgb <- function(STATE, GC, SIZE){	geom_point(data=data.graph[data.graph$State==STATE & data.graph$group.cc==GC,],aes(x=Year, y=fit.full), size=SIZE,
   		        color=rgb(abs(data.graph[data.graph$State==STATE & data.graph$group.cc==GC,"weight.tmean"     ]), # red
                         abs(data.graph[data.graph$State==STATE & data.graph$group.cc==GC,"weight.dbh.recon"     ]), # green
                         abs(data.graph[data.graph$State==STATE & data.graph$group.cc==GC,"weight.precip"   ]))) }   # blue
@@ -428,14 +428,14 @@ ggplot(data.graph) + facet_wrap(group.cc~Site) +
 
 # Plotting the Effects
 pdf("figures/gam3/gam3_influence_in_time_all.pdf", width= 13, height = 8.5)
-ggplot(data.graph) + facet_wrap(group.cc~State) +
+ggplot(data.graph) + facet_grid(group.cc~State) +
 	scale_x_continuous(expand=c(0,0), name="Year") +
 	scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
 	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	geom_line(aes(x=Year, y=fit.tmean), size=2, color="red") +
-	geom_line(aes(x=Year, y=fit.precip), size=2, color="blue") +
-	geom_line(aes(x=Year, y=fit.dbh.recon), size=2, color="green")
+	geom_line(aes(x=Year, y=fit.tmean), size=1, color="red") +
+	geom_line(aes(x=Year, y=fit.precip), size=1, color="blue") +
+	geom_line(aes(x=Year, y=fit.dbh.recon), size=1, color="green")
 dev.off()
 
 

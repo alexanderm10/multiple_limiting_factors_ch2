@@ -57,8 +57,8 @@ plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], 
 summary(test)
 
 
-# Truncatign at 1950; at 1950 the sample depth for the oak openings is only 1
-test <- test[test$Year >= 1950 & test$Year <= 2012,]
+# Truncatign at 1935; at 1935 the sample depth for the oak openings is only 1
+test <- test[test$Year >= 1935 & test$Year <= 2012,]
 
 tree.rw <- test
 summary(tree.rw)
@@ -67,7 +67,7 @@ summary(test)
 
 
 
-save(test, file="processed_data/test_tree_data_1950_2012.Rdata")
+save(test, file="processed_data/test_tree_data_1935_2012.Rdata")
 
 sites.rw <- list()
 
@@ -98,7 +98,7 @@ site.chron <- list()
 for(s in names(sites.i)){
 	
 	site.chron[[s]] <- chron(sites.i[[s]][,2:ncol(sites.i[[s]])], prefix = substr(s, 1, 3), prewhiten = T) 
-	site.chron[[s]][,"Year"]<- c(1950:2012) 
+	site.chron[[s]][,"Year"]<- c(1935:2012) 
 }
 
 summary(site.chron[[5]])
@@ -148,7 +148,8 @@ ggplot(data=mmf)+
 
 
 # Merging the residual chronologies back together
-sites.crn <- data.frame(Harvard = harvard.crn[, "Harres"], 
+sites.crn <- data.frame(Year = harvard.crn[,"Year"],
+            Harvard = harvard.crn[, "Harres"], 
 						Howland = howland.crn[,"Howres"], 
 						Missouri = misso.crn[,"Misres"],
 						Morgan_Monroe = mmf.crn[,"Morres"], 
@@ -156,7 +157,8 @@ sites.crn <- data.frame(Harvard = harvard.crn[, "Harres"],
 						)
 
 summary(sites.crn)
-
+head(sites.crn)
+save(sites.crn, file="processed_data/res_site_chronologies.Rdata")
 
 
 
@@ -171,7 +173,7 @@ climate.use <- read.csv("processed_data/climate_growing_season.csv")
 summary(climate.use)
 
 climate.use <- climate.use[climate.use$Site %in% sites.use,]
-climate.use <- climate.use[climate.use$Year>=1950 & climate.use$Year <=2012,]
+climate.use <- climate.use[climate.use$Year>=1935 & climate.use$Year <=2012,]
 
 climate.site <- list()
 
@@ -270,8 +272,8 @@ clim.cor4$site <- as.factor(clim.cor4$site)
 clim.cor4$type <- as.factor(clim.cor4$type)
 clim.cor4$cor <- as.numeric(clim.cor4$cor)
 
-# Sig value for 81 df = 0.209
-clim.cor4$sig <- ifelse(clim.cor4$cor < -0.2245 | clim.cor4$cor > 0.2245, "Y", "N")
+# Sig value for 75df = 0.2275
+clim.cor4$sig <- ifelse(clim.cor4$cor < -0.2275 | clim.cor4$cor > 0.2275, "Y", "N")
 clim.cor4$sig <- factor(clim.cor4$sig, levels = c("Y", "N"))
 
 clim.cor4$site <- factor(clim.cor4$site, levels = c("Missouri", "Morgan-Monroe", "Oak-Openings", "Harvard", "Howland"))
@@ -280,7 +282,7 @@ clim.cor4$Site <- clim.cor4$site
 clim.cor4$Site <- recode(clim.cor4$Site, "'Missouri' = 'MO'; 'Morgan-Monroe' = 'IN'; 'Oak-Openings' = 'OH'; 'Harvard' = 'MA'; 'Howland' = 'ME'")
 clim.cor4$Site <- factor(clim.cor4$Site, levels = c("MO", "IN", "OH", "MA", "ME"))
 
-
+summary(clim.cor4)
 pdf("figures/site_correlations.pdf", width= 13, height = 8.5)
 ggplot(data=clim.cor4[clim.cor4$type=="std",]) + facet_grid(var~. , scales="free_x") +
 	geom_bar(aes(x=Site, y=cor, fill=sig), stat="identity", position="dodge", colour="black") +
@@ -307,11 +309,11 @@ precip <- read.csv("processed_data/ch2_precip.csv", header=T)
 
 summary(t.mean)
 
-# Limiting time frame--1950-2012
-t.mean <- t.mean[t.mean$Year >= 1951 & t.mean$Year <= 2012,]
-t.min <- t.min[t.min$Year >= 1951 & t.min$Year <= 2012,]
-t.max <- t.max[t.max$Year >= 1951 & t.max$Year <= 2012,]
-precip <- precip[precip$Year >= 1951 & precip$Year <= 2012,]
+# Limiting time frame--1935-2012
+t.mean <- t.mean[t.mean$Year >= 1936 & t.mean$Year <= 2012,]
+t.min <- t.min[t.min$Year >= 1936 & t.min$Year <= 2012,]
+t.max <- t.max[t.max$Year >= 1936 & t.max$Year <= 2012,]
+precip <- precip[precip$Year >= 1936 & precip$Year <= 2012,]
 summary(t.mean)
 summary(t.min)
 summary(t.max)
@@ -336,7 +338,7 @@ precip$Site.Name <- recode(precip$Site.Name, "'Missouri Ozark' = 'Missouri'; 'Mo
 summary(sites.crn)
 sites.crn$Year <- site.chron[[1]][,"Year"]
 head(sites.crn)
-sites.crn <- sites.crn[sites.crn$Year > 1950,]
+sites.crn <- sites.crn[sites.crn$Year > 1935,]
 
 
 #--------------------------------------------
@@ -601,7 +603,7 @@ ggplot(data=all.sites.climate[all.sites.climate$month %in% "grow.seas" & all.sit
   scale_alpha_manual(values = c(1, 0.2))+
   poster.theme2 +
   theme(panel.grid.major=element_blank(), panel.grid.minor= element_blank(), panel.border= element_blank(), panel.background= element_blank()) +
-  labs(title= "TR Site Climate Correlations", x="Seasons", y=expression(bold(paste("Correlation Value (r)"))))+
+  labs(title= "TR Site Climate Correlations 1935-2012", x="Seasons", y=expression(bold(paste("Correlation Value (r)"))))+
    theme(axis.line.x = element_line(color="black", size = 0.5),
         axis.line.y = element_line(color="black", size = 0.5))
 

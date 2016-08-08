@@ -4,6 +4,7 @@ load(file="processed_data/gamm_weights/gam4_weights.Rdata")
 
 summary(gam4.weights)
 factors.fits <- c("fit.tmean", "fit.precip", "fit.dbh.recon", "fit.full", "BA.inc")
+factors.fits2 <- c("tmean.bai", "precip.bai", "dbh.bai", "fit.full.bai", "BA.inc")
 factors.weights <- c("weight.tmean", "weight.dbh.recon", "weight.precip")
 
 # Transforming things back to BA.inc rather than log
@@ -39,10 +40,10 @@ summary(data.graph)
 
 # Ordering the data for graphing
 
-data.graph<- data.graph[order(data.graph$Year, data.graph$group, data.graph$Site, decreasing=F),]
+data.graph<- data.graph[order(data.graph$Year, data.graph$Site, decreasing=F),]
 summary(data.graph)
 
-plot.rgb <- function(STATE,SIZE){	geom_line(data=data.graph[data.graph$State==STATE,],aes(x=Year, y=fit.full), size=SIZE,
+plot.rgb <- function(STATE,SIZE){	geom_point(data=data.graph[data.graph$State==STATE,],aes(x=Year, y=fit.full), size=SIZE,
   		        color=rgb(abs(data.graph[data.graph$State==STATE,"weight.tmean"     ]), # red
                         abs(data.graph[data.graph$State==STATE,"weight.dbh.recon"     ]), # green
                         abs(data.graph[data.graph$State==STATE,"weight.precip"   ]))) }   # blue
@@ -53,8 +54,8 @@ data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "M
 
 # summary(data.graph[!data.graph$group %in% c("BETULA", "CARYA", "FAGR", "FRAX", "SAAL"),])
 
-pdf("figures/gam4_SITE_limiting_factor.pdf", width= 13, height = 8.5)
-ggplot(data.graph) + facet_grid(State~.) +
+pdf("figures/Prelim_Figures/gam4_SITE_limiting_factor.pdf", width= 13, height = 8.5)
+ggplot(data.graph) + facet_grid(State~., scale="free") +
 	scale_x_continuous(expand=c(0,0)) +
 	scale_y_continuous(expand=c(0,0)) +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
@@ -70,7 +71,46 @@ ggplot(data.graph) + facet_grid(State~.) +
 	plot.rgb("MO", 3) +
 	
 	labs(title= "Site", x="Year", y = expression(bold(paste("BAI (mm"^"2", "y"^"-1",")")))) +
-	poster.theme2
+	theme_bw()
+dev.off()
+
+load("processed_data/climate_markeryears.Rdata")
+summary(climate.markers)
+climate.markers$State <- recode(climate.markers$Site, "'Howland' = 'ME';'Harvard' = 'MA';'Morgan Monroe State Park' = 'IN';'Missouri Ozark' = 'MO';'Oak Openings Toledo' = 'OH'")
+
+
+############################################################################
+# Looking at the BAI for each Site in reference to climate variables
+############################################################################
+# Missouri Ozark
+
+pdf("figures/Prelim_Figures/bai_climatemarkers_site.pdf", width= 13, height = 8.5)
+ggplot(data.graph) + facet_grid(State~., scales="free") + 
+	scale_x_continuous(expand=c(0,0), name="Year") +
+  	scale_y_continuous(expand=c(0,0), name="BAI") +
+  	# facet_wrap(~TreeID, scales="free_y", space="free") +
+  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_vline(data=climate.markers[climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
+  	scale_color_manual(values=c("red", "blue"))+
+  	xlim(1920,2015)+
+  	theme(axis.line=element_line(color="black"), panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.border=element_blank(), panel.background=element_blank(),axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5)) +labs(title="Site temp years")
+
+
+ggplot(data.graph) + facet_grid(State~., scales="free") + 
+	scale_x_continuous(expand=c(0,0), name="Year") +
+  	scale_y_continuous(expand=c(0,0), name="BAI") +
+  	# facet_wrap(~TreeID, scales="free_y", space="free") +
+  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_vline(data=climate.markers[climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
+  	scale_color_manual(values=c("dodgerblue", "brown"))+
+  	xlim(1920,2015)+
+  	theme(axis.line=element_line(color="black"), panel.grid.major=element_blank(), panel.grid.minor=element_blank(), panel.border=element_blank(), panel.background=element_blank(),axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5)) +labs(title="Site precip years")
 dev.off()
 	
 # Just plotting the BAI fits
@@ -88,20 +128,67 @@ summary(data.graph)
 data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "ME"))
 
 # Plotting the Effects
-pdf("figures/gam4_influence_in_time.pdf", width= 13, height = 8.5)
+pdf("figures/prelim_figures/gam4_influence_in_time_weights_temp.pdf", width= 13, height = 8.5)
 
 ggplot(data.graph) + facet_grid(State~.) +
-	scale_x_continuous(expand=c(0,0), name="Year") +
-	scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
+	# facet_wrap(~TreeID, scales="free_y", space="free") +
+	# geom_ribbon(data=gam4.weights[gam4.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+	geom_vline(data=climate.markers[climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
+  	scale_color_manual(values=c("red", "blue"))+
+	geom_ribbon(aes(x=Year, ymin=weight.tmean.lwr, ymax=weight.tmean.upr), fill="red", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.precip.lwr, ymax=weight.precip.upr), fill="blue", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon.lwr, ymax=weight.dbh.recon.upr), fill="green", alpha=0.25) +
+	geom_line(aes(x=Year, y=weight.tmean), size=1, color="red") +
+	geom_line(aes(x=Year, y=weight.precip), size=1, color="blue") +
+	geom_line(aes(x=Year, y=weight.dbh.recon), size=1, color="green")+
+	
+	
+	
+	labs(title= "Site", x="Year", y = "Model Fits") +
+	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank())+
+	theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
+	labs(title= "Site Model", x=expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence"))))
+
+dev.off()
+
+pdf("figures/prelim_figures/gam4_influence_in_time_weights_precip.pdf", width= 13, height = 8.5)
+
+ggplot(data.graph) + facet_grid(State~.) +
+	# facet_wrap(~TreeID, scales="free_y", space="free") +
+	# geom_ribbon(data=gam4.weights[gam4.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+	geom_vline(data=climate.markers[climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
+  	scale_color_manual(values=c("lightblue", "brown"))+
+	geom_ribbon(aes(x=Year, ymin=weight.tmean.lwr, ymax=weight.tmean.upr), fill="red", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.precip.lwr, ymax=weight.precip.upr), fill="blue", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon.lwr, ymax=weight.dbh.recon.upr), fill="green", alpha=0.25) +
+	geom_line(aes(x=Year, y=weight.tmean), size=1, color="red") +
+	geom_line(aes(x=Year, y=weight.precip), size=1, color="blue") +
+	geom_line(aes(x=Year, y=weight.dbh.recon), size=1, color="green")+
+	
+	
+	
+	labs(title= "Site", x="Year", y = "Model Fits") +
+	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank())+
+	theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
+	labs(title= "Site Model", x=expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence"))))
+
+dev.off()
+
+
+
+ggplot(data.graph) + facet_grid(State~.) +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
 	# geom_ribbon(data=gam4.weights[gam4.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
 	geom_line(aes(x=Year, y=fit.tmean), size=1, color="red") +
 	geom_line(aes(x=Year, y=fit.precip), size=1, color="blue") +
 	geom_line(aes(x=Year, y=fit.dbh.recon), size=1, color="green")+
-	ylim(c(0,5))+
-	labs(title= "Site", x="Year", y = "Model Fits") +
-	poster.theme2
-dev.off()
+		labs(title= "Site", x="Year", y = "Model Fits") +
+	theme_bw()+
+	labs(title= "Site Model", x=expression(bold(paste("Year"))), y = expression(bold(paste("Effect on BAI (mm"^"2", "y"^"-1",")"))))
 
 #------------------------------------
 # # Just MMF and Harvard

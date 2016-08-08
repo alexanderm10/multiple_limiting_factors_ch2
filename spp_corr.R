@@ -117,15 +117,17 @@ group.df$Species <- recode(group.df$Species, "'TULA' = 'BETULA'")
 
 group.df$Site <- factor(group.df$Site, levels = c("MO", "IN", "OH", "MA", "ME"))
 
-# Sig value for 75 df = 0.209
+# Sig value for 75 df = 0.2245
 group.df$sig <- ifelse(group.df$cor < -0.2245 | group.df$cor > 0.2245, "Y", "N")
 group.df$sig <- factor(group.df$sig, levels = c("Y", "N"))
 
 source("poster_theme.R")
 
-pdf("figures/spp_correlations.pdf", width= 13, height = 8.5)
-ggplot(data = group.df[group.df$chr=="std",]) + facet_grid(Factor ~ Site) + 
-	geom_bar(aes(x=Species, y=cor, fill=sig), stat="identity", position="dodge", colour="black") +
+group.df$Factor <- factor(group.df$Factor, levels=c("tmean", "precip"))
+
+pdf("figures/prelim_figures/spp_correlations.pdf", width= 13, height = 8.5)
+ggplot(data = group.df[group.df$chr=="std",]) + facet_grid(Factor~Species) + 
+	geom_bar(aes(x=Site, y=cor, fill=sig), stat="identity", position="dodge", colour="black") +
 	geom_hline(yintercept=0.2245, linetype="dashed") + 
 	geom_hline(yintercept=-0.2245, linetype="dashed") + 	
 	geom_hline(yintercept=0, linetype="solid") +

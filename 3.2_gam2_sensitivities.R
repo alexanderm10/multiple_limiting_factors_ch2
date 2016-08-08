@@ -21,6 +21,9 @@ model.pred2 <- model.pred$ci
 summary(model.pred2)
 dim(model.pred2)
 
+# Change predicted CI to BAI units
+model.pred2[,c("mean.bai", "lwr.bai", "upr.bai")] <- exp(model.pred2[,c("mean", "lwr", "upr")])
+summary(model.pred2)
 
 # Aggregating to the group level in teh same way we do below with the ring widths
 # We can then compare our modeled RW to our measured RW and see how things look
@@ -31,6 +34,12 @@ names(mean.model)[names(mean.model)=="x"] <- c("BAI.mean")
 mean.model[,"BAI.lwr"] <- aggregate(model.pred2$mean, by=model.pred2[,c("Canopy.Class", "Site", "Year")], FUN=quantile, probs=0.025, na.rm=T)[,"x"]
 mean.model[,"BAI.upr"] <- aggregate(model.pred2$mean, by=model.pred2[,c("Canopy.Class", "Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
 head(mean.model)
+
+mean.modelB <- aggregate(model.pred2$mean.bai, by = model.pred2[, c("Site", "Year")], FUN=mean, na.rm=T)
+names(mean.modelB)[names(mean.modelB)=="x"] <- c("BAI.mean") 
+mean.modelB[,"BAI.lwr"] <- aggregate(model.pred2$mean.bai, by=model.pred2[,c("Site", "Year")], FUN=quantile, probs=0.025, na.rm=T)[,"x"]
+mean.modelB[,"BAI.upr"] <- aggregate(model.pred2$mean.bai, by=model.pred2[,c("Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
+head(mean.modelB)
 
 # creating a group.cc variable for test
 test$group.cc <- as.factor(paste(test$group, test$Canopy.Class, sep="."))
@@ -72,8 +81,8 @@ sanity.gam2.df <- merge(mean.model2, mean.rw, all.x=T, all.y=T)
 summary(sanity.gam2.df)
 
 sanity.gam2.df$log.BAI <- log(sanity.gam2.df$BAI.mean)
-summary(sanity.gam2.df[is.na(sanity.gam1.df$mod.mean),])
-head(sanity.gam2.df[is.na(sanity.gam1.df$mod.mean),])
+summary(sanity.gam2.df[is.na(sanity.gam2.df$mod.mean),])
+head(sanity.gam2.df[is.na(sanity.gam2.df$mod.mean),])
 
 # LM on aggregated BAI
 sanity.lm2 <- lm(mod.mean ~ log.BAI, data=sanity.gam2.df)
@@ -156,23 +165,26 @@ source("0_Calculate_GAMM_Weights.R")
 #                   data=test2)
 
 predictors.all
-vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
+# vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
+vars <- c("tmean", "precip", "dbh.recon")
 gam2.weights <- factor.weights(model.gam = gam2, model.name = "species_response", newdata = test, extent = "", vars = vars, limiting=T)
 
 summary(gam2.weights)
 summary(test)
 gam2.weights[,c("BA.inc", "group", "Canopy.Class")] <- test[,c("BA.inc", "group", "Canopy.Class")] # Adding in factors we forgot
 
+gam2.weights[,c("fit.full.bai", "tmean.bai", "precip.bai", "dbh.bai")] <- exp(gam2.weights[,c("fit.full", "fit.tmean", "fit.precip", "fit.dbh.recon")])
+summary(gam2.weights)
 
 # Just the weights of tmean and Precip, ignoring size
-vars2 <- c("fit.tmean", "fit.precip")
+vars2 <- c("tmean.bai", "precip.bai")
 fit.spline2 <- rowSums(abs(gam2.weights[,vars2]), na.rm=T)
 for(v in vars2){
 	gam2.weights[,paste("weight", v, "2", sep=".")] <- gam2.weights[,v]/fit.spline2
 }
 summary(gam2.weights)
 
-cols.weights <- c("weight.fit.tmean.2", "weight.fit.precip.2")
+cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2")
 for(i in 1:nrow(gam2.weights)){
 	fweight <- abs(gam2.weights[i,cols.weights])
 	gam2.weights[i,"max2"] <- max(fweight, na.rm=T)
