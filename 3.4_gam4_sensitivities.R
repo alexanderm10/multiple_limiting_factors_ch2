@@ -73,23 +73,29 @@ summary(mean.model)
 mean.model2 <- mean.model
 names(mean.model2)[3:5] <- c("mod.mean", "mod.lwr", "mod.up")
 
-sanity.gam4.df <- merge(mean.model2, mean.rw, all.x=T, all.y=T)
-summary(sanity.gam4.df)
-summary(sanity.gam4.df[is.na(sanity.gam4.df$mod.mean),])
-head(sanity.gam4.df[is.na(sanity.gam4.df$mod.mean),])
+gam4.resid <- resid(gam4)
+hist(gam4.resid)
+test$resid.gam4 <- resid(gam4)
+plot(log(BA.inc) ~ resid.gam4, data=test)
+abline(a=0, b=1, col="red")
 
-sanity.gam4.df$log.BAI <- log(sanity.gam4.df$BAI.mean)
 
-# LM on aggregated BAI
-sanity.lm4 <- lm(mod.mean ~ log.BAI, data=sanity.gam4.df)
-lm4.resid <- resid(sanity.lm4)
+# # sanity.gam4.df <- merge(mean.model2, mean.rw, all.x=T, all.y=T)
+# summary(sanity.gam4.df)
+# summary(sanity.gam4.df[is.na(sanity.gam4.df$mod.mean),])
+# head(sanity.gam4.df[is.na(sanity.gam4.df$mod.mean),])
 
-summary(sanity.lm4)
+# sanity.gam4.df$log.BAI <- log(sanity.gam4.df$BAI.mean)
+
+# # LM on aggregated BAI
+# sanity.lm4 <- lm(mod.mean ~ log.BAI, data=sanity.gam4.df)
+# lm4.resid <- resid(sanity.lm4)
+
+# summary(sanity.lm4)
 
 # Graphing residuals
-
-plot(sanity.gam4.df$log.BAI ~ lm4.resid, xlab="Log.BAI", ylab="Residuals", main="gam4 residuals", ylim=c(-4,4))
-abline(0,0)
+# # plot(sanity.gam4.df$log.BAI ~ lm4.resid, xlab="Log.BAI", ylab="Residuals", main="gam4 residuals", ylim=c(-4,4))
+# abline(0,0)
 
 # Sanity Check #1 graph
 pdf("figures/gam_sanity_check/gam4_sanitycheck1.pdf", width= 13, height = 8.5)
@@ -140,17 +146,17 @@ ggplot(data=test[test$TreeID %in% sanity2.trees,]) + facet_wrap(TreeID~ Site, sc
 dev.off()
 
 
-# lm2 for sanity check 2
-summary(model.pred2)
-summary(data.use)
-summary(test)
+# # # lm2 for sanity check 2
+# summary(model.pred2)
+# summary(data.use)
+# summary(test)
 
-model.pred2$RW <- test$RW
-model.pred2$BAI <- test$BA.inc
+# model.pred2$RW <- test$RW
+# model.pred2$BAI <- test$BA.inc
 
-# LM for indiv. trees
-sanity.lm2 <- lm(BAI ~ mean, data=model.pred2)
-summary(sanity.lm2)
+# # LM for indiv. trees
+# sanity.lm2 <- lm(BAI ~ mean, data=model.pred2)
+# summary(sanity.lm2)
 
 # sanity.lm2.quru <- lm(RW ~ mean, data=model.pred2[model.pred2$group=="quru",])
 # summary(sanity.lm2)
@@ -172,7 +178,7 @@ source("0_Calculate_GAMM_Weights.R")
 
 predictors.all
 # vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc", "Site")
-vars <- c("tmean", "precip", "dbh.recon") # This should be your splines for those splines
+vars <- c("tmean", "precip", "dbh.recon", "Year") # This should be your splines for those splines
 test$BAI.orig <- test$BA.inc
 # test$BA.inc <- log(test$BA.inc)
 gam4.weights <- factor.weights(model.gam = gam4, model.name = "species_response", newdata = test, extent = "", vars = vars, limiting=T)
@@ -186,18 +192,18 @@ summary(gam4.weights)
 
 # Just the weights of tmean and Precip, ignoring size
 # Switching to use the BAI-corrected effects
-vars2 <- c("tmean.bai", "precip.bai")
+vars2 <- c("tmean.bai", "precip.bai", "dbh.bai")
 fit.spline2 <- rowSums(abs(gam4.weights[,vars2]), na.rm=T)
 for(v in vars2){
 	gam4.weights[,paste("weight", v, "2", sep=".")] <- gam4.weights[,v]/fit.spline2
 }
 summary(gam4.weights)
 
-cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2")
+cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2", "weight.dbh.bai.2")
 for(i in 1:nrow(gam4.weights)){
 	fweight <- abs(gam4.weights[i,cols.weights])
 	gam4.weights[i,"max2"] <- max(fweight, na.rm=T)
-	gam4.weights[i,"factor.max2"] <- c("tmean", "precip")[which(fweight==max(fweight))]
+	gam4.weights[i,"factor.max2"] <- c("tmean", "precip", "dbh.recon")[which(fweight==max(fweight))]
 }
 gam4.weights$factor.max2 <- as.factor(gam4.weights$factor.max2)
 summary(gam4.weights)

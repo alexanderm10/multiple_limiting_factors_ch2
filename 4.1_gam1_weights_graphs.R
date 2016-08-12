@@ -4,7 +4,10 @@ load(file="processed_data/gamm_weights/gam1_weights.Rdata")
 
 summary(gam1.weights)
 factors.fits <- c("fit.tmean", "fit.precip", "fit.dbh.recon", "fit.full", "BA.inc")
-factors.weights <- c("weight.tmean", "weight.dbh.recon", "weight.precip")
+# factors.weights <- c("weight.tmean", "weight.dbh.recon", "weight.precip")
+# factors.weights <- c("weight.tmean.bai.2", "weight.dbh.bai.2", "weight.precip.bai.2")
+factors.weights <- c("weight.tmean2", "weight.dbh.recon2", "weight.precip2")
+gam1.weights[,c("weight.tmean2", "weight.precip2", "weight.dbh.recon2")] <- gam1.weights[,c("weight.tmean", "weight.precip", "weight.dbh.recon")]/rowSums(gam1.weights[,c("weight.tmean", "weight.precip", "weight.dbh.recon")],na.rm=T)
 
 # Transforming things back to BA.inc rather than log
 gam1.weights[,which(substr(names(gam1.weights),1,3)=="fit")] <- exp(gam1.weights[,which(substr(names(gam1.weights),1,3)=="fit")] )
@@ -31,8 +34,8 @@ data.graph <- merge(data.graph1, data.graph2, all.x=T, all.y=T)
 
 # data.graph <- gam1.weights[gam1.weights$TreeID== "MMA014",]
 summary(data.graph)
-gam1.weights$wts.check <- rowSums(abs(gam1.weights[,c("weight.tmean", "weight.precip", "weight.dbh.recon")]))
-data.graph$wts.check <- rowSums(abs(data.graph[,c("weight.tmean", "weight.precip", "weight.dbh.recon")]))
+gam1.weights$wts.check <- rowSums(abs(gam1.weights[,factors.weights]))
+data.graph$wts.check <- rowSums(abs(data.graph[,factors.weights]))
 
 summary(gam1.weights)
 summary(data.graph)
@@ -43,9 +46,9 @@ data.graph<- data.graph[order(data.graph$Year, data.graph$group, data.graph$Site
 summary(data.graph)
 
 plot.rgb <- function(STATE, SPP, SIZE){	geom_point(data=data.graph[data.graph$State==STATE & data.graph$group==SPP,],aes(x=Year, y=fit.full), size=SIZE,
-  		        color=rgb(abs(data.graph[data.graph$State==STATE & data.graph$group==SPP,"weight.tmean"     ]), # red
-                        abs(data.graph[data.graph$State==STATE & data.graph$group==SPP,"weight.dbh.recon"     ]), # green
-                        abs(data.graph[data.graph$State==STATE & data.graph$group==SPP,"weight.precip"   ]))) }   # blue
+  		        color=rgb(abs(data.graph[data.graph$State==STATE & data.graph$group==SPP,"weight.tmean2"     ]), # red
+                        abs(data.graph[data.graph$State==STATE & data.graph$group==SPP,"weight.dbh.recon2"     ]), # green
+                        abs(data.graph[data.graph$State==STATE & data.graph$group==SPP,"weight.precip2"   ]))) }   # blue
 
 # Plotting the Obs and modeled with influence coloring
 data.graph$State <- recode(data.graph$Site, "'Howland' = 'ME';'Harvard' = 'MA';'Morgan Monroe State Park' = 'IN';'Missouri Ozark' = 'MO';'Oak Openings Toledo' = 'OH'")
@@ -183,12 +186,12 @@ ggplot(data.graph) + facet_grid(group~State) +
 	# geom_ribbon(data=gam4.weights[gam4.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
 	 geom_vline(data=climate.markers[climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
   	scale_color_manual(values=c("red", "blue"))+
-	geom_ribbon(aes(x=Year, ymin=weight.tmean.lwr, ymax=weight.tmean.upr), fill="red", alpha=0.25) +
-	geom_ribbon(aes(x=Year, ymin=weight.precip.lwr, ymax=weight.precip.upr), fill="blue", alpha=0.25) +
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon.lwr, ymax=weight.dbh.recon.upr), fill="green", alpha=0.25) +
-	geom_line(aes(x=Year, y=weight.tmean), size=1, color="red") +
-	geom_line(aes(x=Year, y=weight.precip), size=1, color="blue") +
-	geom_line(aes(x=Year, y=weight.dbh.recon), size=1, color="green")+
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2.lwr, ymax=weight.tmean2.upr), fill="red", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2.lwr, ymax=weight.precip2.upr), fill="blue", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2.lwr, ymax=weight.dbh.recon2.upr), fill="green", alpha=0.25) +
+	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
+	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
+	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="green")+
 	
 	
 	
@@ -208,12 +211,12 @@ ggplot(data.graph) + facet_grid(group~State) +
 	# geom_ribbon(data=gam4.weights[gam4.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
 	 geom_vline(data=climate.markers[climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
   	scale_color_manual(values=c("lightblue", "brown"))+
-	geom_ribbon(aes(x=Year, ymin=weight.tmean.lwr, ymax=weight.tmean.upr), fill="red", alpha=0.25) +
-	geom_ribbon(aes(x=Year, ymin=weight.precip.lwr, ymax=weight.precip.upr), fill="blue", alpha=0.25) +
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon.lwr, ymax=weight.dbh.recon.upr), fill="green", alpha=0.25) +
-	geom_line(aes(x=Year, y=weight.tmean), size=1, color="red") +
-	geom_line(aes(x=Year, y=weight.precip), size=1, color="blue") +
-	geom_line(aes(x=Year, y=weight.dbh.recon), size=1, color="green")+
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2.lwr, ymax=weight.tmean2.upr), fill="red", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2.lwr, ymax=weight.precip2.upr), fill="blue", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2.lwr, ymax=weight.dbh.recon2.upr), fill="green", alpha=0.25) +
+	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
+	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
+	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="green")+
 	
 	
 	
@@ -231,7 +234,7 @@ dev.off()
 
 
 ############################################################################
-# Looking at the BAI for each canopy class in reference to climate factors
+# Looking at the BAI for each SPP in reference to climate factors
 ############################################################################
 
 
@@ -243,8 +246,8 @@ ggplot(data.graph[data.graph$State=="MO",]) + facet_grid(group~., scales="free")
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="MO" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue", "dodgerblue", "brown"))+
   	xlim(1920,2015)+
@@ -257,8 +260,8 @@ ggplot(data.graph[data.graph$State=="MO",]) + facet_grid(group~., scales="free")
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="MO" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1920,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -267,14 +270,14 @@ ggplot(data.graph[data.graph$State=="MO",]) + facet_grid(group~., scales="free")
 
 
 # Morgan Monroe
-# Missouri Ozark
+
 ggplot(data.graph[data.graph$State=="IN",]) + facet_grid(group~., scales="free") + 
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="IN" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue", "dodgerblue", "brown"))+
   	xlim(1920,2015)+
@@ -287,8 +290,8 @@ ggplot(data.graph[data.graph$State=="IN",]) + facet_grid(group~., scales="free")
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="IN" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1920,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -297,14 +300,14 @@ ggplot(data.graph[data.graph$State=="IN",]) + facet_grid(group~., scales="free")
         
 # Oak Openings
 
-# Missouri Ozark
+
 ggplot(data.graph[data.graph$State=="OH",]) + facet_grid(group~., scales="free") + 
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="OH" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue", "dodgerblue", "brown"))+
   	xlim(1920,2015)+
@@ -317,8 +320,8 @@ ggplot(data.graph[data.graph$State=="OH",]) + facet_grid(group~., scales="free")
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="OH" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1920,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -327,14 +330,14 @@ ggplot(data.graph[data.graph$State=="OH",]) + facet_grid(group~., scales="free")
         
 # Harvard
 
-# Missouri Ozark
+
 ggplot(data.graph[data.graph$State=="MA",]) + facet_grid(group~., scales="free") + 
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="MA" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue", "dodgerblue", "brown"))+
   	xlim(1900,2015)+
@@ -347,8 +350,8 @@ ggplot(data.graph[data.graph$State=="MA",]) + facet_grid(group~., scales="free")
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="MA" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1900,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -357,14 +360,14 @@ ggplot(data.graph[data.graph$State=="MA",]) + facet_grid(group~., scales="free")
         
 # Howland
 
-# Missouri Ozark
+
 ggplot(data.graph[data.graph$State=="ME",]) + facet_grid(group~., scales="free") + 
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="ME" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue", "dodgerblue", "brown"))+
   	xlim(1900,2015)+
@@ -377,8 +380,8 @@ ggplot(data.graph[data.graph$State=="ME",]) + facet_grid(group~., scales="free")
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
   	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+  	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="ME" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1900,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+

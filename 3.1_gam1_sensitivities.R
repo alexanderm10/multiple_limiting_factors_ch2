@@ -74,23 +74,11 @@ names(mean.model2)[4:6] <- c("mod.mean", "mod.lwr", "mod.up")
 
 mean.model2$exp.mod.mean <- exp(mean.model2$mod.mean)
 
-sanity.gam1.df <- merge(mean.model2, mean.rw, all.x=T, all.y=T)
-summary(sanity.gam1.df)
-
-sanity.gam1.df$log.BAI <- log(sanity.gam1.df$BAI.mean)
-
-summary(sanity.gam1.df[is.na(sanity.gam1.df$mod.mean),])
-head(sanity.gam1.df[is.na(sanity.gam1.df$mod.mean),])
-
-# LM on aggregated BAI
-sanity.lm1 <- lm(mod.mean ~ log.BAI, data=sanity.gam1.df)
-gam1.resid <- resid(sanity.lm1)
-
-summary(sanity.lm1)
-
-# Checking residuals
-plot(sanity.gam1.df$log.BAI ~ gam1.resid, ylab="Residuals", xlab="log.BAI", ylim=c(-4,4), main="GAM1 Residuals")
-abline(0,0)
+gam1.resid <- resid(gam1)
+hist(gam1.resid)
+test$resid.gam1 <- resid(gam1)
+plot(log(BA.inc) ~ resid.gam1, data=test)
+abline(a=0, b=1, col="red")
 
 summary(mean.rw)
 
@@ -134,20 +122,20 @@ ggplot(data=test[test$TreeID %in% sanity2.trees,]) + facet_wrap(TreeID~ Site, sc
 dev.off()
 
 
-# lm2 for sanity check 2
-summary(model.pred2)
-summary(data.use)
-summary(test)
+# # lm2 for sanity check 2
+# summary(model.pred2)
+# summary(data.use)
+# summary(test)
 
-model.pred2$RW <- test$RW
-model.pred2$BAI <- test$BA.inc
+# model.pred2$RW <- test$RW
+# model.pred2$BAI <- test$BA.inc
 
-# LM for indiv. trees
-sanity.lm2 <- lm(log(BAI) ~ mean, data=model.pred2)
-summary(sanity.lm2)
-
-# sanity.lm2.quru <- lm(RW ~ mean, data=model.pred2[model.pred2$group=="quru",])
+# # LM for indiv. trees
+# sanity.lm2 <- lm(log(BAI) ~ mean, data=model.pred2)
 # summary(sanity.lm2)
+
+# # sanity.lm2.quru <- lm(RW ~ mean, data=model.pred2[model.pred2$group=="quru",])
+# # summary(sanity.lm2)
 
 
 # running scripts to get the weights
@@ -166,7 +154,7 @@ source("0_Calculate_GAMM_Weights.R")
 
 predictors.all
 # vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
-vars <- c("tmean", "precip", "dbh.recon") # This should be your splines for those splines
+vars <- c("tmean", "precip", "dbh.recon", "Year") # This should be your splines for those splines
 gam1.weights <- factor.weights(model.gam = gam1, model.name = "species_response", newdata = test, extent = "", vars = vars, limiting=T)
 
 summary(gam1.weights)
@@ -177,18 +165,19 @@ gam1.weights[,c("fit.full.bai", "tmean.bai", "precip.bai", "dbh.bai")] <- exp(ga
 summary(gam1.weights)
 
 # Just the weights of tmean and Precip, ignoring size
-vars2 <- c("tmean.bai", "precip.bai")
+vars2 <- c("tmean.bai", "precip.bai", "dbh.bai")
 fit.spline2 <- rowSums(abs(gam1.weights[,vars2]), na.rm=T)
 for(v in vars2){
 	gam1.weights[,paste("weight", v, "2", sep=".")] <- gam1.weights[,v]/fit.spline2
 }
 summary(gam1.weights)
 
-cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2")
+cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2", "weight.dbh.bai.2")
+gam1.weights$factor.max2 <- NA
 for(i in 1:nrow(gam1.weights)){
 	fweight <- abs(gam1.weights[i,cols.weights])
 	gam1.weights[i,"max2"] <- max(fweight, na.rm=T)
-	gam1.weights[i,"factor.max2"] <- c("tmean", "precip")[which(fweight==max(fweight))]
+	gam1.weights[i,"factor.max2"] <- c("tmean", "precip", "dbh.recon")[which(fweight==max(fweight))]
 }
 gam1.weights$factor.max2 <- as.factor(gam1.weights$factor.max2)
 summary(gam1.weights)

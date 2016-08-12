@@ -5,12 +5,13 @@ load(file="processed_data/gamm_weights/gam2_weights.Rdata")
 
 summary(gam2.weights)
 factors.fits <- c("fit.tmean", "fit.precip", "fit.dbh.recon", "fit.full", "BA.inc")
-factors.weights <- c("weight.tmean", "weight.dbh.recon", "weight.precip")
+# factors.weights <- c("weight.tmean", "weight.dbh.recon", "weight.precip")
+# factors.weights <- c("weight.tmean.bai.2", "weight.dbh.bai.2", "weight.precip.bai.2")
+factors.weights <- c("weight.tmean2", "weight.dbh.recon2", "weight.precip2")
+gam2.weights[,c("weight.tmean2", "weight.precip2", "weight.dbh.recon2")] <- gam2.weights[,c("weight.tmean", "weight.precip", "weight.dbh.recon")]/rowSums(gam2.weights[,c("weight.tmean", "weight.precip", "weight.dbh.recon")],na.rm=T)
 
 # Transforming things back to BA.inc rather than log
 gam2.weights[,which(substr(names(gam2.weights),1,3)=="fit")] <- exp(gam2.weights[,which(substr(names(gam2.weights),1,3)=="fit")] )
-
-
 
 othervars <- c("Year", "Site", "Canopy.Class", "Model")
 
@@ -34,8 +35,8 @@ data.graph <- merge(data.graph1, data.graph2, all.x=T, all.y=T)
 
 # data.graph <- gam2.weights[gam2.weights$TreeID== "MMA014",]
 summary(data.graph)
-gam2.weights$wts.check <- rowSums(abs(gam2.weights[,c("weight.tmean", "weight.precip", "weight.dbh.recon")]))
-data.graph$wts.check <- rowSums(abs(data.graph[,c("weight.tmean", "weight.precip", "weight.dbh.recon")]))
+gam2.weights$wts.check <- rowSums(abs(gam2.weights[,factors.weights]))
+data.graph$wts.check <- rowSums(abs(data.graph[,factors.weights]))
 
 summary(gam2.weights)
 summary(data.graph)
@@ -46,9 +47,9 @@ data.graph<- data.graph[order(data.graph$Year, data.graph$Canopy.Class, data.gra
 
 
 plot.rgb <- function(STATE, CC, SIZE){	geom_point(data=data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,],aes(x=Year, y=fit.full), size=SIZE,
-  		        color=rgb(abs(data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,"weight.tmean"     ]), # red
-                        abs(data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,"weight.dbh.recon"     ]), # green
-                        abs(data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,"weight.precip"   ]))) }   # blue
+  		        color=rgb(abs(data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,"weight.tmean2"     ]), # red
+                        abs(data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,"weight.dbh.recon2"     ]), # green
+                        abs(data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,"weight.precip2"   ]))) }   # blue
 
 
 # Plotting the Obs and modeled with influence coloring
@@ -61,7 +62,7 @@ ggplot(data.graph) + facet_grid(State~Canopy.Class, scale="free") +
 	scale_x_continuous(expand=c(0,0)) +
 	scale_y_continuous(expand=c(0,0)) +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
-	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
 	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
 	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3) +
 	
@@ -101,7 +102,7 @@ ggplot(data.graph) + facet_grid(State~Canopy.Class) +
   scale_x_continuous(expand=c(0,0), name="Year") +
   scale_y_continuous(expand=c(0,0), name="BAI") +
   # facet_wrap(~TreeID, scales="free_y", space="free") +
-  # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  # geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
   geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
   geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)
 
@@ -120,9 +121,9 @@ ggplot(data.graph[data.graph$State=="MO",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="MO" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue"))+
   	xlim(1900,2015)+
@@ -134,9 +135,9 @@ ggplot(data.graph[data.graph$State=="MO",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="MO" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1900,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -150,9 +151,9 @@ ggplot(data.graph[data.graph$State=="IN",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="IN" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue"))+
   	xlim(1900,2015)+
@@ -164,9 +165,9 @@ ggplot(data.graph[data.graph$State=="IN",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="IN" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1900,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -182,9 +183,9 @@ ggplot(data.graph[data.graph$State=="OH",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="OH" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue"))+
   	xlim(1900,2015)+
@@ -196,9 +197,9 @@ ggplot(data.graph[data.graph$State=="OH",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="OH" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1900,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -211,9 +212,9 @@ ggplot(data.graph[data.graph$State=="MA",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="MA" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue"))+
   	xlim(1900,2015)+
@@ -225,9 +226,9 @@ ggplot(data.graph[data.graph$State=="MA",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="MA" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1900,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -241,9 +242,9 @@ ggplot(data.graph[data.graph$State=="ME",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="ME" & climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	scale_color_manual(values=c("red", "blue"))+
   	xlim(1900,2015)+
@@ -255,9 +256,9 @@ ggplot(data.graph[data.graph$State=="ME",]) + facet_grid(Canopy.Class~., scales=
 	scale_x_continuous(expand=c(0,0), name="Year") +
   	scale_y_continuous(expand=c(0,0), name="BAI") +
   	# facet_wrap(~TreeID, scales="free_y", space="free") +
-  	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  	geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  	geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)+
+  	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+  	geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
+	geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3)+
   	geom_vline(data=climate.markers[climate.markers$State=="ME" & climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
   	xlim(1900,2015)+
   	scale_color_manual(values=c("dodgerblue", "brown"))+
@@ -274,7 +275,7 @@ data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "M
 pdf("figures/Prelim_Figures/gam2_influence_in_time.pdf", width= 13, height = 8.5)
 ggplot(data.graph) + facet_grid(State ~ Canopy.Class, scale="free") +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
-	# geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
+	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
 	geom_vline(data=climate.markers[climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
 	geom_line(aes(x=Year, y=fit.tmean), size=1, color="red") +
 	geom_line(aes(x=Year, y=fit.precip), size=1, color="blue") +
@@ -291,13 +292,13 @@ pdf("figures/Prelim_Figures/gam2_influence_in_time_weights_temp.pdf", width= 13,
 ggplot(data.graph) + facet_grid(State~Canopy.Class) +
 	geom_vline(data=climate.markers[climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
 	scale_color_manual(values=c("red", "blue"))+
-	geom_ribbon(aes(x=Year, ymin=weight.tmean.lwr, ymax=weight.tmean.upr), alpha=0.25, fill="red") +
-	geom_ribbon(aes(x=Year, ymin=weight.precip.lwr, ymax=weight.precip.upr), alpha=0.25, fill="blue") +
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon.lwr, ymax=weight.dbh.recon.upr), alpha=0.25, fill="green") +
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2.lwr, ymax=weight.tmean2.upr), alpha=0.25, fill="red") +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2.lwr, ymax=weight.precip2.upr), alpha=0.25, fill="blue") +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2.lwr, ymax=weight.dbh.recon2.upr), alpha=0.25, fill="green") +
 
-	geom_line(aes(x=Year, y=weight.tmean), size=1, color="red") +
-	geom_line(aes(x=Year, y=weight.precip), size=1, color="blue") +
-	geom_line(aes(x=Year, y=weight.dbh.recon), size=1, color="green")+
+	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
+	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
+	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="green")+
 	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
 panel.background = element_blank())+
 	theme(axis.line.x = element_line(color="black", size = 0.5),
@@ -309,13 +310,13 @@ pdf("figures/Prelim_Figures/gam2_influence_in_time_weights_precip.pdf", width= 1
 ggplot(data.graph) + facet_grid(State~Canopy.Class) +
 	geom_vline(data=climate.markers[climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
 	scale_color_manual(values=c("dodgerblue", "brown"))+
-	geom_ribbon(aes(x=Year, ymin=weight.tmean.lwr, ymax=weight.tmean.upr), alpha=0.25, fill="red") +
-	geom_ribbon(aes(x=Year, ymin=weight.precip.lwr, ymax=weight.precip.upr), alpha=0.25, fill="blue") +
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon.lwr, ymax=weight.dbh.recon.upr), alpha=0.25, fill="green") +
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2.lwr, ymax=weight.tmean2.upr), alpha=0.25, fill="red") +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2.lwr, ymax=weight.precip2.upr), alpha=0.25, fill="blue") +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2.lwr, ymax=weight.dbh.recon2.upr), alpha=0.25, fill="green") +
 
-	geom_line(aes(x=Year, y=weight.tmean), size=1, color="red") +
-	geom_line(aes(x=Year, y=weight.precip), size=1, color="blue") +
-	geom_line(aes(x=Year, y=weight.dbh.recon), size=1, color="green")+
+	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
+	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
+	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="green")+
 	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
 panel.background = element_blank())+
 	theme(axis.line.x = element_line(color="black", size = 0.5),
@@ -325,61 +326,14 @@ dev.off()
 
 
 
-# #---------------------------------------------------
-# # Plotting just MMF and Harvard for Ameridendro
-
-# sites.use2 <- c("Harvard", "Morgan Monroe State Park")
-
-# # Plotting the Obs and modeled with influence coloring
-# pdf("figures/gam2_canopyclass_BAI_limiting_factors_ameridendro.pdf", width= 13, height = 8.5)
-# ggplot(data.graph[data.graph$Site %in% sites.use2,]) + facet_grid(Canopy.Class~Site) +
-	# scale_x_continuous(expand=c(0,0), name="Year") +
-	# scale_y_continuous(expand=c(0,0), name="BAI") +
-	# # facet_wrap(~TreeID, scales="free_y", space="free") +
-	# # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	# geom_line(aes(x=Year, y=BA.inc), size=2, alpha=0.5) +
-	# geom_ribbon(aes(x=Year, ymin=BA.inc.lwr, ymax=BA.inc.upr), alpha=0.3) +
+# Checking residuals
+ggplot(data=data.graph) + facet_grid(Canopy.Class~State, scales="free") +
+	geom_point(aes(x=log(fit.full), y=log(BA.inc)))+
+	geom_abline(intercept=0, slope=1, color="red")
 	
-	# geom_line(aes(x=Year, y = 0), linetype="dashed") +
-	# plot.rgb("Harvard", "C", 3) +
-	# plot.rgb("Harvard", "D", 3) +
-	# plot.rgb("Harvard", "I", 3) +
-	# plot.rgb("Harvard", "S", 3) +
-
 	
-	# plot.rgb("Morgan Monroe State Park", "C", 3) +
-	# plot.rgb("Morgan Monroe State Park", "D", 3) +
-	# plot.rgb("Morgan Monroe State Park", "I", 3) +
-	# plot.rgb("Morgan Monroe State Park", "S", 3) +
-	# poster.theme2
 	
-
-# dev.off()		
-# # Just plotting the BAI fits
-# summary(data.graph)
-
-# ggplot(data.graph) + facet_wrap(group~Site) +
-  # scale_x_continuous(expand=c(0,0), name="Year") +
-  # scale_y_continuous(expand=c(0,0), name="BAI") +
-  # # facet_wrap(~TreeID, scales="free_y", space="free") +
-  # # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-  # geom_line(aes(x=Year, y=fit.full), size=2, alpha=0.5) +
-  # geom_ribbon(aes(x=Year, ymin=fit.full.lwr, ymax=fit.full.upr), alpha=0.3)
-
-# # Plotting the Effects
-
-# pdf("figures/gam2_influence_in_time_ameridendro.pdf", width= 13, height = 8.5)
-# ggplot(data.graph[data.graph$Site %in% sites.use2,]) + facet_grid(Canopy.Class~Site) +
-	# scale_x_continuous(expand=c(0,0), name="Year") +
-	# scale_y_continuous(expand=c(0,0), name="Effect on RW (in mm)") +
-	# # facet_wrap(~TreeID, scales="free_y", space="free") +
-	# # geom_ribbon(data=gam1.weights[gam1.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	# geom_line(aes(x=Year, y=fit.tmean), size=2, color="red") +
-	# geom_line(aes(x=Year, y=fit.precip), size=2, color="blue") +
-	# geom_line(aes(x=Year, y=fit.dbh.recon), size=2, color="green") +
-	# poster.theme2
 	
-# dev.off()	
 
 gam2.data.graph <- data.graph
 save(gam2.data.graph, file="processed_data/gam2_graph_data.Rdata")

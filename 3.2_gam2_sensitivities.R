@@ -1,4 +1,4 @@
- ################################################### 
+################################################### 
 # Copied over from 0_process_gamm.R
 # This will give us the sensitivities of RW in a pretty format.
 
@@ -41,8 +41,8 @@ mean.modelB[,"BAI.lwr"] <- aggregate(model.pred2$mean.bai, by=model.pred2[,c("Si
 mean.modelB[,"BAI.upr"] <- aggregate(model.pred2$mean.bai, by=model.pred2[,c("Site", "Year")], FUN=quantile, probs=0.975, na.rm=T)[,"x"]
 head(mean.modelB)
 
-# creating a group.cc variable for test
-test$group.cc <- as.factor(paste(test$group, test$Canopy.Class, sep="."))
+# # creating a group.cc variable for test
+# test$group.cc <- as.factor(paste(test$group, test$Canopy.Class, sep="."))
 
 # aggregating the raw data for graphing
 mean.rw <- aggregate(test$BA.inc, by=test[, c("Canopy.Class", "Site", "Year")], FUN=mean, na.rm=T)
@@ -84,13 +84,19 @@ sanity.gam2.df$log.BAI <- log(sanity.gam2.df$BAI.mean)
 summary(sanity.gam2.df[is.na(sanity.gam2.df$mod.mean),])
 head(sanity.gam2.df[is.na(sanity.gam2.df$mod.mean),])
 
-# LM on aggregated BAI
-sanity.lm2 <- lm(mod.mean ~ log.BAI, data=sanity.gam2.df)
-gam2.resid <- resid(sanity.lm2)
-summary(sanity.lm2)
+gam2.resid <- resid(gam2)
+hist(gam2.resid)
+test$resid.gam2 <- resid(gam2)
+plot(log(BA.inc) ~ resid.gam2, data=test)
+abline(a=0, b=1, col="red")
 
-plot(sanity.gam2.df$log.BAI ~ gam2.resid, xlab="Log BAI", ylab="Residuals", main="Gam2 Residuals", ylim=c(-4,4))
-abline(0,0)
+# # # LM on aggregated BAI
+# sanity.lm2 <- lm(mod.mean ~ log.BAI, data=sanity.gam2.df)
+# gam2.resid <- resid(sanity.lm2)
+# summary(sanity.lm2)
+
+# plot(sanity.gam2.df$log.BAI ~ gam2.resid, xlab="Log BAI", ylab="Residuals", main="Gam2 Residuals", ylim=c(-4,4))
+# abline(0,0)
 
 
 # Sanity Check #1 graph
@@ -134,20 +140,20 @@ ggplot(data=test[test$TreeID %in% sanity2.trees,]) + facet_wrap(TreeID~ Site, sc
 dev.off()
 
 
-# lm2 for sanity check 2
-summary(model.pred2)
-summary(data.use)
-summary(test)
+# # lm2 for sanity check 2
+# summary(model.pred2)
+# summary(data.use)
+# summary(test)
 
-model.pred2$RW <- test$RW
-model.pred2$BAI <- test$BA.inc
+# model.pred2$RW <- test$RW
+# model.pred2$BAI <- test$BA.inc
 
-# LM for indiv. trees
-sanity.lm2 <- lm(BAI ~ mean, data=model.pred2)
-summary(sanity.lm2)
-
-# sanity.lm2.quru <- lm(RW ~ mean, data=model.pred2[model.pred2$group=="quru",])
+# # LM for indiv. trees
+# sanity.lm2 <- lm(BAI ~ mean, data=model.pred2)
 # summary(sanity.lm2)
+
+# # sanity.lm2.quru <- lm(RW ~ mean, data=model.pred2[model.pred2$group=="quru",])
+# # summary(sanity.lm2)
 
 
 # running scripts to get the weights
@@ -166,7 +172,7 @@ source("0_Calculate_GAMM_Weights.R")
 
 predictors.all
 # vars <- c("tmean", "precip", "dbh.recon", "Canopy.Class", "group.plot", "group", "group.cc")
-vars <- c("tmean", "precip", "dbh.recon")
+vars <- c("tmean", "precip", "dbh.recon", "Year")
 gam2.weights <- factor.weights(model.gam = gam2, model.name = "species_response", newdata = test, extent = "", vars = vars, limiting=T)
 
 summary(gam2.weights)
@@ -177,18 +183,18 @@ gam2.weights[,c("fit.full.bai", "tmean.bai", "precip.bai", "dbh.bai")] <- exp(ga
 summary(gam2.weights)
 
 # Just the weights of tmean and Precip, ignoring size
-vars2 <- c("tmean.bai", "precip.bai")
+vars2 <- c("tmean.bai", "precip.bai", "dbh.bai")
 fit.spline2 <- rowSums(abs(gam2.weights[,vars2]), na.rm=T)
 for(v in vars2){
 	gam2.weights[,paste("weight", v, "2", sep=".")] <- gam2.weights[,v]/fit.spline2
 }
 summary(gam2.weights)
 
-cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2")
+cols.weights <- c("weight.tmean.bai.2", "weight.precip.bai.2", "weight.dbh.bai.2")
 for(i in 1:nrow(gam2.weights)){
 	fweight <- abs(gam2.weights[i,cols.weights])
 	gam2.weights[i,"max2"] <- max(fweight, na.rm=T)
-	gam2.weights[i,"factor.max2"] <- c("tmean", "precip")[which(fweight==max(fweight))]
+	gam2.weights[i,"factor.max2"] <- c("tmean", "precip", "dbh.recon")[which(fweight==max(fweight))]
 }
 gam2.weights$factor.max2 <- as.factor(gam2.weights$factor.max2)
 summary(gam2.weights)

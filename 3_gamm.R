@@ -30,7 +30,7 @@ summary(test)
 
 
 # Get a list of what predictors & responses I'm using
-predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc", "Site") 
+predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc", "Site", "Year", "PlotID") 
 
 # Getting rid of observations that have NAs in the important variables
 test <- test[complete.cases(test[,predictors.all]),]
@@ -91,14 +91,20 @@ save(test, file="ch2_combined_data_use.Rdata")
 # RW ~ CLIMATE(Species) + Size
                   
 
-gam1 <- gamm(log(BA.inc)~ s(tmean, k=3, by=group) +
+gam1 <- gam(log(BA.inc)~ s(tmean, k=3, by=group) +
                   s(precip, k=3, by=group) +
                   s(dbh.recon, k=3, by=group) +
-                   Site + Canopy.Class + group,
-                  random=list(Site=~1, PlotID=~1, TreeID=~1),
+                  s(Year, k=4, by=PlotID)+
+                   Site + PlotID  + TreeID + Canopy.Class + group,
+                  # random=list(Site=~1, PlotID=~1, TreeID=~1),
                   data=test)
 
-
+summary(gam1)$r.sq # R-squared
+summary(gam1)$dev.expl # explained deviance
+anova(gam1) 
+# Results 10 Aug 2016
+# Only a few species are significantly sensitive to temp (p<0.05): ACRU, ACSA, PIST, TSCA
+# Only a few species are significantly sensitive to precip (p<0.05): ACSA, TSCA, (FRAX is close)
                   
 # # gam1.test <- gamm(BA.inc ~ s(tmean, k=3, by=group) + # tmean*Species 
                   # s(precip, k=3, by=group) +
@@ -114,12 +120,21 @@ save(gam1, file="processed_data/gam_results/gam1_climate_by_species.Rdata")
 # s(tmean, by=Spp) + s(tmean, by=Canopy) + s(tmean, by=Spp.Can)
 
                   
-gam2 <- gamm(log(BA.inc)~ s(tmean, k=3, by=Canopy.Class) +
+gam2 <- gam(log(BA.inc)~ s(tmean, k=3, by=Canopy.Class) +
                   s(precip, k=3, by=Canopy.Class) +
                   s(dbh.recon, k=3, by=Canopy.Class) +
-                  Site + Canopy.Class + group,
-                  random=list(Site=~1, PlotID=~1, TreeID=~1),
-                  data=test)                  
+                  s(Year, k=4, by=PlotID)+
+                   Site + PlotID  + TreeID + Canopy.Class + group,
+                  # random=list(Site=~1, PlotID=~1, TreeID=~1),
+                  data=test)
+# Look at the R-squared and explained deviance
+summary(gam2)$r.sq # R-squared
+summary(gam2)$dev.expl # explained deviance
+anova(gam2) 
+# Results 10 Aug 2016
+# Only Dominant trees have a significant trend with precip
+# Intermediate trees (as a whole) are insensitive to temperature 
+#  -- suppressed trees still have the U-shape
                   
 # # gam2.test <- gamm(BA.inc~ s(tmean, k=3, by=Canopy.Class) +
                   # s(precip, k=3, by=Canopy.Class) +
@@ -135,12 +150,20 @@ gam2 <- gamm(log(BA.inc)~ s(tmean, k=3, by=Canopy.Class) +
                   # random=list(Site=~1, PlotID=~1, TreeID=~1),
                   # data=test, control=list(niterEM=0, sing.tol=1e-20, opt="optim"))
 
-gam4 <- gamm(log(BA.inc)~ s(tmean, k=3, by=Site) +
+gam4 <- gam(log(BA.inc)~ s(tmean, k=3, by=Site) +
                   s(precip, k=3, by=Site) +
                   s(dbh.recon, k=3, by=Site) +
-                  Site + Canopy.Class + group,
-                  random=list(PlotID=~1, TreeID=~1),
+                  s(Year, k=4, by=PlotID)+
+                  Site + PlotID  + TreeID + Canopy.Class + group,
+                  # random=list(Site=~1, PlotID=~1, TreeID=~1),
                   data=test)
+summary(gam4)$r.sq # R-squared
+summary(gam4)$dev.expl # explained deviance
+anova(gam4) 
+# Results 10 Aug 2016
+# Only Dominant trees have a significant trend with precip
+# Intermediate trees (as a whole) are insensitive to temperature 
+#  -- suppressed trees still have the U-shape
 
 
 
@@ -172,26 +195,43 @@ data <- test
 		
 		# Figure out which vars are numeric vs. factor
 		vars.num <- vector()
+		
 		for(v in predictors.all){
 			if(class(data[,v]) %in% c("numeric", "integer")) vars.num <- c(vars.num, v)
 		}
 		
 		# Getting the unique values of our factor variables and adding them to the data frame
 		# need to skip group & group.cc so we aren't trying to match Carya & Quercus etc
-		predictors.all <- predictors.all[!predictors.all %in% c("Species", "spp.plot")]
-		for(v in predictors.all[!predictors.all %in% vars.num & !(predictors.all %in% c("group", "group.cc"))]){
+		# predictors.all <- predictors.all[!predictors.all %in% c("Species", "spp.plot")]
+		predictors.all <- c("tmean", "precip", "dbh.recon", "Year", "Site", "PlotID", "TreeID", "Canopy.Class", "group")
+		spline.by=c("group", "Canopy.Class", "Site", "PlotID") # the "by" terms in the models you're running
+		for(v in predictors.all[!predictors.all %in% vars.num & !(predictors.all %in% c("Site"))]){
 			# if v is a factor, merge all unique values into the dataframe
-			var.temp <- data.frame(x=unique(data[,v])) 
+			if(!(v %in% spline.by)){ # Only pull the full range of values for whatever the "by" term was by, otherwise everythign should have the same shape, just different intercepts
+				var.temp <- data.frame(x=unique(data[,v])[1]) 
+			}else {
+				var.temp <- data.frame(x=unique(data[,v])) 
+			}
 			names(var.temp) <- v
 			new.dat <- merge(new.dat, var.temp, all.x=T, all.y=T)
 		}
-		# getting species from species.plot
-		new.dat$group <- as.factor(ifelse(substr(new.dat$group.plot, 1, 4)=="BETU", "BETULA", ifelse(substr(new.dat$group.plot, 1,4)=="CARY", "CARYA", substr(new.dat$group.plot, 1, 4))))
+		# Separate out Plot & Site
+		# new.dat$PlotID <- as.factor(ifelse(substr(new.dat$TreeID, 1, 3)=="HOW", substr(new.dat$TreeID, 1, 4), substr(new.dat$TreeID, 1, 3)))
 		
-		# Adding in the group.canopy class then getting rid of combinations we don't actually have in our data
-		new.dat$group.cc <- as.factor(paste(new.dat$group, new.dat$Canopy.Class, sep="."))
-		new.dat <- new.dat[new.dat$group.cc %in% unique(test$group.cc),]
+		# Matching the site for the plot
+		for(p in unique(new.dat$PlotID)){
+			new.dat[new.dat$PlotID==p, "Site"] <- unique(test[test$PlotID==p, "Site"])
+		}
+		new.dat$Site <- as.factor(new.dat$Site)
 		summary(new.dat)
+		
+		# getting species from species.plot
+		# new.dat$group <- as.factor(ifelse(substr(new.dat$group.plot, 1, 4)=="BETU", "BETULA", ifelse(substr(new.dat$group.plot, 1,4)=="CARY", "CARYA", substr(new.dat$group.plot, 1, 4))))
+		
+		# # Adding in the group.canopy class then getting rid of combinations we don't actually have in our data
+		# new.dat$group.cc <- as.factor(paste(new.dat$group, new.dat$Canopy.Class, sep="."))
+		# new.dat <- new.dat[new.dat$group.cc %in% unique(test$group.cc),]
+		# summary(new.dat)
 		
 		# Putting the numerical variables into an array and adding it in 
 		var.temp <- data.frame(array(dim=c(n.out, length(vars.num))))
@@ -203,14 +243,27 @@ data <- test
 		summary(new.dat)
 								
 write.csv(new.dat, file="processed_data/sensitivity_extaction_dataframe.csv", row.names=F)								
+
 # Change which gamm you look at here!
+
+load("processed_data/gam_results/gam1_climate_by_species.Rdata")
 n <- 100						
 		# SOurce & run the function
 		source("0_Calculate_GAMM_Posteriors.R")
-		g1.ci.terms.pred <- post.distns(model.gam=gam1, model.name="species_response", n=n, newdata=new.dat, vars=predictors.all, terms=T)
+		# Make things run faster by reducing dimensions
+		new.dat2 <- new.dat
+		vars.fac <- c("Site", "PlotID", "TreeID", "Canopy.Class", "group")
+		var.smooth <- "group"
+		for(v in vars.fac){
+			if(v == var.smooth) next # keep all levels for our "by" variable
+			# Get rid of unimportant levels for everything else
+			l1 <- unique(new.dat2[,v])[1]
+			new.dat2 <- new.dat2[new.dat2[,v]==l1,]
+		}
+		g1.ci.terms.pred <- post.distns(model.gam=gam1, model.name="species_response", n=n, newdata=new.dat2, vars=predictors.all, terms=T)
 		
 		g1.ci.out <- g1.ci.terms.pred$ci # separting out the confidence interval 
-		g1.ci.out[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
+		g1.ci.out[,predictors.all[!predictors.all %in% vars.num]] <- new.dat2[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
 		g1.ci.out$x <- as.numeric(g1.ci.out$x) # making x numeric; will make factors NA
 		summary(g1.ci.out)
 		
@@ -230,6 +283,13 @@ ci.terms.graph[ci.terms.graph$upr<(-3),"upr"] <- -3
 ci.terms.graph[which(ci.terms.graph$mean>3),"mean"] <- NA 
 ci.terms.graph[ci.terms.graph$lwr>(3),"lwr"] <- 3
 ci.terms.graph[ci.terms.graph$upr>(3),"upr"] <- 3 
+
+ci.terms.graph[ci.terms.graph$mean.bai<(0),"mean.bai"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr.bai<(0),"lwr.bai"] <- 0
+ci.terms.graph[ci.terms.graph$upr.bai<(0),"upr.bai"] <- 0 
+ci.terms.graph[which(ci.terms.graph$mean.bai>12),"mean.bai"] <- NA 
+ci.terms.graph[ci.terms.graph$lwr.bai>(12),"lwr.bai"] <- 12
+ci.terms.graph[ci.terms.graph$upr.bai>(12),"upr.bai"] <- 12 
 	
 
 # Truncating to observed range
@@ -286,7 +346,7 @@ pdf("figures/prelim_figures/gam1_sensitivities_truncated_precip.pdf", width= 13,
 			scale_fill_manual(values=colors.use)+
 			theme_bw()+
 			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", 							"y"^"-1",")"))))+
-			ylim(-1,2)
+			scale_y_continuous(expand=c(0,0))
 dev.off()
 
 pdf("figures/prelim_figures/gam1_sensitivities_truncated_size.pdf", width= 13, height = 8.5)		
@@ -299,7 +359,7 @@ pdf("figures/prelim_figures/gam1_sensitivities_truncated_size.pdf", width= 13, h
 			scale_fill_manual(values=colors.use)+
 			theme_bw()+
 			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2", 							"y"^"-1",")"))))+
-			ylim(-1,10)
+			scale_y_continuous(expand=c(0,0))
 dev.off()
 
 
@@ -317,15 +377,15 @@ pdf("figures/prelim_figures/gam1_sensitivities_truncated_combo.pdf", width= 13, 
 			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
 			 theme(axis.line.x = element_line(color="black", size = 0.5),
         axis.line.y = element_line(color="black", size = 0.5))+
-        scale_x_continuous(expand=c(0,0)) + scale_y_continuous(expand=c(0,0))+
-        ylim(-1,10)
+        scale_x_continuous(expand=c(0,0)) + scale_y_continuous(expand=c(0,0))
+
         
 dev.off()
 
 pdf("figures/prelim_figures/gam1_sensitivities_truncated_combo2.pdf", width= 13, height = 8.5)		
 		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean", "precip", "dbh.recon"),]) + 
 			facet_grid(~Effect, scales = "free") +
-			geom_line(aes(x=x, y=0), linetype="dashed")+
+			geom_hline(yintercept=0, linetype="dashed")+
 			geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=group), alpha=0.5) +
 			geom_line(aes(x=x, y=mean.bai, color=group)) +
 			scale_color_manual(values=colors.use) +
@@ -334,8 +394,8 @@ pdf("figures/prelim_figures/gam1_sensitivities_truncated_combo2.pdf", width= 13,
 			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
 			 theme(axis.line.x = element_line(color="black", size = 0.5),
         axis.line.y = element_line(color="black", size = 0.5))+
-        scale_x_continuous(expand=c(0,0)) + scale_y_continuous(expand=c(0,0))+
-        ylim(-1,10)
+        scale_x_continuous(expand=c(0,0)) + scale_y_continuous(expand=c(0,0))
+
 dev.off()
 
 
@@ -447,6 +507,21 @@ for(s in unique(test$Canopy.Class)){
 
 pdf("figures/Prelim_Figures/gam2_sensitivities.pdf", width= 13, height = 8.5)		
 ggplot(data=g2.ci.out2[g2.ci.out2$Effect %in% c("tmean", "precip", "dbh.recon"), ]) + 
+  facet_wrap(~Effect, scales="free") +
+  geom_line(aes(x=x, y=0), linetype="dashed")+
+  geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=Canopy.Class), alpha=0.5) +
+  geom_line(aes(x=x, y=mean.bai, color=Canopy.Class))+
+  scale_color_manual(values=c("#0072B2", "#009E73", "#E69F00")) +
+  scale_fill_manual(values=c("#0072B2", "#009E73",  "#E69F00")) +
+  theme_bw()+
+  labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
+  theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
+  scale_y_continuous(expand=c(0,0))
+dev.off()		
+
+pdf("figures/Prelim_Figures/gam2_sensitivities_no_size.pdf", width= 13, height = 8.5)		
+ggplot(data=g2.ci.out2[g2.ci.out2$Effect %in% c("tmean", "precip"), ]) + 
   facet_wrap(~Effect, scales="free_x") +
   geom_line(aes(x=x, y=0), linetype="dashed")+
   geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=Canopy.Class), alpha=0.5) +
@@ -457,8 +532,9 @@ ggplot(data=g2.ci.out2[g2.ci.out2$Effect %in% c("tmean", "precip", "dbh.recon"),
   labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
   theme(axis.line.x = element_line(color="black", size = 0.5),
         axis.line.y = element_line(color="black", size = 0.5))+
-  ylim(0,2.5)
-dev.off()		
+  scale_y_continuous(expand=c(0,0))
+dev.off()
+
 
 
 		g2.ci.out2$PlotID <- as.factor(substr(g2.ci.out2$group.plot, 6, nchar(paste(g2.ci.out2$group.plot)))) # adding a plotID factor
@@ -569,7 +645,7 @@ g4.ci.terms.pred <- post.distns(model.gam=gam4, model.name="Site_level", n=n, ne
 		
 		g4.ci.out <- g4.ci.terms.pred$ci # separting out the confidence interval 
 		g4.ci.out[,predictors.all[!predictors.all %in% vars.num]] <- new.dat[,predictors.all[!predictors.all %in% vars.num]] # copying over our factor labels
-		g4.ci.out$x <- as.numeric(g4.ci.out$x) # making x numeric; will make factors NA
+		g4.ci.out$x <- as.numeric(g4.ci.out$x) # making x numeric; will make factors NA; NA's are ok here
 		summary(g4.ci.out)
 
 		# Convert mean, lwr, upr to BAI units
@@ -645,7 +721,7 @@ dev.off()
 
 pdf("figures/prelim_figures/gam4_sensitivities_observed_precip.pdf", width= 13, height = 8.5)
 		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% "precip", ]) + 
-			facet_grid(Site*Effect~.) +
+			facet_wrap(Effect~.) +
 			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +
 			geom_line(aes(x=x, y=exp(mean), color=Site))+
 			geom_hline(yintercept=0, linetype="dashed") +
@@ -674,7 +750,7 @@ dev.off()
 
 pdf("figures/prelim_figures/gam4_sensitivities_observed_combo.pdf", width= 13, height = 8.5)
 		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean", "precip","dbh.recon"), ]) + 
-			facet_grid(~Effect, scales="free") +
+			facet_wrap(~Effect, scales="free", ncol=1) +
 			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +
 			geom_line(aes(x=x, y=exp(mean), color=Site))+
 			geom_hline(yintercept=0, linetype="dashed") +
@@ -684,9 +760,25 @@ pdf("figures/prelim_figures/gam4_sensitivities_observed_combo.pdf", width= 13, h
 			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
 			 theme(axis.line.x = element_line(color="black", size = 0.5),
         axis.line.y = element_line(color="black", size = 0.5))+
-         ylim(0,7)
+         scale_y_continuous(expand=c(0,0))
 dev.off()
  
+pdf("figures/prelim_figures/gam4_sensitivities_observed_combo_no_size.pdf", width= 13, height = 8.5)
+		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean", "precip"), ]) + 
+			facet_wrap(~Effect, scales="free_x") +
+			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +
+			geom_line(aes(x=x, y=exp(mean), color=Site))+
+			geom_hline(yintercept=0, linetype="dashed") +
+			scale_colour_manual("", values = cbbPalette) +
+			scale_fill_manual("", values = cbbPalette) +
+			theme_bw()+
+			labs(x = "Climate Variable", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
+			 theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
+         ylim(-1,3)
+dev.off()
+
+
 ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean", "precip","dbh.recon"), ]) + 
   facet_grid(~Effect, scales="free") +
   geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=Site), alpha=0.5) +

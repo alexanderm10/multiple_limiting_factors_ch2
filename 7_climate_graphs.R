@@ -28,7 +28,7 @@ data.use$Site <- factor(data.use$Site, levels = c("Missouri Ozark", "Morgan Monr
 
 
 summary(data.use)
-data.use <- data.use[data.use$Year >=1920,]
+data.use <- data.use[data.use$Year >=1950,]
 
 # data.use <- na.omit(data.use)
 # data.use <- droplevels(data.use)
@@ -216,7 +216,7 @@ sites <- unique(temp$Site)
 
 dim(temp)
 temp$mean <- NA
-
+require(zoo)
 
 for(s in sites){
 	temp[temp$Site==s,"mean"] <- rollmean(temp[temp$Site==s,"tmean"],10, fill=list(NA,NULL,NA))
