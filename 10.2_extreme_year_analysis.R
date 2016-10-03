@@ -64,10 +64,56 @@ summary(gam2.weights)
 gam2.weights$mix.mark <- as.factor(paste(gam2.weights$Temp.Mark, gam2.weights$Precip.Mark, sep="-"))
 summary(gam2.weights)
 
+# calculating median BAI for temp and precip
+median.temp.s <- data.frame(type= unique(gam2.weights$Temp.Mark))
+for(i in unique(gam2.weights$Temp.Mark)){
+  median.temp.s[median.temp.s$type==i,"median"] <- median(gam2.weights[gam2.weights$Temp.Mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])
+}
+median.temp.s$Canopy.Class <- as.factor("S")
+median.temp.i <- data.frame(type= unique(gam2.weights$Temp.Mark))
+for(i in unique(gam2.weights$Temp.Mark)){
+  median.temp.i[median.temp.s$type==i,"median"] <- median(gam2.weights[gam2.weights$Temp.Mark==i & gam2.weights$Canopy.Class=="I","BA.inc"])
+}
+median.temp.i$Canopy.Class <- as.factor("I")
+
+median.temp.d <- data.frame(type= unique(gam2.weights$Temp.Mark))
+for(i in unique(gam2.weights$Temp.Mark)){
+  median.temp.d[median.temp.s$type==i,"median"] <- median(gam2.weights[gam2.weights$Temp.Mark==i & gam2.weights$Canopy.Class=="D","BA.inc"])
+}
+median.temp.d$Canopy.Class <- as.factor("D")
+
+median.temp <- rbind(median.temp.d, median.temp.i, median.temp.s)
+
+#############
+# Precip
+median.precip.s <- data.frame(type= unique(gam2.weights$Precip.Mark))
+for(i in unique(gam2.weights$Precip.Mark)){
+  median.precip.s[median.precip.s$type==i,"median"] <- median(gam2.weights[gam2.weights$Precip.Mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])
+}
+median.precip.s$Canopy.Class <- as.factor("S")
+median.precip.i <- data.frame(type= unique(gam2.weights$Precip.Mark))
+for(i in unique(gam2.weights$Precip.Mark)){
+  median.precip.i[median.precip.s$type==i,"median"] <- median(gam2.weights[gam2.weights$Precip.Mark==i & gam2.weights$Canopy.Class=="I","BA.inc"])
+}
+median.precip.i$Canopy.Class <- as.factor("I")
+
+median.precip.d <- data.frame(type= unique(gam2.weights$Precip.Mark))
+for(i in unique(gam2.weights$Precip.Mark)){
+  median.precip.d[median.precip.s$type==i,"median"] <- median(gam2.weights[gam2.weights$Precip.Mark==i & gam2.weights$Canopy.Class=="D","BA.inc"])
+}
+median.precip.d$Canopy.Class <- as.factor("D")
+
+median.precip <- rbind(median.precip.d, median.precip.i, median.precip.s)
+
+
+
+
+
 ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +
 	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +
-	scale_color_manual(values=c("grey50", "red", "blue")) +
-	scale_fill_manual(values=c("grey50", "red", "blue")) +
+  geom_vline(data=median.temp, aes(xintercept=median, color=type)) +
+  scale_color_manual(values=c("grey50", "blue", "red")) +
+	scale_fill_manual(values=c("grey50", "blue", "red")) +
 	xlim(0,25) +
 	labs(x= "BAI", y="Density") +
 	theme(axis.line=element_line(color="black"), 
@@ -90,7 +136,8 @@ ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +
 	
 ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +
 	geom_density(aes(x=BA.inc.Clim,color=Precip.Mark, fill=Precip.Mark), alpha=0.1) +
-	scale_color_manual(values=c("grey50", "brown", "darkgreen")) +
+  geom_vline(data=median.precip, aes(xintercept=median, color=type)) +
+  scale_color_manual(values=c("grey50", "brown", "darkgreen")) +
 	scale_fill_manual(values=c("grey50", "brown", "darkgreen")) +
 	xlim(0,25) +
 	labs(x= "BAI", y="Density") +
