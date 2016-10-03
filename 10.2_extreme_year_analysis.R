@@ -57,18 +57,108 @@ tukey.s["Temp.Mark"]
 ###########################################################
 # probabity density functions for extreme years
 ###########################################################
+load("processed_data/climate_markeryears.Rdata")
+summary(gam2.weights)
+
+# Making a combined temp/precip marker year
+gam2.weights$mix.mark <- as.factor(paste(gam2.weights$Temp.Mark, gam2.weights$Precip.Mark, sep="-"))
 summary(gam2.weights)
 
 ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +
 	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +
-	xlim(0,25)
-
+	scale_color_manual(values=c("grey50", "red", "blue")) +
+	scale_fill_manual(values=c("grey50", "red", "blue")) +
+	xlim(0,25) +
+	labs(x= "BAI", y="Density") +
+	theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_text(face="bold", size=rel(1.0)),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="top",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1)) +
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+	
 ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +
-	geom_density(aes(x=BA.inc,color=Precip.Mark,fill=Precip.Mark), alpha=0.1)+
-	xlim(0,25)
+	geom_density(aes(x=BA.inc.Clim,color=Precip.Mark, fill=Precip.Mark), alpha=0.1) +
+	scale_color_manual(values=c("grey50", "brown", "darkgreen")) +
+	scale_fill_manual(values=c("grey50", "brown", "darkgreen")) +
+	xlim(0,25) +
+	labs(x= "BAI", y="Density") +
+	theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_text(face="bold", size=rel(1.0)),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="top",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1)) +
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
 
-ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +
-	geom_density(aes(x=BA.inc,fill=Precip.Mark))
+# Calculating median growth for each extreme year combination
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))
+
+for(i in unique(gam2.weights$mix.mark)){
+	marker.median.s[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])
+}
+marker.median.s$Canopy.Class <- as.factor("S")
+
+marker.median.d <- data.frame(type= unique(gam2.weights$mix.mark))
+
+for(i in unique(gam2.weights$mix.mark)){
+	marker.median.d[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="D","BA.inc"])
+}
+marker.median.d$Canopy.Class <- as.factor("D")
+
+marker.median.i <- data.frame(type= unique(gam2.weights$mix.mark))
+
+for(i in unique(gam2.weights$mix.mark)){
+	marker.median.i[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="I","BA.inc"])
+}
+marker.median.i$Canopy.Class <- as.factor("I")
+
+marker.median <- rbind(marker.median.i, marker.median.d, marker.median.s)
+
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Oak Openings Toledo",]) + facet_grid(Canopy.Class~Site) +
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+
+	xlim(0,25)+ 
+	labs(x= "BAI", y="Density") +
+	theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_text(face="bold", size=rel(1.0)),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="top",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1)) +
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+
 
 
 ###########################################################

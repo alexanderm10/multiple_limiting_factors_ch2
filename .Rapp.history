@@ -1,543 +1,930 @@
-gam2.weights$Year <- as.factor(gam2.weights$Year)
-sea.df <- recast(gam2.weights$BA.inc, Year~TreeID)
-sea.df <- recast(gam2.weights[,c("Year", "TreeID", "Canopy.Class", "BA.inc")], Year~TreeID)
-summary(sea.df)
-sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc")], Year~TreeID)
-summary(sea.df)
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]
-D.names
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]#
-I.names <- gam2.weights[gam2.weights$Canopy.Class=="I", "TreeID"]#
-S.names <- gam2.weights[gam2.weights$Canopy.Class=="S", "TreeID"]
-sea.df[,names(sea.df) %in% D.names]
-row.names(sea.df) <- sea.df$Year
-gam2.weights$Temp.Mark
-sea.test <- sea(sea.df[,names(sea.df) %in% D.names], gam2.weights$Temp.Mark, lag=5, resample=1000)
-unique(gam2.weights$Year)
-which(gam2.weights$Temp.Mark == "hot")
-gam2.weights[gam2.weights$Temp.Mark == "hot", "Year"]
-gam2.weights[gam2.weights$Temp.Mark == "hot", unique(gam2.weights$Year)]
-gam2.weights$Temp.Mark == "hot"
-hot.years <-  gam2.weights[gam2.weights$Temp.Mark == "hot"]"Year"
-hot.years <-  gam2.weights[gam2.weights$Temp.Mark == "hot"]
-gam2.weights$Year[gam2.weights$Temp.Mark == "hot"]
-hot.years <-  unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])
-hot.years
-hot.years <-  unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])
-hot.years <-  unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])#
-cool years <-  unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cool"])#
-wet.years <-  unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
-dry.years <-  unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])
-gam2.weights$Temp.Mark
-hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])
-cool years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])
-gam2.weights$Temp.Mark == "cold"
-gam2.weights$Year[gam2.weights$Temp.Mark == "cold"]
-unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])
-cool years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])
-cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])
-wet.hot.years <- intersect(hot.years, wet.years)
-wet.hot.years
-wet.hot.years <- intersect(hot.years, wet.years)#
-wet.cool.years <- intersect(cool.years, wet.years)#
-dry.hot.years <- intersect(hot.years, dry.years)#
-dry.cool.years <- intersect(cool.years, dry.years)
-wet.hot.years
-wet.cool.years
-dry.hot.years
-dry.cool.years
-wet.hot.years <- as.numeric(intersect(hot.years, wet.years))
-wet.hot.years
-wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
-wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
-dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
-dry.cool.years <- as.numeric(intersect(cool.years, dry.years))
-hot.years
-sea.test <- sea(sea.df[,names(sea.df) %in% D.names], hot.years , lag=5, resample=1000)
-sea.df[,names(sea.df) %in% D.names]
-sea.test <- sea(sea.df[,names(sea.df) %in% D.names], hot.years , lag=5, resample=1000)
-hot.years
-sea.test <- sea(sea.df[,names(sea.df) %in% D.names], cool.years , lag=5, resample=1000)
-dom.bai <- sea.df[,names(sea.df) %in% D.names]
-head(dom.bai)
-int.bai <- sea.df[,names(sea.df) %in% I.names]#
-#
-sup.bai <- sea.df[,names(sea.df) %in% S.names]
-sea.test <- sea(dom.abi, cool.years , lag=5, resample=1000)
-sea.test <- sea(dom.bai, cool.years , lag=5, resample=1000)
-data(cana157)
-test <- data(cana157)
-summary(test)
-cana157
-dom.bai
-dom.bai[,"TP2086"]
-sea.test <- sea(dom.bai[,"TP2086"], cool.years , lag=5, resample=1000)
-test <- as.data.frame(dom.abi["TP2086"])
-test <- as.data.frame(dom.bai["TP2086"])
-test
-sea.test <- sea(dom.bai[,"TP2086"], cool.years , lag=5, resample=1000)
-sea.test <- sea(test, cool.years , lag=5, resample=1000)
-warnings()
-sea.test <- sea(test, cool.years , lag=2, resample=1000)
-barplot(test)
-barplot(sea.test)
-summary(sea.test)
-?chron
-dom.bai.chron <- chron(dom.bai)
-summary(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, cool.years , lag=2, resample=1000)
-summary(sea.test)
-sea.test <- sea(dom.bai.chron, hot.years , lag=5, resample=1000)
-warnings()
-summary(sea.test)
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-summary(sea.test)
-hot.years
-dom.bai.chron
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-summary(sea.test)
-warnings()
-event.years < - c(1960, 1970)
-c(1960, 1970)
-event.years < - c(1960, 1970)
-meow < - c(1960, 1970)
-meow < - as.vector(c(1960, 1970))
-meow < - c(1960, 1970)
-meow <- c(1960, 1970, 1980)
-sea.test <- sea(dom.bai.chron,meow , lag=2, resample=1000)
-summary(sea.test)
-sea.test <- sea(dom.bai,meow , lag=2, resample=1000)
-hot.years
-cool.years
-wet.years
-sea.test <- sea(dom.bai.chron, wet.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
-summary(sea.test)
-foo <- sea.test$unscaled
-names(foo) <- sea.test$lag
-names(foo)
-sea.test$lag
-foo
-sea.test$unscaled
-foo <- sea.test$se.unscaled
-names(foo) <- sea.test$lag
-barplot(foo, col=ifeslse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-data(cana157)#
-event.years <- c(1631, 1742, 1845)#
-cana157.sea <- sea(cana157, event.years)#
-foo <- cana157.sea$se.unscaled#
-names(foo) <- cana157.sea$lag#
-barplot(foo, col = ifelse(cana157.sea$p < 0.05, "grey30", "grey75"), #
-        ylab = "RWI", xlab = "Superposed Epoch")
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & game.weights$State=="IN", "TreeID"]
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]
-hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])#
-cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])#
-wet.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
-dry.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])#
-#
-wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
-wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
-dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
-dry.cool.years <- as.numeric(intersect(cool.years, dry.years))#
-#
-dom.bai <- sea.df[,names(sea.df) %in% D.names]#
-head(dom.bai)#
-#
-dom.bai.chron <- chron(dom.bai)#
-summary(dom.bai.chron)#
-#
-int.bai <- sea.df[,names(sea.df) %in% I.names]#
-#
-sup.bai <- sea.df[,names(sea.df) %in% S.names]#
-#
-test <- as.data.frame(dom.bai["TP2086"])#
-meow <- c(1960, 1970, 1980)
-sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]
-dom.bai <- sea.df[,names(sea.df) %in% D.names]
-dom.bai.chron <- chron(dom.bai)
-sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
-dom.bai
-head(dom.bai)
-dom.bai.chron <- chron(dom.bai)
-dom.bai.chron
-sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
-wet.cool.years
-dom.bai.chron
-sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
-summary(sea.test)
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]
-dom.bai <- sea.df[,names(sea.df) %in% D.names]#
-head(dom.bai)
-dom.bai.chron <- chron(dom.bai)
-summary(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
-meow <- c(1960, 1970, 1980)
-sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
-sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
-dom.bai.chron <- chron(dom.bai)
-summary(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
-summary(sea.test)
-# Scripts for supplemental figure#
-# S1 <- Species Response curves#
-# S2 <- Species weights#
-# S3 <- Site Response curves#
-# S4 <- Site Weights#
-# S5 <- Canopy.Class * Site weights#
+ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+library(mgcv)#
 library(ggplot2)#
-library(gridExtra)#
+library(car)#
+# Christy's GAMM code#
 #
-################################################################
-# Supplemental Fig. 1 Species GAM response Curves#
-################################################################
-load("processed_data/gam1_response_graph.Rdata")#
-library(RColorBrewer)#
-summary(ci.terms.graph)#
-spp.use <- c("ACSA", "CARYA", "QUAL", "QURU", "TSCA", "PIST")#
+# gam1 <- gamm(Y ~  s(Biomass, bs="cr", k=3, by=PFT) + s(tair, k=k, by=PFT) + s(precipf, k=k, by=PFT) + s(CO2, k=k, by=PFT), random=list(PlotID=~1), data=data) #
 #
-spp.colors <- read.csv("spp.Colors.csv", header=T)	#
-summary(spp.colors)	#
+# Loading in my data#
 #
-group.fig <- spp.use#
-group.fig <- group.fig[order(group.fig)]#
-colors.use <- as.vector(c(paste(spp.colors[spp.colors$Species %in% group.fig, "color"])))#
-cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")#
+data.use <- read.csv("processed_data/AllSites_tree_plus_climate_and_BA.csv", header=T)#
 #
-# Only plotting 2 major species at each site#
-S1.t <-		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean") & ci.terms.graph$group %in% spp.use,]) + #
-			#facet_grid(~Effect, scales = "free") +#
-			geom_hline(yintercept=0, linetype="dashed")+#
-			geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=group), alpha=0.5) +#
-			geom_line(aes(x=x, y=mean.bai, color=group)) +#
-			scale_color_manual(values=brewer.pal(6, "Dark2")) +#
-			scale_fill_manual(values=brewer.pal(6, "Dark2"))+#
-			labs(x = expression(bold(paste("Temperature ("^"o", "C)"))), y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+#
-			 theme(axis.line=element_line(color="black"), #
-		panel.grid.major=element_blank(), #
-		panel.grid.minor=element_blank(), #
-		panel.border=element_blank(),  #
-		panel.background=element_blank(), #
-		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
-		strip.text=element_text(face="bold", size=rel(1.0)),#
-		axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="right",#
-        legend.key.size = unit(0.75, "cm"),#
-        legend.text = element_text(size=rel(1.1)),#
-        legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #theme(axis.text.y=element_blank())	#
-		ylim(0,6) #
+data.use$group <- data.use$Species#
+data.use$group <- recode(data.use$group, "'CAOV' = 'CARYA'; 'CACO' = 'CARYA'; #
+  							'CATE' = 'CARYA'; 'ACSAC' = 'ACSA'; 'BEAL' = 'BETULA'; 'BELE' = 'BETULA'; 'QUMU' = 'QUAL'")#
 #
-S1.p <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("precip") & ci.terms.graph$group %in% spp.use,]) + #
-			#facet_grid(~Effect, scales = "free") +#
-			geom_hline(yintercept=0, linetype="dashed")+#
-			geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=group), alpha=0.5) +#
-			geom_line(aes(x=x, y=mean.bai, color=group)) +#
-			scale_color_manual(values=brewer.pal(6, "Dark2")) +#
-			scale_fill_manual(values=brewer.pal(6, "Dark2"))+#
-			labs(x = "Precipitation (mm)", y = element_blank())+#
-			 theme(axis.line=element_line(color="black"), #
-		panel.grid.major=element_blank(), #
-		panel.grid.minor=element_blank(), #
-		panel.border=element_blank(),  #
-		panel.background=element_blank(), #
-		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
-		strip.text=element_text(face="bold", size=rel(1.0)),#
-		axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="none",#
-        legend.key.size = unit(0.75, "cm"),#
-        legend.text = element_text(size=rel(1.1)),#
-        legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #
-        theme(axis.text.y=element_blank())	+#
-		ylim(0,6) #
-S1.size <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("dbh.recon") & ci.terms.graph$group %in% spp.use,]) + #
-			#facet_grid(~Effect, scales = "free") +#
-			geom_hline(yintercept=0, linetype="dashed")+#
-			geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=group), alpha=0.5) +#
-			geom_line(aes(x=x, y=mean.bai, color=group)) +#
-			scale_color_manual(values=brewer.pal(6, "Dark2")) +#
-			scale_fill_manual(values=brewer.pal(6, "Dark2"))+#
-			labs(x = "DBH (cm)", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+#
-			 theme(axis.line=element_line(color="black"), #
-		panel.grid.major=element_blank(), #
-		panel.grid.minor=element_blank(), #
-		panel.border=element_blank(),  #
-		panel.background=element_blank(), #
-		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
-		strip.text=element_text(face="bold", size=rel(1.0)),#
-		axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="right",#
-        legend.key.size = unit(0.75, "cm"),#
-        legend.text = element_text(size=rel(1.1)),#
-        legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #theme(axis.text.y=element_blank())	#
-		scale_y_continuous(expand=c(0,0)) #
+data.use$group.plot <- as.factor(paste(data.use$group, data.use$PlotID, sep="."))
+# reducing the amount of data for the test runs#
+sites.use <- c("Harvard", "Howland", "Morgan Monroe State Park", "Oak Openings Toledo", "Missouri Ozark")#
 #
-pdf("figures/prelim_figures/pub_figs/S1_spp_response.pdf", width= 13, height = 8.5)		#
-	grid.newpage()#
-	pushViewport(viewport(layout=grid.layout(nrow=1, ncol=3, widths=c(1.3,1,2))))#
-	print(S1.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))#
-  	print(S1.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))#
-  	print(S1.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))	#
-dev.off()#
+test <- data.use[data.use$Site %in% sites.use & !is.na(data.use$RW) & !is.na(data.use$BA.inc),]#
+summary(test)#
 #
-png(file.path("figures/Prelim_Figures/pub_figs/", "S1.png"), width=13, height=8.5, units="in", res=180)#
-	grid.newpage()#
-	pushViewport(viewport(layout=grid.layout(nrow=1, ncol=3, widths=c(1.3,1,2))))#
-	print(S1.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))#
-  	print(S1.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))#
-  	print(S1.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))	#
-dev.off()#
-################################################################
-# Supplemental Fig. 2 Site GAM response Curves#
-################################################################
-load("processed_data/gam4_response_graph.Rdata")#
-library(RColorBrewer)#
-summary(ci.terms.graph)#
-cbbPalette <- c("#009E73", "#e79f00", "#9ad0f3", "#0072B2", "#D55E00")#
-S2.t <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean"), ]) + #
-			#facet_wrap(~Effect, scales="free") +#
-			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +#
-			geom_line(aes(x=x, y=exp(mean), color=Site))+#
-			geom_hline(yintercept=0, linetype="dashed") +#
-			scale_colour_manual("", values = cbbPalette) +#
-			scale_fill_manual("", values = cbbPalette) +#
-			theme_bw()+#
-			labs(x = expression(bold(paste("Temperature ("^"o", "C)"))), y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+#
-			 theme(axis.line=element_line(color="black"), #
-		panel.grid.major=element_blank(), #
-		panel.grid.minor=element_blank(), #
-		panel.border=element_blank(),  #
-		panel.background=element_blank(), #
-		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
-		strip.text=element_text(face="bold", size=rel(1.0)),#
-		axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="none",#
-        legend.key.size = unit(0.75, "cm"),#
-        legend.text = element_text(size=rel(1.1)),#
-        legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #theme(axis.text.y=element_blank())	#
-		ylim(0,3) #
-S2.p <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("precip"), ]) + #
-			#facet_wrap(~Effect, scales="free") +#
-			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +#
-			geom_line(aes(x=x, y=exp(mean), color=Site))+#
-			geom_hline(yintercept=0, linetype="dashed") +#
-			scale_colour_manual("", values = cbbPalette) +#
-			scale_fill_manual("", values = cbbPalette) +#
-			theme_bw()+#
-			labs(x = "Precip (mm)", y = element_blank())+#
-			 theme(axis.line=element_line(color="black"), #
-		panel.grid.major=element_blank(), #
-		panel.grid.minor=element_blank(), #
-		panel.border=element_blank(),  #
-		panel.background=element_blank(), #
-		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
-		strip.text=element_text(face="bold", size=rel(1.0)),#
-		axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="none",#
-        legend.key.size = unit(0.75, "cm"),#
-        legend.text = element_text(size=rel(1.1)),#
-        legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #
-		ylim(0,3)+#
-		theme(axis.text.y=element_blank())	 #
-S2.size <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("dbh.recon"), ]) + #
-			#facet_wrap(~Effect, scales="free") +#
-			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +#
-			geom_line(aes(x=x, y=exp(mean), color=Site))+#
-			geom_hline(yintercept=0, linetype="dashed") +#
-			scale_colour_manual("", values = cbbPalette) +#
-			scale_fill_manual("", values = cbbPalette) +#
-			theme_bw()+#
-			labs(x = "DBH (cm)", y = element_blank())+#
-			 theme(axis.line=element_line(color="black"), #
-		panel.grid.major=element_blank(), #
-		panel.grid.minor=element_blank(), #
-		panel.border=element_blank(),  #
-		panel.background=element_blank(), #
-		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
-		strip.text=element_text(face="bold", size=rel(1.0)),#
-		axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="right",#
-        legend.key.size = unit(0.75, "cm"),#
-        legend.text = element_text(size=rel(1.1)),#
-        legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #
-		scale_y_continuous(expand=c(0,0))	 #
-pdf("figures/Prelim_Figures/pub_figs/S2_combined.pdf", height = 8, width = 13)#
-	grid.newpage()#
-	pushViewport(viewport(layout=grid.layout(nrow=1, ncol=3, widths=c(1.3,1,2))))#
-	print(S2.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))#
-  	print(S2.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))#
-  	print(S2.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))	#
-dev.off()#
+test$group.cc <- as.factor(paste(test$group, test$Canopy.Class, sep="."))#
+summary(test)#
+# Get a list of what predictors & responses I'm using#
+predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc", "Site", "Year", "PlotID") #
 #
-png(file.path("figures/Prelim_Figures/pub_figs/", "S2.png"), width=13, height=8.5, units="in", res=180)#
-	grid.newpage()#
-	pushViewport(viewport(layout=grid.layout(nrow=1,ncol=3, widths=c(1.3,1,2))))#
-	print(S2.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))#
-  	print(S2.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))#
-  	print(S2.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))#
-dev.off()#
-################################################################
-# Supplemental Fig. 3 Spp weights#
-################################################################
-load("processed_data/gam1_weights_graph.R")#
+# Getting rid of observations that have NAs in the important variables#
+test <- test[complete.cases(test[,predictors.all]),]#
+test <- test[test$Live.Dead=="LIVE" & !test$Canopy.Class=="F",]#
 #
-S3 <- ggplot(data.graph[data.graph$group %in% spp.use,]) + facet_grid(group~State) +#
-		geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), fill="red", alpha=0.25) +#
-		geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), fill="blue", alpha=0.25) +#
-		geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2- weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), fill="darkgreen", alpha=0.25) +#
-		geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +#
-		geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +#
-		geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="darkgreen")+#
-		labs(x=expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence")))) +#
+# Subsetting to a set of species that we have enough data to feel good about#
+#species.use <- c("TSCA", "QURU", "ACRU", "BEAL", "ACSA", "LITU", "QUAL", "CAOV", "CACO", "CATE", "JUVI", "QUVE", "PCRU", "THOC", "PIST")#
+group.use <- c("ACRU", "ACSA", "BETULA", "CARYA", "FAGR", "FRAX", "PIST", "QUAL", "QURU", "QUVE", "SAAL", "TSCA", "ULRU", "PCRU", "THOC", "LITU", "JUVI")#
+#
+test <- test[test$group %in% group.use,]#
+#
+summary(test)#
+#
+par(new=F)#
+plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], type="l")#
+test$log.dbh <- log(test$dbh.recon)#
+summary(test)#
+#
+summary(test)#
+summary(test$Live.Dead)#
+summary(test$Canopy.Class)#
+# RW <- test$RW#
+# temp <- test$tmean#
+# precip <- test$precip#
+# canopy <- test$Canopy.Class#
+# size <- test$DBH..cm.#
+# species <- unique(test$Species)#
+# library(ggplot2)#
+# ggplot(data=test) +#
+   # facet_wrap(~PlotID) +#
+   # geom_histogram(aes(x=dbh.recon))#
+# ggplot(data=test) +#
+   # facet_wrap(~Species) +#
+   # geom_histogram(aes(x=dbh.recon))#
+# hist(test$dbh.recon)#
+# test2 <- test[test$group %in% c("QURU", "ACRU") & test$Year>=1980,]#
+# test2 <- test[test$group %in% c("QURU", "ACRU"),]#
+test2 <- test[test$Site %in% c("Morgan Monroe State Park", "Harvard"), ]#
+# test2$log.dbh <- log(test2$dbh.recon)#
+# summary(test2)#
+summary(test)#
+test[test$BA.inc==0, "BA.inc"] <- 1e-6#
+save(test, file="ch2_combined_data_use.Rdata")
+library(ggplot2)#
+require(mgcv)#
+require(lsmeans)#
+require(car)#
+require(moments)#
+#
+# calculating competition indices#
+load("processed_data/gam2_weights_processed.Rdata")#
+summary(gam2.weights)#
+#
+load("ch2_combined_data_use.Rdata")#
+summary(test)#
+#
+# Going to calculat the comptition index based on the maximum BA in a given plot#
+# making a variable for the basal area at the time of sampling#
+#
+plots <- unique(test$PlotID)#
+#
+for(y in unique(test$Year)){#
+	for(p in unique(test$PlotID)){#
+		BA.max <- max(test[test$PlotID==p & test$Year==y, "BA"], na.rm=T)#
+		for(i in unique(test[test$PlotID==p & test$Year==y,"TreeID"])){#
+			test[test$TreeID==i & test$Year==y, "comp.index"] <- test[test$TreeID==i & test$Year==y,"BA"] / BA.max		#
+		}#
+	}#
+}#
+#
+summary(test)#
+#
+mean(test[test$Canopy.Class=="D", "BA"]); sd(test[test$Canopy.Class=="D", "BA"])#
+mean(test[test$Canopy.Class=="I", "BA"]); sd(test[test$Canopy.Class=="I", "BA"])#
+mean(test[test$Canopy.Class=="S", "BA"]); sd(test[test$Canopy.Class=="S", "BA"])#
+#
+# By Canopy Class only#
+#
+othervars <- c("Year", "Canopy.Class")#
+comp.index.mean <- aggregate(test$comp.index, by= test[,othervars], FUN=mean, na.rm=T)#
+names(comp.index.mean) <- c("Year", "Canopy.Class", "Mean")#
+comp.index.UB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(comp.index.UB)#
+names(comp.index.UB) <- c("Year", "Canopy.Class", "UB")#
+#
+comp.index.LB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(comp.index.LB) <- c("Year", "Canopy.Class", "LB")#
+summary(comp.index.LB)#
+#
+comp.index <- cbind(comp.index.mean, comp.index.UB$UB, comp.index.LB$LB)#
+summary(comp.index)#
+names(comp.index) <- c("Year", "Canopy.Class", "Mean", "UB", "LB")#
+#
+ggplot(data=comp.index) + facet_grid(Canopy.Class~.) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+# By Canopy Class and State#
+othervars <- c("Year", "Site","Canopy.Class")#
+site.ci.mean <- aggregate(test$comp.index, by= test[,othervars], FUN=mean, na.rm=T)#
+names(site.ci.mean) <- c("Year", "Site", "Canopy.Class", "Mean")#
+site.ci.UB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(site.ci.UB)#
+names(site.ci.UB) <- c("Year", "Site","Canopy.Class", "UB")#
+#
+site.ci.LB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(site.ci.LB) <- c("Year", "Site", "Canopy.Class", "LB")#
+summary(site.ci.LB)#
+#
+comp.index.site <- cbind(site.ci.mean, site.ci.UB$UB, site.ci.LB$LB)#
+summary(comp.index.site)#
+names(comp.index.site) <- c("Year", "Site", "Canopy.Class", "Mean", "UB", "LB")	#
+ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+comp.index.site$Canopy.Class <- factor(comp.index.site$Canopy.Class, levels= c("D", "C", "I", "S"))
+ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+comp.index$Canopy.Class <- factor(comp.index$Canopy.Class, levels=c("D", "C", "I", "S"))
+ggplot(data=comp.index) + facet_grid(Canopy.Class~.) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+comp.index.site$Site <- factor(comp.index.site$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))
+ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+comp.index$Site <- factor(comp.index$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))
+ggplot(data=comp.index) + facet_grid(Canopy.Class~.) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+library(mgcv)#
+library(ggplot2)#
+library(car)#
+# Christy's GAMM code#
+#
+# gam1 <- gamm(Y ~  s(Biomass, bs="cr", k=3, by=PFT) + s(tair, k=k, by=PFT) + s(precipf, k=k, by=PFT) + s(CO2, k=k, by=PFT), random=list(PlotID=~1), data=data) #
+#
+# Loading in my data#
+#
+data.use <- read.csv("processed_data/AllSites_tree_plus_climate_and_BA.csv", header=T)#
+#
+data.use$group <- data.use$Species#
+data.use$group <- recode(data.use$group, "'CAOV' = 'CARYA'; 'CACO' = 'CARYA'; #
+  							'CATE' = 'CARYA'; 'ACSAC' = 'ACSA'; 'BEAL' = 'BETULA'; 'BELE' = 'BETULA'; 'QUMU' = 'QUAL'")#
+#
+data.use$group.plot <- as.factor(paste(data.use$group, data.use$PlotID, sep="."))#
+#
+data.use$Canopy.Class <- recode(data.use$Canopy.Class, "'C' = 'D'")#
+summary(data.use)#
+# reducing the amount of data for the test runs#
+sites.use <- c("Harvard", "Howland", "Morgan Monroe State Park", "Oak Openings Toledo", "Missouri Ozark")#
+#
+test <- data.use[data.use$Site %in% sites.use & !is.na(data.use$RW) & !is.na(data.use$BA.inc),]#
+summary(test)#
+#
+test$group.cc <- as.factor(paste(test$group, test$Canopy.Class, sep="."))#
+summary(test)#
+# Get a list of what predictors & responses I'm using#
+predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc", "Site", "Year", "PlotID") #
+#
+# Getting rid of observations that have NAs in the important variables#
+test <- test[complete.cases(test[,predictors.all]),]#
+test <- test[test$Live.Dead=="LIVE" & !test$Canopy.Class=="F",]#
+#
+# Subsetting to a set of species that we have enough data to feel good about#
+#species.use <- c("TSCA", "QURU", "ACRU", "BEAL", "ACSA", "LITU", "QUAL", "CAOV", "CACO", "CATE", "JUVI", "QUVE", "PCRU", "THOC", "PIST")#
+group.use <- c("ACRU", "ACSA", "BETULA", "CARYA", "FAGR", "FRAX", "PIST", "QUAL", "QURU", "QUVE", "SAAL", "TSCA", "ULRU", "PCRU", "THOC", "LITU", "JUVI")#
+#
+test <- test[test$group %in% group.use,]#
+#
+summary(test)#
+#
+par(new=F)#
+plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], type="l")#
+test$log.dbh <- log(test$dbh.recon)#
+summary(test)#
+#
+summary(test)#
+summary(test$Live.Dead)#
+summary(test$Canopy.Class)#
+# RW <- test$RW#
+# temp <- test$tmean#
+# precip <- test$precip#
+# canopy <- test$Canopy.Class#
+# size <- test$DBH..cm.#
+# species <- unique(test$Species)#
+# library(ggplot2)#
+# ggplot(data=test) +#
+   # facet_wrap(~PlotID) +#
+   # geom_histogram(aes(x=dbh.recon))#
+# ggplot(data=test) +#
+   # facet_wrap(~Species) +#
+   # geom_histogram(aes(x=dbh.recon))#
+# hist(test$dbh.recon)#
+# test2 <- test[test$group %in% c("QURU", "ACRU") & test$Year>=1980,]#
+# test2 <- test[test$group %in% c("QURU", "ACRU"),]#
+test2 <- test[test$Site %in% c("Morgan Monroe State Park", "Harvard"), ]#
+# test2$log.dbh <- log(test2$dbh.recon)#
+# summary(test2)#
+summary(test)#
+test[test$BA.inc==0, "BA.inc"] <- 1e-6#
+save(test, file="ch2_combined_data_use.Rdata")#
+# test.gam3 <- test
+library(ggplot2)#
+require(mgcv)#
+require(lsmeans)#
+require(car)#
+require(moments)#
+#
+# calculating competition indices#
+load("processed_data/gam2_weights_processed.Rdata")#
+summary(gam2.weights)#
+#
+load("ch2_combined_data_use.Rdata")#
+summary(test)#
+#
+# Going to calculat the comptition index based on the maximum BA in a given plot#
+# making a variable for the basal area at the time of sampling#
+#
+plots <- unique(test$PlotID)#
+#
+for(y in unique(test$Year)){#
+	for(p in unique(test$PlotID)){#
+		BA.max <- max(test[test$PlotID==p & test$Year==y, "BA"], na.rm=T)#
+		for(i in unique(test[test$PlotID==p & test$Year==y,"TreeID"])){#
+			test[test$TreeID==i & test$Year==y, "comp.index"] <- test[test$TreeID==i & test$Year==y,"BA"] / BA.max		#
+		}#
+	}#
+}#
+#
+summary(test)#
+#
+mean(test[test$Canopy.Class=="D", "BA"]); sd(test[test$Canopy.Class=="D", "BA"])#
+mean(test[test$Canopy.Class=="I", "BA"]); sd(test[test$Canopy.Class=="I", "BA"])#
+mean(test[test$Canopy.Class=="S", "BA"]); sd(test[test$Canopy.Class=="S", "BA"])#
+#
+# By Canopy Class only#
+#
+othervars <- c("Year", "Canopy.Class")#
+comp.index.mean <- aggregate(test$comp.index, by= test[,othervars], FUN=mean, na.rm=T)#
+names(comp.index.mean) <- c("Year", "Canopy.Class", "Mean")#
+comp.index.UB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(comp.index.UB)#
+names(comp.index.UB) <- c("Year", "Canopy.Class", "UB")#
+#
+comp.index.LB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(comp.index.LB) <- c("Year", "Canopy.Class", "LB")#
+summary(comp.index.LB)#
+#
+comp.index <- cbind(comp.index.mean, comp.index.UB$UB, comp.index.LB$LB)#
+summary(comp.index)#
+names(comp.index) <- c("Year", "Canopy.Class", "Mean", "UB", "LB")#
+#
+comp.index$Canopy.Class <- factor(comp.index$Canopy.Class, levels=c("D", "C", "I", "S"))#
+#
+ggplot(data=comp.index) + facet_grid(Canopy.Class~.) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))#
+# By Canopy Class and State#
+othervars <- c("Year", "Site","Canopy.Class")#
+site.ci.mean <- aggregate(test$comp.index, by= test[,othervars], FUN=mean, na.rm=T)#
+names(site.ci.mean) <- c("Year", "Site", "Canopy.Class", "Mean")#
+site.ci.UB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(site.ci.UB)#
+names(site.ci.UB) <- c("Year", "Site","Canopy.Class", "UB")#
+#
+site.ci.LB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(site.ci.LB) <- c("Year", "Site", "Canopy.Class", "LB")#
+summary(site.ci.LB)#
+#
+comp.index.site <- cbind(site.ci.mean, site.ci.UB$UB, site.ci.LB$LB)#
+summary(comp.index.site)#
+names(comp.index.site) <- c("Year", "Site", "Canopy.Class", "Mean", "UB", "LB")	#
+comp.index.site$Canopy.Class <- factor(comp.index.site$Canopy.Class, levels= c("D", "C", "I", "S"))	#
+comp.index.site$Site <- factor(comp.index.site$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))#
+ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+summary(test)#
+#
+mean(test[test$Canopy.Class=="D", "BA"]); sd(test[test$Canopy.Class=="D", "BA"])#
+mean(test[test$Canopy.Class=="I", "BA"]); sd(test[test$Canopy.Class=="I", "BA"])#
+mean(test[test$Canopy.Class=="S", "BA"]); sd(test[test$Canopy.Class=="S", "BA"])#
+#
+# By Canopy Class only#
+#
+othervars <- c("Year", "Canopy.Class")#
+comp.index.mean <- aggregate(test$comp.index, by= test[,othervars], FUN=mean, na.rm=T)#
+names(comp.index.mean) <- c("Year", "Canopy.Class", "Mean")#
+comp.index.UB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(comp.index.UB)#
+names(comp.index.UB) <- c("Year", "Canopy.Class", "UB")#
+#
+comp.index.LB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(comp.index.LB) <- c("Year", "Canopy.Class", "LB")#
+summary(comp.index.LB)#
+#
+comp.index <- cbind(comp.index.mean, comp.index.UB$UB, comp.index.LB$LB)#
+summary(comp.index)#
+names(comp.index) <- c("Year", "Canopy.Class", "Mean", "UB", "LB")#
+#
+comp.index$Canopy.Class <- factor(comp.index$Canopy.Class, levels=c("D","I", "S"))#
+#
+ggplot(data=comp.index) + facet_grid(Canopy.Class~.) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))#
+# By Canopy Class and State#
+othervars <- c("Year", "Site","Canopy.Class")#
+site.ci.mean <- aggregate(test$comp.index, by= test[,othervars], FUN=mean, na.rm=T)#
+names(site.ci.mean) <- c("Year", "Site", "Canopy.Class", "Mean")#
+site.ci.UB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(site.ci.UB)#
+names(site.ci.UB) <- c("Year", "Site","Canopy.Class", "UB")#
+#
+site.ci.LB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(site.ci.LB) <- c("Year", "Site", "Canopy.Class", "LB")#
+summary(site.ci.LB)#
+#
+comp.index.site <- cbind(site.ci.mean, site.ci.UB$UB, site.ci.LB$LB)#
+summary(comp.index.site)#
+names(comp.index.site) <- c("Year", "Site", "Canopy.Class", "Mean", "UB", "LB")	#
+comp.index.site$Canopy.Class <- factor(comp.index.site$Canopy.Class, levels= c("D", "I", "S"))	#
+comp.index.site$Site <- factor(comp.index.site$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))#
+ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=test[test$Year ==2013]) + facet_grid(~Site) +#
+	geom_violin(aes(x=Canopy.Class, y= comp.index))
+ggplot(data=test[test$Year ==2013,]) + facet_grid(~Site) +#
+	geom_violin(aes(x=Canopy.Class, y= comp.index))
+ggplot(data=test[test$Year ==2013,]) + facet_grid(~Site) +#
+	geom_violin(aes(x=Canopy.Class, y= comp.index), scale="width") +#
+	geom_errorbar(aes(x=Canopy.Class, y= comp.index))
+ggplot(data=test[test$Year ==2013,]) + facet_grid(~Site) +#
+	geom_violin(aes(x=Canopy.Class, y= comp.index), scale="width")
+ggplot(data=test[test$Year ==2013,]) + #
+	geom_violin(aes(x=Canopy.Class, y= comp.index), scale="width")
+ggplot(data=test) + facet.grid(~Site) + #
+	geom_density(aes(x=DBH..cm., fill=Canopy.Classes))
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., fill=Canopy.Classes))
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., fill=Canopy.Class))
+test$Site <- factor(test$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., fill=Canopy.Class))
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., fill=Canopy.Class), alpha=0.5)
+ggplot(data=test) + facet_grid(Canopy.Class~Site) + #
+	geom_density(aes(x=DBH..cm., fill=Canopy.Class), alpha=0.5)
+ggplot(data=test) + facet_grid(Canopy.Class~Site) + #
+	geom_hist(aes(x=DBH..cm., fill=Canopy.Class), alpha=0.5)
+ggplot(data=test) + facet_grid(Canopy.Class~Site) + #
+	geom_histogram(aes(x=DBH..cm., fill=Canopy.Class), alpha=0.5)
+ggplot(data=test) + facet_grid(Canopy.Class~Site) + #
+	geom_histogram(aes(x=DBH..cm., fill=Canopy.Class))
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_histogram(aes(x=DBH..cm., fill=Canopy.Class))
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_histogram(aes(x=DBH..cm., fill=Canopy.Class))
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_histogram(aes(x=DBH..cm., fill=Canopy.Class), binwidht=0.5)
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_histogram(aes(x=DBH..cm., fill=Canopy.Class), binwidth=0.5)
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_histogram(aes(x=DBH..cm., fill=Canopy.Class), binwidth=5)
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_histogram(aes(x=DBH..cm., fill=Canopy.Class), binwidth=1)
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., fill=Canopy.Class), position="stack")
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., color=Canopy.Class,fill=Canopy.Class), position="stack")
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., color=Canopy.Class,fill=Canopy.Class), position="stack", alpha=0.8)
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., color=Canopy.Class,fill=Canopy.Class), position="stack", alpha=0.1)
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., color=Canopy.Class,fill=Canopy.Class), position="stack", alpha=0.4)
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm., color=Canopy.Class,fill=Canopy.Class), position="stack", alpha=0.4) +#
+	labs(x="DBH (CM)", y="Density") +#
 	theme(axis.line=element_line(color="black"), #
 		panel.grid.major=element_blank(), #
 		panel.grid.minor=element_blank(), #
 		panel.border=element_blank(),  #
 		panel.background=element_blank(), #
 		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
 		strip.text=element_text(face="bold", size=rel(1.0)),#
 		axis.line.x = element_line(color="black", size = 0.5),#
         axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="right",#
+        legend.position="top",#
         legend.key.size = unit(0.75, "cm"),#
         legend.text = element_text(size=rel(1.1)),#
         legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #
-		scale_y_continuous(expand=c(0,0))	 	#
-#
-pdf("figures/Prelim_Figures/pub_figs/S3.pdf", height = 8, width = 13)#
-	S3#
-dev.off()#
-#
-png(file.path("figures/Prelim_Figures/pub_figs/", "S3.png"), width=13, height=8.5, units="in", res=180)#
-	S3#
-#
-dev.off()#
-################################################################
-# Supplemental Fig. 4 Site Weights#
-################################################################
-load("processed_data/gam4_weights_graph.Rdata")#
-#
-S4 <- ggplot(data.graph) + facet_grid(State~.) +#
-	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), alpha=0.25, fill="red") +#
-	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), alpha=0.25, fill="blue") +#
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2 - weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), alpha=0.25, fill="darkgreen") +#
-	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +#
-	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +#
-	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="darkgreen")+#
-		labs(x=expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence"))))+#
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.4) +#
+	labs(x="DBH (CM)", y="Density") +#
 	theme(axis.line=element_line(color="black"), #
 		panel.grid.major=element_blank(), #
 		panel.grid.minor=element_blank(), #
 		panel.border=element_blank(),  #
 		panel.background=element_blank(), #
 		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
 		strip.text=element_text(face="bold", size=rel(1.0)),#
 		axis.line.x = element_line(color="black", size = 0.5),#
         axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="right",#
+        legend.position="top",#
         legend.key.size = unit(0.75, "cm"),#
         legend.text = element_text(size=rel(1.1)),#
         legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #
-		scale_y_continuous(expand=c(0,0))	 	#
-pdf("figures/Prelim_Figures/pub_figs/S4.pdf", height = 8, width = 13)#
-	S4#
-dev.off()#
-#
-png(file.path("figures/Prelim_Figures/pub_figs/", "S4.png"), width=13, height=8.5, units="in", res=180)#
-	S4#
-#
-dev.off()#
-#
-################################################################
-# Supplemental Fig. 5 Site * Canopy.Class Weights#
-################################################################
-load("processed_data/gam2_weights_graph_withSites.Rdata")#
-data.graph$Canopy.Class <- recode(data.graph$Canopy.Class, "'D'='Dominant';'I'='Intermediate';'S'='Suppressed'")#
-#
-S5 <- ggplot(data.graph) + facet_grid(Canopy.Class~State) +#
-	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), alpha=0.25, fill="red") +#
-	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), alpha=0.25, fill="blue") +#
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2 - weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), alpha=0.25, fill="darkgreen") +#
-	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +#
-	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +#
-	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="darkgreen")+#
-		labs(x=expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence"))))+#
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	labs(x="DBH (CM)", y="Density") +#
 	theme(axis.line=element_line(color="black"), #
 		panel.grid.major=element_blank(), #
 		panel.grid.minor=element_blank(), #
 		panel.border=element_blank(),  #
 		panel.background=element_blank(), #
 		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
-		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
 		strip.text=element_text(face="bold", size=rel(1.0)),#
 		axis.line.x = element_line(color="black", size = 0.5),#
         axis.line.y = element_line(color="black", size = 0.5),#
-        legend.position="right",#
+        legend.position="top",#
         legend.key.size = unit(0.75, "cm"),#
         legend.text = element_text(size=rel(1.1)),#
         legend.key = element_rect(fill = "white")) + #
-        guides(color=guide_legend(ncol=1)) +#
-        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
-        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
-        scale_x_continuous(expand=c(0,0)) +       #
-		scale_y_continuous(expand=c(0,0))	 	#
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	labs(x="DBH (CM)", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())+#
+	xlim(expand=c(0,0))#
+	ylim(expand=c(0,0))
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	labs(x="DBH (CM)", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())+#
+	xlim(expand=c(0,0)) +#
+	ylim(expand=c(0,0))
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	labs(x="DBH (CM)", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())+#
+	ylim(expand=c(0,0))
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	labs(x="DBH (CM)", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())
+test$DBH.recon
+summary(test)
+comp.index.mean <- aggregate(test$dbh.recon, by= test[,othervars], FUN=mean, na.rm=T)
+dbh.recon.mean <- aggregate(test$dbh.recon, by= test[,othervars], FUN=mean, na.rm=T)
+names(comp.index.mean) <- c("Year", "Canopy.Class", "Mean")
+names(dbh.recon.mean) <- c("Year", "Canopy.Class", "Mean")
+dbh.recon.mean <- aggregate(test$dbh.recon, by= test[,othervars], FUN=mean, na.rm=T)#
+names(dbh.recon.mean) <- c("Year", "Canopy.Class", "Mean")#
+dbh.recon.UB <- aggregate(test$dbh.recon, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(dbh.recon.UB)#
+names(dbh.recon.UB) <- c("Year", "Canopy.Class", "UB")#
 #
-pdf("figures/Prelim_Figures/pub_figs/S5.pdf", height = 8, width = 13)#
-	S5#
-dev.off()#
+dbh.recon.LB <- aggregate(test$dbh.recon, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(dbh.recon.LB) <- c("Year", "Canopy.Class", "LB")#
+summary(dbh.recon.LB)#
 #
-png(file.path("figures/Prelim_Figures/pub_figs/", "S5.png"), width=13, height=8.5, units="in", res=180)#
-	S5#
+dbh.recon <- cbind(dbh.recon.mean, dbh.recon.UB$UB, dbh.recon.LB$LB)#
+summary(dbh.recon)#
+names(dbh.recon) <- c("Year", "Canopy.Class", "Mean", "UB", "LB")#
 #
-dev.off()
+dbh.recon$Canopy.Class <- factor(dbh.recon$Canopy.Class, levels=c("D","I", "S"))
+summary(dbh.recon)
+ggplot(data=dbh.recon) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+othervars <- c("Year", "Canopy.Class")
+dbh.recon.mean <- aggregate(test$dbh.recon, by= test[,othervars], FUN=mean, na.rm=T)
+names(dbh.recon.mean) <- c("Year", "Canopy.Class", "Mean")
+dbh.recon.UB <- aggregate(test$dbh.recon, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(dbh.recon.UB)#
+names(dbh.recon.UB) <- c("Year", "Canopy.Class", "UB")
+dbh.recon.LB <- aggregate(test$dbh.recon, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(dbh.recon.LB) <- c("Year", "Canopy.Class", "LB")#
+summary(dbh.recon.LB)
+summary(dbh.recon.UB)
+dbh.recon <- cbind(dbh.recon.mean, dbh.recon.UB$UB, dbh.recon.LB$LB)
+summary(dbh.recon)
+names(dbh.recon) <- c("Year", "Canopy.Class", "Mean", "UB", "LB")
+summary(dbh.recon)
+dbh.recon$Canopy.Class <- factor(dbh.recon$Canopy.Class, levels=c("D","I", "S"))
+ggplot(data=dbh.recon) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon) + facet_grid(Canopy.Class~.)#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon) + facet_grid(~Canopy.Class) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+save(dbh.recon, file="processed_data/dbh_recon_graph.Rdata")
+load("processed_data/dbh_recon_graph.Rdata")#
+summary(dbh.recon)#
+ggplot(data=dbh.recon) + facet_grid(~Canopy.Class) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+load("ch2_combined_data_use.Rdata")#
+summary(test)#
+#
+ggplot(data=test) + #facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	labs(x="DBH (CM)", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	labs(x="DBH (CM)", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x=element_blank())+#
+	labs(x="DBH (CM)", y="Density")
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	#theme(axis.title.x=element_blank())+#
+	labs(x="DBH (CM)", y="Density")
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	labs(x="DBH (CM)", y="Density")
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	labs(x="DBH (cm)", y="Density")
+othervars <- c("Year", "Site",  "Canopy.Class")
+dbh.recon.mean <- aggregate(test$dbh.recon, by= test[,othervars], FUN=mean, na.rm=T)#
+names(dbh.recon.mean) <- c("Year", "Site","Canopy.Class", "Mean")
+othervars <- c("Year", "Site",  "Canopy.Class")#
+dbh.recon.mean <- aggregate(test$dbh.recon, by= test[,othervars], FUN=mean, na.rm=T)#
+names(dbh.recon.mean) <- c("Year", "Site","Canopy.Class", "Mean")#
+dbh.recon.UB <- aggregate(test$dbh.recon, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(dbh.recon.UB)#
+names(dbh.recon.UB) <- c("Year", "Site","Canopy.Class", "UB")#
+#
+dbh.recon.LB <- aggregate(test$dbh.recon, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(dbh.recon.LB) <- c("Year", "Site","Canopy.Class", "LB")#
+summary(dbh.recon.LB)#
+#
+dbh.recon <- cbind(dbh.recon.mean, dbh.recon.UB$UB, dbh.recon.LB$LB)#
+summary(dbh.recon)#
+names(dbh.recon) <- c("Year", "Site","Canopy.Class", "Mean", "UB", "LB")#
+#
+dbh.recon$Canopy.Class <- factor(dbh.recon$Canopy.Class, levels=c("D","I", "S"))#
+#
+save(dbh.recon, file="processed_data/dbh_recon_graph.Rdata")#
+ggplot(data=dbh.recon) + facet_grid(~Canopy.Class) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon) + facet_grid(Site~Canopy.Class) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon) + facet_grid(Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon) + facet_grid(Site~.) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon[dbh.recon$Year >= 1950,]) + facet_grid(Site~.) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon[dbh.recon$Year >= 1950,]) + facet_grid(Site~Canopy.Class) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon[dbh.recon$Year >= 1950,]) + facet_grid(Canopy.Classs~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=dbh.recon[dbh.recon$Year >= 1950,]) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+othervars <- c("Year", "Site",  "Canopy.Class")#
+dbh.recon.mean <- aggregate(test$dbh.recon, by= test[,othervars], FUN=mean, na.rm=T)#
+names(dbh.recon.mean) <- c("Year", "Site","Canopy.Class", "Mean")#
+dbh.recon.UB <- aggregate(test$dbh.recon, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
+summary(dbh.recon.UB)#
+names(dbh.recon.UB) <- c("Year", "Site","Canopy.Class", "UB")#
+#
+dbh.recon.LB <- aggregate(test$dbh.recon, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
+names(dbh.recon.LB) <- c("Year", "Site","Canopy.Class", "LB")#
+summary(dbh.recon.LB)#
+#
+dbh.recon <- cbind(dbh.recon.mean, dbh.recon.UB$UB, dbh.recon.LB$LB)#
+summary(dbh.recon)#
+names(dbh.recon) <- c("Year", "Site","Canopy.Class", "Mean", "UB", "LB")#
+#
+dbh.recon$Canopy.Class <- factor(dbh.recon$Canopy.Class, levels=c("D","I", "S"))#
+#
+save(dbh.recon, file="processed_data/dbh_recon_graph.Rdata")#
+ggplot(data=dbh.recon[dbh.recon$Year >= 1950,]) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
+ggplot(data=test) + facet_grid(~Site) + #
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	labs(x="DBH (cm)", y="Density")
+ggplot(data=dbh.recon[dbh.recon$Year >= 1950,]) + facet_grid(Canopy.Class~Site) +#
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class)) +theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	labs(x="Year", y="DBH (cm)")
+summary(gam2.weights)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc, fill=Temp.Mark))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc, fill=Temp.Mark), position="stack")
+ggplot(gam2.weights) + facet_grid(~Canopy.Class) +#
+	geom_density(aes(x=BA.inc, fill=Temp.Mark), position="stack")
+ggplot(gam2.weights) + facet_grid(~Canopy.Class) +#
+	geom_density(aes(x=BA.inc, fill=Temp.Mark), position="fill")
+ggplot(gam2.weights) + facet_grid(~Canopy.Class) +#
+	geom_density(aes(x=BA.inc, fill=Temp.Mark), aes=0.75)
+ggplot(gam2.weights) + facet_grid(~Canopy.Class) +#
+	geom_density(aes(x=BA.inc, fill=Temp.Mark), alpha=0.75)
+ggplot(gam2.weights) + facet_grid(~Canopy.Class) +#
+	geom_density(aes(x=BA.inc, fill=Temp.Mark), alpha=0.45)
+ggplot(gam2.weights) + facet_grid(~Canopy.Class) +#
+	geom_density(aes(x=BA.inc, ..count..,fill=Temp.Mark), alpha=0.45, position="stack")
+ggplot(gam2.weights) + facet_grid(~Canopy.Class) +#
+	geom_density(aes(x=BA.inc, ..count..,fill=Temp.Mark), position="stack")
+ggplot(gam2.weights) + facet_grid(~Canopy.Class) +#
+	geom_density(aes(x=BA.inc,fill=Temp.Mark), position="stack")
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,fill=Temp.Mark), position="stack")
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,fill=Temp.Mark))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,fill=Precip.Mark))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,fill=Temp.Mark*Precip.Mark))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,fill=intersect(Temp.Mark,Precip.Mark)))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,fill=Precip.Mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Precip.Mark,fill=Precip.Mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25)#
+#
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Precip.Mark,fill=Precip.Mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	geom_vline(xintercept=median(BA.inc, fill=Temp.Mark))#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	geom_vline(xintercept=median(BA.inc, fill=Temp.Mark))+#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	geom_vline(xintercept=median(BA.inc, color=Temp.Mark))+#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	geom_vline(xintercept=median(BA.inc), color=Temp.Mark)+#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	geom_vline(xintercept=median(gam2.weights$BA.inc), color=Temp.Mark)+#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	stat_summary(fun.x="median")
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	stat_summary(aes(BA.inc),fun.x="median")#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	stat_summary(aes(BA.inc),fun.x="median")
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	stat_summary(aes(BA.inc),fun.y="median")
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	stat_summary(aes(BA.inc),fun.y="median", geom="line")
+summary(gam2.weights)
+intersect(gam2.weights$Temp.Mark, gam2.weights$Precip.mark)
+?intersect
+tukey.s <- TukeyHSD(cr.testS)
 library(ggplot2)#
 require(mgcv)#
 require(lsmeans)#
@@ -584,245 +971,563 @@ summary(cr.testS)#
 tukey.s <- TukeyHSD(cr.testS)#
 tukey.s["Precip.Mark:Temp.Mark"] # Significant (for better or worse)#
 tukey.s["Precip.Mark"]#
-tukey.s["Temp.Mark"]#
-# lsmeans(cr.testD, pairwise~Precip.Mark, adjust="tukey")	#
-# lsmeans(cr.testD, pairwise~Temp.Mark, adjust="tukey")	#
-# lsmeans(cr.testI, pairwise~Precip.Mark, adjust="tukey")	#
-# lsmeans(cr.testS, pairwise~Precip.Mark, adjust="tukey")	#
+tukey.s["Temp.Mark"]
+tukey.s["Precip.Mark:Temp.Mark"] # Significant (for better or worse)
+load("processed_data/climate_markeryears.Rdata")
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25)#
+	scale_x_continuous(limits=c(0,0))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	scale_x_continuous(limits=c(0,0))
+gam2.weights$mix.mark <- paste(gam2.weights$Temp.mark, gam2weights$Precip.mark, sep="-")
+gam2.weights$mix.mark <- paste(gam2.weights$Temp.mark, gam2.weights$Precip.mark, sep="-")
+gam2.weights$mix.mark <- paste(gam2.weights$Temp.Mark, gam2.weights$Precip.Mark, sep="-")
+summary(gam2.weights)
+gam2.weights$mix.mark <- as.factor(paste(gam2.weights$Temp.Mark, gam2.weights$Precip.Mark, sep="-"))
+summary(gam2.weights)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S",]) + #facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Precip.Mark,fill=mix.mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S",]) + #facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry"),]) + #facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(limits=c(0,0))
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+tukey.s["Precip.Mark:Temp.Mark"] # Significant (for better or worse)
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=log(BA.inc),color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+summary(gam2.weights)
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=log(BA.inc.Clim),color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Precip.Mark, fill=Precip.Mark), alpha=0.1) +#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=Precip.Mark, fill=Precip.Mark), alpha=0.1) +#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=Precip.Mark, fill=Precip.Mark), alpha=0.1) +#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	xlim(0,25)
+marker.median <- dataframe(NA)
+marker.median <- data.frame(NA)
+unique(gam2.weights$mix.mark)
+marker.median <- data.frame(type= unique(gam2.weights$mix.mark))
+marker.median
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))
+for(i in marker.median$type){#
+	marker.median[i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"], na.rm=T)#
+}
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))#
 #
-############################################################
-# Attemping an SEA analysis#
-############################################################
+for(i in marker.median$type){#
+	marker.median.s[i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"], na.rm=T)#
+}
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))
+for(i in marker.median$type){#
+	marker.median.s[i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"], na.rm=T)#
+}
+for(i in marker.median$type){#
+	marker.median.s[i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}
+for(i in marker.median.s$type){#
+	marker.median.s[i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}
+marker.median.s
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))
+marker.median.s
+marker.median.s$type
+for(i in marker.median.s$type){#
+	marker.median.s[i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}
+marker.median.s
+marker.median.s <- data.frame(NA)
+for(i in unique(gam2.weights$mix.mark)){#
+	marker.median.s[i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}
+marker.median.s
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))
+marker.median.s
+for(i in marker.median$type){#
+	marker.median.s[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"], na.rm=T)#
+}
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))
+for(i in marker.median$type){#
+	marker.median.s[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"], na.rm=T)#
+}
+marker.median.s
+for(i in marker.median$type){#
+	marker.median.s[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))
+for(i in marker.median$type){#
+	marker.median.s[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}
+median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])
+i
+marker.median$type
+gam2.weights$mix.mark
+for(i in unique(marker.median$type)){#
+	marker.median.s[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}
+marker.median.s <- data.frame(type= unique(gam2.weights$mix.mark))
+marker.median.s
+for(i in unique(gam2.weights$mix.mark)){#
+	marker.median.s[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
+	xlim(0,25)
+for(i in unique(gam2.weights$mix.mark)){#
+	marker.median.s[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="S","BA.inc"])#
+}#
 #
-summary(gam2.weights)#
-gam2.weights$Year <- as.factor(gam2.weights$Year)#
+marker.median.d <- data.frame(type= unique(gam2.weights$mix.mark))#
 #
-sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc")], Year~TreeID)#
-summary(sea.df)#
-row.names(sea.df) <- sea.df$Year#
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]#
-I.names <- gam2.weights[gam2.weights$Canopy.Class=="I", "TreeID"]#
-S.names <- gam2.weights[gam2.weights$Canopy.Class=="S", "TreeID"]#
+for(i in unique(gam2.weights$mix.mark)){#
+	marker.median.d[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="D","BA.inc"])#
+}#
 #
-hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])#
-cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])#
-wet.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
-dry.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])#
+marker.median.i <- data.frame(type= unique(gam2.weights$mix.mark))#
 #
-wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
-wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
-dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
-dry.cool.years <- as.numeric(intersect(cool.years, dry.years))#
-#
-dom.bai <- sea.df[,names(sea.df) %in% D.names]#
-head(dom.bai)#
-#
-dom.bai.chron <- chron(dom.bai)#
-summary(dom.bai.chron)#
-#
-int.bai <- sea.df[,names(sea.df) %in% I.names]#
-#
-sup.bai <- sea.df[,names(sea.df) %in% S.names]#
-#
-test <- as.data.frame(dom.bai["TP2086"])#
-meow <- c(1960, 1970, 1980)#
-#
-sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)#
-summary(sea.test)#
-#
-foo <- sea.test$se.unscaled#
-names(foo) <- sea.test$lag#
-#
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-summary(gam2.weights)#
-gam2.weights$Year <- as.factor(gam2.weights$Year)#
-#
-sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc")], Year~TreeID)#
-summary(sea.df)#
-row.names(sea.df) <- sea.df$Year
-library(reshape)
-sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc")], Year~TreeID)
-summary(sea.df)#
-row.names(sea.df) <- sea.df$Year#
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]#
-I.names <- gam2.weights[gam2.weights$Canopy.Class=="I", "TreeID"]#
-S.names <- gam2.weights[gam2.weights$Canopy.Class=="S", "TreeID"]
-hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])#
-cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])#
-wet.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
-dry.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])#
-#
-wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
-wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
-dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
-dry.cool.years <- as.numeric(intersect(cool.years, dry.years))#
-#
-dom.bai <- sea.df[,names(sea.df) %in% D.names]#
-head(dom.bai)#
-#
-dom.bai.chron <- chron(dom.bai)#
-summary(dom.bai.chron)#
-#
-int.bai <- sea.df[,names(sea.df) %in% I.names]#
-#
-sup.bai <- sea.df[,names(sea.df) %in% S.names]#
-#
-test <- as.data.frame(dom.bai["TP2086"])#
-meow <- c(1960, 1970, 1980)
-library(dplR)
-dom.bai <- sea.df[,names(sea.df) %in% D.names]#
-head(dom.bai)#
-#
-dom.bai.chron <- chron(dom.bai)#
-summary(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
-head(dom.bai)
-dom.bai.chron <- chron(dom.bai[,1:10])
-summary(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-summary(sea.test)
-foo <- sea.test$se.unscaled#
-names(foo) <- sea.test$lag
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-sea.test <- sea(dom.bai.chron, cool.years , lag=2, resample=1000)
-warnings()
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot" & gam2.weights$State=="IN"])
-hot.years
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]
-hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot" & gam2.weights$State=="IN"])
-dom.bai <- sea.df[,names(sea.df) %in% D.names]#
-head(dom.bai)#
-#
-dom.bai.chron <- chron(dom.bai[,1:10])#
-summary(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-hot.years
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-summary(sea.test)
-foo <- sea.test$se.unscaled#
-names(foo) <- sea.test$lag#
-#
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-hot.years
-meow <- c(1955, 1959)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-summary(sea.test)
-foo <- sea.test$se.unscaled#
-names(foo) <- sea.test$lag#
-#
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-line(x=sea.test, y = sea.test$se.unscaled)
-sea.test$se.unscaled
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-line(x=sea.test$lag, y = sea.test$se.unscaled)
-lines(x=sea.test$lag, y = sea.test$se.unscaled)
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch", ylim = c) 0, 10)#
-	lines(x=sea.test$lag, y = sea.test$se.unscaled)
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch", ylim = c(0, 10))
-lines(x=sea.test$lag, y = sea.test$se.unscaled)
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]#
-I.names <- gam2.weights[gam2.weights$Canopy.Class=="I" & gam2.weights$State=="IN", "TreeID", "TreeID"]#
-S.names <- gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$State=="IN", "TreeID", "TreeID"]
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-I.names <- gam2.weights[gam2.weights$Canopy.Class=="I" & gam2.weights$State=="IN", "TreeID"]
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]#
-I.names <- gam2.weights[gam2.weights$Canopy.Class=="I" & gam2.weights$State=="IN", "TreeID"]#
-S.names <- gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$State=="IN", "TreeID"]
-dom.bai.chron <- chron(dom.bai)
-summary(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-summary(dom.bai.chron)
-dim(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-summary(sea.test)
-foo <- sea.test$se.unscaled#
-names(foo) <- sea.test$lag#
-#
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="ME", "TreeID"]
-hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot" & gam2.weights$State=="ME"])
-dom.bai <- sea.df[,names(sea.df) %in% D.names]#
-head(dom.bai)
-head(dom.bai)#
-#
-dom.bai.chron <- chron(dom.bai)#
-summary(dom.bai.chron)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-summary(sea.test)
-foo <- sea.test$se.unscaled
-names(foo) <- sea.test$lag
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-5*3*8
-D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="MO", "TreeID"]#
-I.names <- gam2.weights[gam2.weights$Canopy.Class=="I" & gam2.weights$State=="IN", "TreeID"]#
-S.names <- gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$State=="IN", "TreeID"]#
-#
-hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot" & gam2.weights$State=="MO"])#
-cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])#
-wet.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
-dry.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])#
-#
-wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
-wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
-dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
-dry.cool.years <- as.numeric(intersect(cool.years, dry.years))#
-#
-dom.bai <- sea.df[,names(sea.df) %in% D.names]#
-head(dom.bai)#
-#
-dom.bai.chron <- chron(dom.bai)#
-summary(dom.bai.chron)#
-#
-int.bai <- sea.df[,names(sea.df) %in% I.names]#
-int.bai.chron <- chron(int.bai)#
-sup.bai <- sea.df[,names(sea.df) %in% S.names]#
-#
-test <- as.data.frame(dom.bai["TP2086"])#
-meow <- c(1955, 1959)#
-#
-sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
-summary(sea.test)
-foo <- sea.test$se.unscaled#
-names(foo) <- sea.test$lag#
-#
-barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
-sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+for(i in unique(gam2.weights$mix.mark)){#
+	marker.median.i[marker.median.s$type==i,"median"] <- median(gam2.weights[gam2.weights$mix.mark==i & gam2.weights$Canopy.Class=="I","BA.inc"])#
+}
+marker.median.s$Canopy.Class <- as.factor("S")
+marker.median.d$Canopy.Class <- as.factor("D")
+marker.median.i$Canopy.Class <- as.factor("I")
+marker.median <- rbind(marker.median.i, marker.median.d, marker.median.s)
+marker.median
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25) +#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25) +#
+	scale_x_continuous(expand=c(0,0))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	scale_x_continuous(expand=c(0,0)) +#
+		xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	scale_x_continuous(expand=c(0,0)) +#
+		xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	geom_vline(xintercept=marker.median, fill=type)#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	geom_vline(xintercept=marker.median, fill=type)+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	geom_vline(data=marker.median, aes(xintercept=median, fill=type))+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	geom_vline(data=marker.median, aes(xintercept=median, color=type))+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A")], aes(xintercept=median, color=type))+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)
+tukey.s["Precip.Mark:Temp.Mark"] # Significant (for better or worse)
+summary(gam2.weights)
+facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +
+xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +
+xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Harvard",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Harvard",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Missouri Ozarks",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Missouri Ozark",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)
+summary(climate.markers)
+climate.markers
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Harvard",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Harvard",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)+ #
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Harvard",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)+ #
+	labs(x= "BAI", y="Density")#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Harvard",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)+ #
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Howland",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)+ #
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Morgan Monroe State Park",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)+ #
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A") & gam2.weights$Site=="Oak Openings Toledo",]) + facet_grid(Canopy.Class~Site) +#
+	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1) +#
+	#geom_vline(data=marker.median[marker.median$type %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),], aes(xintercept=median, color=type))+#
+	xlim(0,25)+ #
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25)
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	xlim(0,25) +#
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=Precip.Mark, fill=Precip.Mark), alpha=0.1) +#
+	xlim(0,25) +#
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	scale_color_manual(values=c("black", "red", "blue"))#
+	xlim(0,25) +#
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	scale_color_manual(values=c("black", "red", "blue")) +#
+	xlim(0,25) +#
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	scale_color_manual(values=c("black", "red", "blue")) +#
+	scale_fill_manual(values=c("black", "red", "blue")) +#
+	xlim(0,25) +#
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
+	scale_color_manual(values=c("grey50", "red", "blue")) +#
+	scale_fill_manual(values=c("grey50", "red", "blue")) +#
+	xlim(0,25) +#
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=Precip.Mark, fill=Precip.Mark), alpha=0.1) +#
+	xlim(0,25) +#
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
+	geom_density(aes(x=BA.inc.Clim,color=Precip.Mark, fill=Precip.Mark), alpha=0.1) +#
+	scale_color_manual(values=c("grey50", "brown", "darkgreen")) +#
+	scale_fill_manual(values=c("grey50", "brown", "darkgreen")) +#
+	xlim(0,25) +#
+	labs(x= "BAI", y="Density") +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="top",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(nrow=1)) +#
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
