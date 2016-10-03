@@ -2,6 +2,9 @@ library(ggplot2)
 library(car)
 load(file="processed_data/gamm_weights/gam1_weights.Rdata")
 
+se <- function(x){
+  sd(x, na.rm=TRUE) / sqrt((length(!is.na(x))))}
+
 summary(gam1.weights)
 factors.fits <- c("fit.tmean", "fit.precip", "fit.dbh.recon", "fit.full", "BA.inc")
 # factors.weights <- c("weight.tmean", "weight.dbh.recon", "weight.precip")
@@ -20,6 +23,8 @@ data.graph1[,paste(factors.fits, "upr", sep=".")] <- aggregate(gam1.weights[,fac
 
 data.graph1[,paste(factors.fits, "lwr", sep=".")] <- aggregate(gam1.weights[,factors.fits], by = gam1.weights[,othervars], FUN= quantile, prob= 0.025, na.rm=T)[,factors.fits]
 
+
+
 summary(data.graph1)
 
 data.graph2 <- aggregate(abs(gam1.weights[,factors.weights]), by = gam1.weights[,othervars], FUN= mean, na.rm=T)
@@ -27,6 +32,11 @@ data.graph2 <- aggregate(abs(gam1.weights[,factors.weights]), by = gam1.weights[
 data.graph2[,paste(factors.weights, "upr", sep=".")] <- aggregate(abs(gam1.weights[,factors.weights]), by = gam1.weights[,othervars], FUN= quantile, prob= 0.975, na.rm=T)[,factors.weights]
 
 data.graph2[,paste(factors.weights, "lwr", sep=".")] <- aggregate(abs(gam1.weights[,factors.weights]), by = gam1.weights[,othervars], FUN= quantile, prob= 0.025, na.rm=T)[,factors.weights]
+
+data.graph2[,paste(factors.weights, "SD", sep=".")] <- aggregate(abs(gam1.weights[,factors.weights]), by = gam1.weights[,othervars], FUN= sd, na.rm=T)[,factors.weights]
+
+data.graph2[,paste(factors.weights, "SE", sep=".")] <- aggregate(abs(gam1.weights[,factors.weights]), by = gam1.weights[,othervars], FUN= se)[,factors.weights]
+
 
 summary(data.graph2)
 
@@ -38,6 +48,7 @@ gam1.weights$wts.check <- rowSums(abs(gam1.weights[,factors.weights]))
 data.graph$wts.check <- rowSums(abs(data.graph[,factors.weights]))
 
 summary(gam1.weights)
+#save(gam1.weights, file="processed_data/gam1_weights_processed.Rdata")
 summary(data.graph)
 
 # Ordering the data for graphing
@@ -53,6 +64,8 @@ plot.rgb <- function(STATE, SPP, SIZE){	geom_point(data=data.graph[data.graph$St
 # Plotting the Obs and modeled with influence coloring
 data.graph$State <- recode(data.graph$Site, "'Howland' = 'ME';'Harvard' = 'MA';'Morgan Monroe State Park' = 'IN';'Missouri Ozark' = 'MO';'Oak Openings Toledo' = 'OH'")
 data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "ME"))
+
+save(data.graph, file="processed_data/gam1_weights_graph.Rdata")
 
 summary(data.graph[!data.graph$group %in% c("BETULA", "CARYA", "FAGR", "FRAX", "SAAL"),])
 
@@ -79,6 +92,10 @@ ggplot(data.graph) + facet_grid(group~State, scale="free") +
 	plot.rgb("MA", "ULRU", 3) +
 	plot.rgb("MA", "CARYA", 3) +
 	plot.rgb("MA", "SAAL", 3) +
+	plot.rgb("MA", "THOC", 3) +
+	plot.rgb("MA", "LITU", 3) +
+	plot.rgb("MA", "JUVI", 3) +
+	plot.rgb("MA", "PCRU", 3) +
 	
 	plot.rgb("ME", "ACRU", 3) +
 	plot.rgb("ME", "PIST", 3) +
@@ -93,7 +110,11 @@ ggplot(data.graph) + facet_grid(group~State, scale="free") +
 	plot.rgb("ME", "ULRU", 3) +
 	plot.rgb("ME", "CARYA", 3) +
 	plot.rgb("ME", "SAAL", 3) +
-
+	plot.rgb("ME", "THOC", 3) +
+	plot.rgb("ME", "LITU", 3) +
+	plot.rgb("ME", "JUVI", 3) +
+	plot.rgb("ME", "PCRU", 3) +
+	
 	
 	plot.rgb("MO", "ACRU", 3) +
 	plot.rgb("MO", "PIST", 3) +
@@ -108,6 +129,10 @@ ggplot(data.graph) + facet_grid(group~State, scale="free") +
 	plot.rgb("MO", "ULRU", 3) +
 	plot.rgb("MO", "CARYA", 3) +
 	plot.rgb("MO", "SAAL", 3) +
+	plot.rgb("MO", "THOC", 3) +
+	plot.rgb("MO", "LITU", 3) +
+	plot.rgb("MO", "JUVI", 3) +
+	plot.rgb("MO", "PCRU", 3) +
 
 	plot.rgb("IN", "ACRU", 3) +
 	plot.rgb("IN", "PIST", 3) +
@@ -122,7 +147,10 @@ ggplot(data.graph) + facet_grid(group~State, scale="free") +
 	plot.rgb("IN", "ULRU", 3) +
 	plot.rgb("IN", "CARYA", 3) +
 	plot.rgb("IN", "SAAL", 3) +
-
+	plot.rgb("IN", "THOC", 3) +
+	plot.rgb("IN", "LITU", 3) +
+	plot.rgb("IN", "JUVI", 3) +
+	plot.rgb("IN", "PCRU", 3) +
 
 	plot.rgb("OH", "ACRU", 3) +
 	plot.rgb("OH", "PIST", 3) +
@@ -137,6 +165,12 @@ ggplot(data.graph) + facet_grid(group~State, scale="free") +
 	plot.rgb("OH", "ULRU", 3) +
 	plot.rgb("OH", "CARYA", 3) +
 	plot.rgb("OH", "SAAL", 3)+
+	plot.rgb("OH", "THOC", 3) +
+	plot.rgb("OH", "LITU", 3) +
+	plot.rgb("OH", "JUVI", 3) +
+	plot.rgb("OH", "PCRU", 3) +
+	
+	
 	labs(title= "Species", x="Year", y = expression(bold(paste("BAI (mm"^"2", "y"^"-1",")")))) +
 	theme_bw()
 dev.off()
@@ -186,9 +220,10 @@ ggplot(data.graph) + facet_grid(group~State) +
 	# geom_ribbon(data=gam4.weights[gam4.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
 	 geom_vline(data=climate.markers[climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
   	scale_color_manual(values=c("red", "blue"))+
-	geom_ribbon(aes(x=Year, ymin=weight.tmean2.lwr, ymax=weight.tmean2.upr), fill="red", alpha=0.25) +
-	geom_ribbon(aes(x=Year, ymin=weight.precip2.lwr, ymax=weight.precip2.upr), fill="blue", alpha=0.25) +
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2.lwr, ymax=weight.dbh.recon2.upr), fill="green", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), fill="red", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), fill="blue", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2- weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), fill="green", alpha=0.25) +
+	
 	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
 	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
 	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="green")+
@@ -211,9 +246,11 @@ ggplot(data.graph) + facet_grid(group~State) +
 	# geom_ribbon(data=gam4.weights[gam4.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
 	 geom_vline(data=climate.markers[climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
   	scale_color_manual(values=c("lightblue", "brown"))+
-	geom_ribbon(aes(x=Year, ymin=weight.tmean2.lwr, ymax=weight.tmean2.upr), fill="red", alpha=0.25) +
-	geom_ribbon(aes(x=Year, ymin=weight.precip2.lwr, ymax=weight.precip2.upr), fill="blue", alpha=0.25) +
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2.lwr, ymax=weight.dbh.recon2.upr), fill="green", alpha=0.25) +
+	
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), fill="red", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), fill="blue", alpha=0.25) +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2- weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), fill="green", alpha=0.25) +
+	
 	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
 	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
 	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="green")+

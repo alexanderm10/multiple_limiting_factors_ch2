@@ -1,0 +1,504 @@
+# Scripts for figures to be used in Chapter 2
+
+#############################################################################
+#Figure1
+# Map of Study sites
+#############################################################################
+
+library(ggplot2)
+library(maps)
+library(raster)
+library(car)
+
+sites.exp <- read.csv("~/PhD/Carbon Research/Calloc_generalscripts/DOE_sites_ross_sampled.csv")
+
+summary(sites.exp)
+sites.exp[,c("site.name", "lat", "long")]
+# Trimming to just the sites for ch. 2
+ch2.sites.exp <- sites.exp[sites.exp$site.name%in% c("Harvard Forest", "Howland Forest", "Morgan Monroe State Forest","Missouri Ozark","Ohio Oak Openings"),]
+ch2.sites.exp$state<- recode(ch2.sites.exp$site.name, "'Harvard Forest'='MA';'Howland Forest'='ME';'Morgan Monroe State Forest'='IN';'Missouri Ozark'='MO';'Ohio Oak Openings'='OH'")
+#sites.obs[,c("Site.code", "Lat", "Long")]
+
+
+ch2.sites.exp[,c("site.name", "lat", "long")]
+summary(ch2.sites.exp[,c("site.name", "lat", "long")])
+#summary(sites.obs[,c("Site.code", "Lat", "Long")])
+
+#sites.obs[,c("Site.code", "Site", "Lat", "Long")]
+
+
+dat.map <- data.frame(Site= c(ch2.sites.exp$site.name),
+                      Lat = c(ch2.sites.exp$lat),
+                      Lon = c(ch2.sites.exp$long),
+                      type= c(rep("Experiment", nrow(ch2.sites.exp)))
+)
+summary(dat.map)
+
+# 10m land cover from Natural Earth http://www.naturalearthdata.com/downloads/10m-raster-data/10m-natural-earth-1/
+nat.earth <- stack("~/PhD/Carbon Research/Calloc_generalscripts/base_layers/NE1_HR_LC_SR_W_DR/NE1_HR_LC_SR_W_DR.tif")
+
+nat.crop <- crop(nat.earth, y=c(min(dat.map$Lon, na.rm=T)-5, max(dat.map$Lon, na.rm=T)+5, min(dat.map$Lat, na.rm=T)-5, max(dat.map$Lat, na.rm=T)+5))
+nat.crop <- aggregate(nat.crop, fact=2, fun=mean)
+
+rast.table <- data.frame(xyFromCell(nat.crop, 1:ncell(nat.crop)),
+                         getValues(nat.crop/255))
+
+rast.table$rgb <- with(rast.table, rgb(NE1_HR_LC_SR_W_DR.1,
+                                       NE1_HR_LC_SR_W_DR.2,
+                                       NE1_HR_LC_SR_W_DR.3,
+                                       1))
+
+states <- map_data("state")
+names(states)
+summary(states)
+names(states) <- c("Lon", "Lat", paste(names(states[,3:ncol(states)])))
+
+# states.crop <- states[states$Lon %in% range(dat.map$Lon) & states$Lat %in% range(dat.map$Lat),]
+dim(states)
+# Note: the natural earth data takes quite a while to plot!`
+png("figures/Prelim_Figures/pub_figs/Figure1.png", width=10, height=5, units="in", res=220)
+	ggplot(data=dat.map) +
+  		guides(fill="none") +
+  		geom_tile(data=rast.table, aes(x=x, y=y), fill=rast.table$rgb) + # NOTE: fill MUST be outside of the aes otherwise it converts it to ggcolors
+  		geom_path(data=states,aes(x = Lon, y = Lat, group=group), color = "black", size=0.1) +
+  		geom_point(aes(x=Lon, y=Lat, color=type), size=2.5, alpha=0.75) +
+  		geom_text(data=ch2.sites.exp,aes(x=long+0.65, y=lat+0.65, label = paste("",as.character(state),
+  					 sep="")), color="black", size=5,fontface="bold") +
+  		scale_color_manual(values="red", name="Data Type") +
+  		theme_bw() +
+  		theme(legend.position="none") +
+  		scale_x_continuous(expand=c(0,0), name="Degrees Longitude", limits =range(rast.table$x)) +
+ 		scale_y_continuous(expand=c(0,0), name="Degrees Latitude", limits=range(rast.table$y)) +
+  		coord_equal()
+
+dev.off()
+
+
+#############################################################################
+# Figure2
+# Combined figure of climate space and climate time series
+#############################################################################
+library(ggplot2)
+library(car)
+require(plyr)
+require(ggplot2)
+require(RColorBrewer)
+require(reshape)
+require(scales)
+require(zoo)
+cbbPalette <- c("#009E73", "#e79f00", "#9ad0f3", "#0072B2", "#D55E00")
+
+
+# Setting up the Scatter plot of temp vs. precip climate space
+cols <- brewer.pal(8,"Set1")
+cols <- c(cols[2], cols[1], cols[3:8]) # inverts red/blue order
+
+source("poster_theme.R")
+# Doing some data exploration with the cliamte data.
+
+data.use <- read.csv("processed_data/AllSites_tree_plus_climate_and_BA.csv", header=T)
+summary(data.use)
+
+sites.use <- c("Harvard", "Howland", "Morgan Monroe State Park", "Oak Openings Toledo", "Missouri Ozark")
+
+data.use <- data.use[data.use$Site %in% sites.use,]
+
+summary(data.use[data.use$Site=="Howland","tmean"])
+
+data.use$Site <- factor(data.use$Site, levels = c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))
+
+
+summary(data.use)
+data.use <- data.use[data.use$Year >=1950,]
+
+# data.use <- na.omit(data.use)
+# data.use <- droplevels(data.use)
+
+# Script that allows polygons to be drawn around the scatter cloud to show site conditions better.
+df <- data.use
+find_hull <- function(data.use) data.use[chull(data.use$tmean, data.use$precip),]
+hulls <- ddply(df, "Site", find_hull)
+summary(hulls)
+
+# Restructuring for legend
+data.use$Site <- factor(data.use$Site, levels=c("Howland", "Harvard", "Oak Openings Toledo", "Morgan Monroe State Park", "Missouri Ozark"))
+	
+fig2 <- ggplot(data=data.use, aes(tmean, precip, colour=Site, fill=Site)) + 
+  geom_point() + 
+  geom_hline(yintercept=0, colour="darkgrey") + 
+  geom_vline(xintercept=0, colour="darkgrey") +
+  scale_colour_manual("", values = cbbPalette) +
+  scale_fill_manual("", values = cbbPalette) +
+  #labs(x = "Temperature", y = "Precip")+
+  # labs(title = "Site Climate 1950-2012", x = "Mean GS Temp (˚C)", y = expression(bold(paste("Cumulative GS Precip (mm yr"^"-1",")"))))+
+		 theme(axis.line=element_line(color="black", size=0.5), panel.grid.major=element_blank(), panel.grid.minor= element_blank(), panel.border= element_blank(), panel.background= element_blank(), axis.text.x=element_text(angle=0, color="black", size=rel(1.5)), axis.text.y=element_text(color="black", size=rel(1.5)), axis.title.x=element_text(face="bold", size=rel(1.5), vjust=-0.5),  axis.title.y=element_text(face="bold", size=rel(1.5), vjust=1), plot.margin=unit(c(0.1,0.5,0.5,0.1), "lines"))+
+		 theme(legend.position=c(0.2,0.85))+
+		 poster.theme2+
+		 theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5))+
+        scale_x_continuous(limits=c(10, 30))+
+        scale_y_continuous(limits=c(100, 1200))
+  
+  
+fig2
+
+# Fig. 2A
+# Density lines- not quite there yet.  
+fig2a <- fig2 + geom_density2d(alpha=.5); fig2a
+
+# Fig.2 Scatterplot by itself--Climate dataf rom 1950-2014
+
+
+figure2a <- fig2 + geom_polygon(data=hulls, alpha=.2)+
+	
+		 theme(axis.line=element_line(color="black", size=0.5), 
+		 	panel.grid.major=element_blank(), 
+		 	panel.grid.minor= element_blank(), 
+		 	panel.border= element_blank(), 
+		 	panel.background= element_blank(), 
+		 	axis.text.x=element_text(angle=0, color="black", size=rel(1.5)),
+		 	axis.text.y=element_text(color="black", size=rel(1.5)), 
+		 	axis.title.x=element_text(size=15, vjust=-0.5),
+		 	axis.title.y=element_text(size=15, vjust=1),
+		 	plot.margin=unit(c(0.1,0.5,0.5,0.1), "lines"))+
+		 theme(legend.position="top")+
+		 theme(axis.line.x = element_line(color="black", size = 0.5),
+        	axis.line.y = element_line(color="black", size = 0.5))+
+        	scale_x_continuous(name="GS Mean Temperature (˚C)", limits=c(10, 30))+
+        	scale_y_continuous(name= expression(bold(paste("Cumulative GS Precip (mm yr"^"-1",")"))),
+        		limits=c(100, 1100))
+
+
+
+
+pdf("figures/Prelim_Figures/pub_figs/Figure2a.pdf", height = 8, width = 13)
+	figure2a
+dev.off()
+
+#----------------------------------------------------------------------
+# Creating Figure 2B which is the timeseries of climate with the extreme years marked
+#----------------------------------------------------------------------
+load("processed_data/climate_markeryears.Rdata") # climate.markers
+load("processed_data/climate_ts.Rdata")
+source("poster_theme.R")
+figure2b_temp <- ggplot(data=climate.combo[climate.combo$type %in%"tmean",]) + 
+	facet_grid(~Site, scales="free")+
+	
+	geom_vline(data=climate.markers[climate.markers$type %in% "tmean",],aes(xintercept=marker.year, color=marker), alpha=0.50)+
+	geom_line(aes(x=Year, y=value, color=type), size=0.75) +
+	geom_line(aes(x=Year, y=mean), size=2) +
+	scale_color_manual(values=c("lightblue", "orange", "red")) +
+	scale_x_continuous(breaks = seq(1950, 2015, by=10),labels = c("1950","1960","1970", "1980","1990", "2000","2010")) +
+	# scale_x_continuous(breaks = seq(1950, 2015, by=10)) +
+	scale_y_continuous(expand=c(0,0), name=expression(bold(paste("Temperature ("^"o", "C)"))), breaks=c(10, 12.5, 15.0, 17.5)) +
+	
+	labs(x="Year", y="Mean Temperature") +
+		
+	theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_text(face="bold", size=rel(1.0)),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="top",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1)) +
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+	theme(axis.title.x=element_blank())
+	
+	
+pdf("figures/Prelim_Figures/pub_figs/Figure2b_temp.pdf", height = 8, width = 13)
+	figure2b_temp
+dev.off()
+
+figure2b_precip <- ggplot(data=climate.combo[climate.combo$type %in% "precip",]) + 
+	facet_grid(~Site, scales="free")+
+	
+	geom_vline(data=climate.markers[climate.markers$type %in% "precip",],aes(xintercept=marker.year,
+		 color=marker), alpha=0.50)+
+	geom_line(aes(x=Year, y=value, color=type), size=0.75) +
+	geom_line(aes(x=Year, y=mean), size=2) +
+	scale_color_manual(values=c("brown", "blue", "darkgreen"))+
+	scale_x_continuous(breaks = seq(1950, 2015, by=10),labels = c("1950","1960","1970", "1980","1990", "2000","2010")) +
+	labs(x="Year", y="Cumulative Precipitation") +
+		
+	theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_blank(),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="bottom",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1)) +
+	theme(axis.title.x = element_text(size=rel(1.1), face="bold"),
+        axis.title.y= element_text(size=rel(1.1), face="bold"))	
+	
+pdf("figures/Prelim_Figures/pub_figs/Figure2b_precip.pdf", height = 8, width = 13)
+	figure2b_precip
+dev.off()
+
+
+	 
+# Figure 2 Combined
+# combining figures with Christy's Script
+pdf("figures/Prelim_Figures/pub_figs/Figure2_combined.pdf", height = 13, width = 13)
+	grid.new(page)
+	pushViewport(viewport(layout=grid.layout(nrow=3,ncol=1, widths=c(1.3,1,2))))
+	print(figure2a  , vp = viewport(layout.pos.row = 1, layout.pos.col=1))
+  	print(figure2b_temp, vp = viewport(layout.pos.row = 2, layout.pos.col=1))
+  	print(figure2b_precip, vp = viewport(layout.pos.row = 3, layout.pos.col=1))	
+dev.off()
+
+png(file.path("figures/Prelim_Figures/pub_figs/", "Figure2.png"), width=13, height=8.5, units="in", res=180)
+	grid.new(page)
+	pushViewport(viewport(layout=grid.layout(nrow=3,ncol=1, widths=c(1.3,1,2))))
+	print(figure2a  , vp = viewport(layout.pos.row = 1, layout.pos.col=1))
+  	print(figure2b_temp, vp = viewport(layout.pos.row = 2, layout.pos.col=1))
+  	print(figure2b_precip, vp = viewport(layout.pos.row = 3, layout.pos.col=1))
+dev.off()
+#############################################################################
+# Figure 3
+# Sensitivity Curves fro the Canopy.Class Model
+#############################################################################
+# Getting just temp and precip curves here then will combine with size for later
+
+load("processed_data/gam2_response_graph.R")
+
+g2.ci.out2$Canopy.Class <- recode(g2.ci.out2$Canopy.Class, "'D'='Dominant';'I'='Intermediate';'S'='Suppressed'")
+		
+fig3.t<- 	ggplot(data=g2.ci.out2[g2.ci.out2$Effect %in% "tmean", ]) + 
+  		#facet_wrap(~Effect, scales="free_x") +
+  		geom_line(aes(x=x, y=0), linetype="dashed")+
+  		geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=Canopy.Class), alpha=0.5) +
+  		geom_line(aes(x=x, y=mean.bai, color=Canopy.Class))+
+  		scale_color_manual(values=c("#0072B2", "#009E73", "#E69F00")) +
+  		scale_fill_manual(values=c("#0072B2", "#009E73",  "#E69F00")) +
+		labs(x = expression(bold(paste("Temperature ("^"o", "C)"))), y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+
+  		 ylim(0,2) +
+  		theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_blank(),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="none",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1))+
+       	theme(axis.title.x = element_text(size=rel(1.1), face="bold"),
+        axis.title.y= element_text(size=rel(1.1), face="bold"))	
+
+pdf("figures/Prelim_Figures/pub_figs/Figure3_temp.pdf", width= 13, height = 8.5)
+	fig3.t
+dev.off()
+#---------------------------------------
+# Precip
+fig3.p<- 	ggplot(data=g2.ci.out2[g2.ci.out2$Effect %in% "precip", ]) + 
+  		#facet_wrap(~Effect, scales="free_x") +
+  		geom_line(aes(x=x, y=0), linetype="dashed")+
+  		geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=Canopy.Class), alpha=0.5) +
+  		geom_line(aes(x=x, y=mean.bai, color=Canopy.Class))+
+  		scale_color_manual(values=c("#0072B2", "#009E73", "#E69F00")) +
+  		scale_fill_manual(values=c("#0072B2", "#009E73",  "#E69F00")) +
+  		labs(x = "Cumulative Precipitation (mm)", y=element_blank())+
+  		 ylim(0,2) +
+  		theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_blank(),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="none",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1)) +
+        ylim(0,2) +
+	theme(axis.title.x = element_text(size=rel(1.1), face="bold"),
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+
+        theme(axis.text.y=element_blank())	
+
+pdf("figures/Prelim_Figures/pub_figs/Figure3_precip.pdf", width= 13, height = 8.5)
+	fig3.p
+dev.off()
+
+
+#---------------------------------------
+# Size
+fig3.size<- 	ggplot(data=g2.ci.out2[g2.ci.out2$Effect %in% "dbh.recon", ]) + 
+  		#facet_wrap(~Effect, scales="free_x") +
+  		geom_line(aes(x=x, y=0), linetype="dashed")+
+  		geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=Canopy.Class), alpha=0.5) +
+  		geom_line(aes(x=x, y=mean.bai, color=Canopy.Class))+
+  		scale_color_manual(values=c("#0072B2", "#009E73", "#E69F00")) +
+  		scale_fill_manual(values=c("#0072B2", "#009E73",  "#E69F00")) +
+  		labs(x = "DBH (cm)", y=element_blank())+
+  		 #ylim(0,2) +
+  		theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_blank(),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="right",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(ncol=1)) +
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),
+        axis.title.y= element_text(size=rel(1.1), face="bold")) #+
+        #theme(axis.text.y=element_blank())	
+
+pdf("figures/Prelim_Figures/pub_figs/Figure3_DBH.pdf", width= 13, height = 8.5)
+	fig3.size
+dev.off()
+
+# Figure 3 Combined
+# combining figures with Christy's Script
+pdf("figures/Prelim_Figures/pub_figs/Figure3_combined.pdf", height = 8, width = 13)
+	grid.new(page)
+	pushViewport(viewport(layout=grid.layout(nrow=1,ncol=3, widths=c(1.3,1,2))))
+	print(fig3.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))
+  	print(fig3.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))
+  	print(fig3.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))	
+dev.off()
+
+png(file.path("figures/Prelim_Figures/pub_figs/", "Figure3.png"), width=13, height=8.5, units="in", res=180)
+	grid.new(page)
+	pushViewport(viewport(layout=grid.layout(nrow=1,ncol=3, widths=c(1.3,1,2))))
+	print(fig3.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))
+  	print(fig3.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))
+  	print(fig3.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))
+dev.off()
+#############################################################################
+# Figure 4
+# Weights of CC Model graphed without site separation
+#############################################################################
+load("processed_data/gam2_weights_graph.R")
+
+
+fig4 <-	ggplot(data.graph) + facet_grid(~Canopy.Class) +
+		
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE),
+	 alpha=0.25, fill="red") +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 +
+	 weight.precip2.SE), alpha=0.25, fill="blue") +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2 - weight.dbh.recon2.SE, ymax=weight.dbh.recon2 +
+	 weight.dbh.recon2.SE), alpha=0.25, fill="darkgreen") +
+		
+	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
+	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
+	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="darkgreen")+
+	
+	labs(y="% Growth Limitation", x="Year") +
+	
+	theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_text(face="bold", size=rel(1.0)),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="right",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(ncol=1)) +
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),
+        axis.title.y= element_text(size=rel(1.1), face="bold")) #+
+        #theme(axis.text.y=element_blank())	
+	
+
+
+pdf("figures/Prelim_Figures/pub_figs/Figure4.pdf", width= 13, height = 8.5)
+	fig4
+dev.off()
+
+png(file.path("figures/Prelim_Figures/pub_figs/", "Figure4.png"), width=13, height=8.5, units="in", res=180)
+	fig4
+dev.off()
+
+
+#############################################################################
+# Figure 5
+# Probability density functions for diameter
+#############################################################################
+
+load("ch2_combined_data_use.Rdata")
+summary(test)
+
+ggplot(data=test) + facet_grid(~Site) + 
+	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +
+	
+	
+		
+	theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_text(face="bold", size=rel(1.0)),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="top",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1)) +
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+	labs(x="DBH (cm)", y="Density")
+
+load("processed_data/dbh_recon_graph.Rdata")
+summary(dbh.recon)
+ggplot(data=dbh.recon[dbh.recon$Year >= 1950,]) + facet_grid(Canopy.Class~Site) +
+	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + 
+	geom_line(aes(x=Year, y = Mean, color=Canopy.Class)) +theme(axis.line=element_line(color="black"), 
+		panel.grid.major=element_blank(), 
+		panel.grid.minor=element_blank(), 
+		panel.border=element_blank(),  
+		panel.background=element_blank(), 
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+		strip.text=element_text(face="bold", size=rel(1.0)),
+		axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5),
+        legend.position="top",
+        legend.key.size = unit(0.75, "cm"),
+        legend.text = element_text(size=rel(1.1)),
+        legend.key = element_rect(fill = "white")) + 
+        guides(color=guide_legend(nrow=1)) +
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+	labs(x="Year", y="DBH (cm)")

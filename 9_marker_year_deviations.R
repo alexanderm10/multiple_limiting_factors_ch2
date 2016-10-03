@@ -181,6 +181,25 @@ summary(gam2.dat.summary)
 gam2.dat.summary$Site <- factor(gam2.dat.summary$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))
 
 
+pdf("figures/Prelim_Figures/gam2_rel_growth.pdf", width= 13, height = 8.5)
+# Hot and Dry
+ggplot(gam2.dat.summary) +
+	facet_grid(Canopy.Class~Site, scales="fixed") +
+	
+	geom_ribbon(aes(x=Year, ymin=Clim.Rel.LB, ymax=Clim.Rel.UB, fill=Canopy.Class), alpha=0.35) +
+	geom_line(aes(x=Year, y=Clim.Rel,color=Canopy.Class),size=0.75) +
+		geom_hline(yintercept=0, color="gray50", linetype="dashed") +
+	
+	# geom_vline(data=gam2.dat.summary[gam2.dat.summary$Temp.Mark=="hot",], aes(xintercept=Year), alpha=0.3, color="red") +
+	# geom_vline(data=gam2.dat.summary[gam2.dat.summary$Precip.Mark=="dry",], aes(xintercept=Year), alpha=0.5, color="brown", linetype="dashed") +
+	
+	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+panel.background = element_blank())+
+	theme(axis.line.x = element_line(color="black", size = 0.5),
+        axis.line.y = element_line(color="black", size = 0.5)) +
+    scale_x_continuous(expand=c(0,0)) +
+    scale_y_continuous(expand=c(0,0))
+dev.off()
 
 pdf("figures/Prelim_Figures/gam2_rel_growth_hot_dry.pdf", width= 13, height = 8.5)
 # Hot and Dry
@@ -224,7 +243,7 @@ panel.background = element_blank())+
         axis.line.y = element_line(color="black", size = 0.5)) +
     scale_x_continuous(expand=c(0,0)) +
     scale_y_continuous(expand=c(0,0))
-dev.off
+dev.off()
 
 
 #########################################################
@@ -296,68 +315,17 @@ summary(gam4.dat.summary)
 gam1.weights$Temp.Mark <- recode(gam1.weights$Temp.Mark, "'NONE'='A'")
 gam1.weights$Precip.Mark <- recode(gam1.weights$Precip.Mark, "'NONE'='A'")
 summary(gam1.weights)
+save(gam1.weights, file="processed_data/gam1_weights_processed.Rdata")
 
-# Model won't run all together for BAI, will have to do site specific
 
-# Temperature Models
-# Missouri
-gam1.lme.temp.mo <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="MO",]); anova(gam1.lme.temp)
-summary(gam1.lme.temp.mo)
-lsmeans(gam1.lme.temp.mo, pairwise~Temp.Mark*group, adjust="tukey")
-# IN
-gam1.lme.temp.in <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="in",]); anova(gam1.lme.temp)
-summary(gam1.lme.temp.in)
-lsmeans(gam1.lme.temp.in, pairwise~Temp.Mark*group, adjust="tukey")
 
-# OH
-gam1.lme.temp.oh <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="oh",]); anova(gam1.lme.temp)
-summary(gam1.lme.temp.oh)
-lsmeans(gam1.lme.temp.oh, pairwise~Temp.Mark*group, adjust="tukey")
-
-# MA
-gam1.lme.temp.ma <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="ma",]); anova(gam1.lme.temp)
-summary(gam1.lme.temp.ma)
-lsmeans(gam1.lme.temp.ma, pairwise~Temp.Mark*group, adjust="tukey")
-
-# ME
-gam1.lme.temp.me <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="me",]); anova(gam1.lme.temp)
-summary(gam1.lme.temp.me)
-lsmeans(gam1.lme.temp.me, pairwise~Temp.Mark*group, adjust="tukey")
 
 # Precip Models
-gam1.lme.precip.mo <- lme(BA.inc ~ Precip.Mark*group-Precip.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="MO",]); anova(gam1.lme.precip)
-summary(gam1.lme.precip.mo)
-lsmeans(gam1.lme.precip.mo, pairwise~Precip.Mark*group, adjust="tukey")
-# IN
-gam1.lme.precip.in <- lme(BA.inc ~ Precip.Mark*group-Precip.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="in",]); anova(gam1.lme.precip)
-summary(gam1.lme.precip.in)
-lsmeans(gam1.lme.precip.in, pairwise~Precip.Mark*group, adjust="tukey")
-
-# OH
-gam1.lme.precip.oh <- lme(BA.inc ~ Precip.Mark*group-Precip.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="oh",]); anova(gam1.lme.precip)
-summary(gam1.lme.precip.oh)
-lsmeans(gam1.lme.precip.oh, pairwise~Precip.Mark*group, adjust="tukey")
-
-# MA
-gam1.lme.precip.ma <- lme(BA.inc ~ Precip.Mark*group-Precip.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="ma",]); anova(gam1.lme.precip)
-summary(gam1.lme.precip.ma)
-lsmeans(gam1.lme.precip.ma, pairwise~Precip.Mark*group, adjust="tukey")
-
-# ME
-gam1.lme.precip.me <- lme(BA.inc ~ Precip.Mark*group-Precip.Mark, 
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="me",]); anova(gam1.lme.precip)
-summary(gam1.lme.precip.me)
-lsmeans(gam1.lme.precip.me, pairwise~Precip.Mark*group, adjust="tukey")
-
+gam1.lme.precip <- lme(BA.inc ~ Precip.Mark*group-Precip.Mark, 
+			random=list(PlotID=~1, TreeID=~1), data=gam1.weights) 
+anova(gam1.lme.precip)
+summary(gam1.lme.precip)
+lsmeans(gam1.lme.precip, pairwise~Precip.Mark*group, adjust="tukey")
 
 
 
@@ -384,17 +352,21 @@ lsmeans(gam1.lme.wts.precip, pairwise~Factor*Precip.Mark*group, adjust="tukey")
 # Recoding Non-extreme years to 'A' for ambient
 gam2.weights$Temp.Mark <- recode(gam2.weights$Temp.Mark, "'NONE'='A'")
 gam2.weights$Precip.Mark <- recode(gam2.weights$Precip.Mark, "'NONE'='A'")
+save(gam2.weights,file="processed_data/gam2_weights_processed.Rdata")
 
 summary(gam2.weights)
+gam2.weights <- gam2.weights[gam2.weights$Year >=1950]
 
 head(gam2.weights)
 gam2.lme.temp <- lme(BA.inc ~ Temp.Mark*Canopy.Class-Temp.Mark, 
-			random=list(State=~1,PlotID=~1, TreeID=~1), data=gam2.weights); anova(gam2.lme.temp)
+			random=list(State=~1,PlotID=~1, TreeID=~1), data=gam2.weights)
+anova(gam2.lme.temp)
 summary(gam2.lme.temp)
 lsmeans(gam2.lme.temp, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")	
 
 gam2.lme.precip <- lme(BA.inc ~ Precip.Mark*Canopy.Class-Temp.Mark, 
-			random=list(State=~1,PlotID=~1, TreeID=~1), data=gam2.weights); anova(gam2.lme.precip)
+			random=list(State=~1,PlotID=~1, TreeID=~1), data=gam2.weights)
+anova(gam2.lme.precip)
 summary(gam2.lme.precip)
 lsmeans(gam2.lme.precip, pairwise~Precip.Mark*Canopy.Class, adjust="tukey")	
 
@@ -412,29 +384,18 @@ lsmeans(gam2.lme.wt.temp, pairwise~Factor*Temp.Mark*Canopy.Class, adjust="tukey"
 
 
 
-# Setting up a site by site runs
-# Missouri Ozarks
-lme.temp.MO <- lme(BA.inc ~ Temp.Mark*Canopy.Class-Temp.Mark, 
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam2.weights[gam2.weights$Site=="Missouri Ozark",]); anova(lme.temp.MO)
-summary(lme.temp.MO)			
+# Setting up a site by site runs to just compare the growth between canopy Classes
+gam2.lme.sites <- lme(BA.inc~Temp.Mark*State*Canopy.Class-Temp.Mark,	
+						random=list(State=~1, PlotID=~1, TreeID=~1),
+						data=gam2.weights)
+						
+anova(gam2.lme.sites)
+summary(gam2.lme.sites)
 
-# Need to to multi-comparisons 
-lsmeans(lme.temp.MO, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")
+lsmeans(gam2.lme.sites, pairwise~State*Canopy.Class, adjust="tukey")
 
 
-# Morgan Monroe
-lme.temp.IN <- lme(BA.inc ~ Temp.Mark*Canopy.Class-Temp.Mark, 
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam2.weights[gam2.weights$Site=="Morgan Monroe State Park",]); anova(lme.temp.IN)
-summary(lme.temp.IN)			
 
-# Need to to multi-comparisons 
-lsmeans(lme.temp.IN, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")
-			
-
-gam2.weights$Precip.Mark <- recode(gam1.weights$Precip.Mark, "'NONE'='A'")
-lme.precip <- lme(BA.inc ~ Precip.Mark*group, 
-			random=list(Site=~1, PlotID=~1, TreeID=~1), data=gam2.weights); anova(lme.precip) 
-summary(lme.precip)
 
 
 ############################################################
@@ -445,7 +406,7 @@ gam4.weights$Temp.Mark <- recode(gam4.weights$Temp.Mark, "'NONE'='A'")
 gam4.weights$Precip.Mark <- recode(gam4.weights$Precip.Mark, "'NONE'='A'")
 
 summary(gam4.weights)
-
+save(gam4.weights, file="processed_data/gam4_weights_processed.Rdata")
 
 
 
@@ -469,15 +430,15 @@ gam4.wt.stack$Factor <- as.factor(substr(gam4.wt.stack$Factor, 8, nchar(paste(ga
 gam4.wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam4.weights[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]
 summary(gam4.wt.stack)
 
-gam4.lme.wts.temp <- lme(Weight ~ Factor*State, 
-			random=list(PlotID=~1, TreeID=~1), data=gam4.wt.stack); anova(gam4.lme.temp)
+gam4.lme.wts.temp <- lme(Weight ~ Temp.Mark*Factor*State, 
+			random=list(PlotID=~1, TreeID=~1), data=gam4.wt.stack); anova(gam4.lme.wts.temp)
 summary(gam4.lme.wts.temp)	
-lsmeans(gam4.lme.wts.temp, pairwise~Factor*State, adjust="tukey")		
+lsmeans(gam4.lme.wts.temp, pairwise~Temp.Mark*Factor*State, adjust="tukey")		
 
-gam4.lme.wts.precip <- lme(Weight ~ Factor*State, 
-			random=list(PlotID=~1, TreeID=~1), data=gam4.wt.stack); anova(gam4.lme.precip)
+gam4.lme.wts.precip <- lme(Weight ~ Precip.Mark*Factor*State, 
+			random=list(PlotID=~1, TreeID=~1), data=gam4.wt.stack); anova(gam4.lme.wts.precip)
 summary(gam4.lme.wts.precip)	
-lsmeans(gam4.lme.wts.precip, pairwise~Factor*State, adjust="tukey")	
+lsmeans(gam4.lme.wts.precip, pairwise~Precip.Mark*Factor*State, adjust="tukey")	
 
 
 ######################################################################################################

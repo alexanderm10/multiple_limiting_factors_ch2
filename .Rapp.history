@@ -1,891 +1,828 @@
-?tukey.HSD
-?lsmeans
-?TukeyHSD
-TukeyHSD(lme.temp.mm)
-?glht()
-summary(glht(lme.temp.mm, linfct=mcp(Temp.Mark*Canopy.Class="Tukey")))
-summary(glht(lme.temp.mm, linfct=mcp(Temp.Mark="Tukey")))
-summary(glht(lme.temp.mm, linfct=mcp(Temp.Mark="Tukey")))
-?mcp
-summary(glht(lme.temp.mm, linfct=mcp(Canopy.Class="Tukey")))
-install.packages("lsmeans")
-library(lsmeans)
-?lsmeans
-lsmeans(lme.temp.mm)
-lsmeans(lme.temp.mm, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")
-lsmeans(lme.temp.mm, pairwise~Temp.Mark, adjust="tukey")
-lsmeans(lme.temp.mm, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")
-lme.temp.MO <- lme(BA.inc ~ Temp.Mark*Canopy.Class-Temp.Mark, #
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam2.weights[gam2.weights$Site=="Missouri Ozarks",]); anova(lme.temp.MO)#
-summary(lme.temp.MO)
-lme.temp.MO <- lme(BA.inc ~ Temp.Mark*Canopy.Class-Temp.Mark, #
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam2.weights[gam2.weights$Site=="Missouri Ozarks",]);
-lme.temp.MO <- lme(BA.inc ~ Temp.Mark*Canopy.Class-Temp.Mark, #
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam2.weights[gam2.weights$Site=="Missouri Ozark",]); anova(lme.temp.MO)#
-summary(lme.temp.MO)
-lsmeans(lme.temp.MO, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")
-lme.temp.spp <- lme(BA.inc ~ Temp.Mark*Site-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(lme.temp.spp)
-gam1.weights$Temp.Mark <- recode(gam1.weights$Temp.Mark, "'NONE'='A'")
-require(ggplot2)#
-require(mgcv)#
-load("processed_data/climate_markeryears.Rdata")#
-load("ch2_combined_data_use.Rdata")#
-summary(climate.markers)#
+gam2.weights$Year <- as.factor(gam2.weights$Year)
+sea.df <- recast(gam2.weights$BA.inc, Year~TreeID)
+sea.df <- recast(gam2.weights[,c("Year", "TreeID", "Canopy.Class", "BA.inc")], Year~TreeID)
+summary(sea.df)
+sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc")], Year~TreeID)
+summary(sea.df)
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]
+D.names
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]#
+I.names <- gam2.weights[gam2.weights$Canopy.Class=="I", "TreeID"]#
+S.names <- gam2.weights[gam2.weights$Canopy.Class=="S", "TreeID"]
+sea.df[,names(sea.df) %in% D.names]
+row.names(sea.df) <- sea.df$Year
+gam2.weights$Temp.Mark
+sea.test <- sea(sea.df[,names(sea.df) %in% D.names], gam2.weights$Temp.Mark, lag=5, resample=1000)
+unique(gam2.weights$Year)
+which(gam2.weights$Temp.Mark == "hot")
+gam2.weights[gam2.weights$Temp.Mark == "hot", "Year"]
+gam2.weights[gam2.weights$Temp.Mark == "hot", unique(gam2.weights$Year)]
+gam2.weights$Temp.Mark == "hot"
+hot.years <-  gam2.weights[gam2.weights$Temp.Mark == "hot"]"Year"
+hot.years <-  gam2.weights[gam2.weights$Temp.Mark == "hot"]
+gam2.weights$Year[gam2.weights$Temp.Mark == "hot"]
+hot.years <-  unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])
+hot.years
+hot.years <-  unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])
+hot.years <-  unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])#
+cool years <-  unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cool"])#
+wet.years <-  unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
+dry.years <-  unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])
+gam2.weights$Temp.Mark
+hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])
+cool years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])
+gam2.weights$Temp.Mark == "cold"
+gam2.weights$Year[gam2.weights$Temp.Mark == "cold"]
+unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])
+cool years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])
+cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])
+wet.hot.years <- intersect(hot.years, wet.years)
+wet.hot.years
+wet.hot.years <- intersect(hot.years, wet.years)#
+wet.cool.years <- intersect(cool.years, wet.years)#
+dry.hot.years <- intersect(hot.years, dry.years)#
+dry.cool.years <- intersect(cool.years, dry.years)
+wet.hot.years
+wet.cool.years
+dry.hot.years
+dry.cool.years
+wet.hot.years <- as.numeric(intersect(hot.years, wet.years))
+wet.hot.years
+wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
+wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
+dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
+dry.cool.years <- as.numeric(intersect(cool.years, dry.years))
+hot.years
+sea.test <- sea(sea.df[,names(sea.df) %in% D.names], hot.years , lag=5, resample=1000)
+sea.df[,names(sea.df) %in% D.names]
+sea.test <- sea(sea.df[,names(sea.df) %in% D.names], hot.years , lag=5, resample=1000)
+hot.years
+sea.test <- sea(sea.df[,names(sea.df) %in% D.names], cool.years , lag=5, resample=1000)
+dom.bai <- sea.df[,names(sea.df) %in% D.names]
+head(dom.bai)
+int.bai <- sea.df[,names(sea.df) %in% I.names]#
 #
-load(file="processed_data/gamm_weights/gam2_weights.Rdata")#
-load(file="processed_data/gamm_weights/gam1_weights.Rdata")#
-# Looking at the non-Size & Time BAI#
-summary(gam1.weights)#
-gam1.weights$BA.inc.Clim <- gam1.weights$BA.inc - exp(gam1.weights$fit.dbh.recon) - exp(gam1.weights$fit.Year)#
-summary(gam1.weights)#
-# Species Level Model--GAM1#
+sup.bai <- sea.df[,names(sea.df) %in% S.names]
+sea.test <- sea(dom.abi, cool.years , lag=5, resample=1000)
+sea.test <- sea(dom.bai, cool.years , lag=5, resample=1000)
+data(cana157)
+test <- data(cana157)
+summary(test)
+cana157
+dom.bai
+dom.bai[,"TP2086"]
+sea.test <- sea(dom.bai[,"TP2086"], cool.years , lag=5, resample=1000)
+test <- as.data.frame(dom.abi["TP2086"])
+test <- as.data.frame(dom.bai["TP2086"])
+test
+sea.test <- sea(dom.bai[,"TP2086"], cool.years , lag=5, resample=1000)
+sea.test <- sea(test, cool.years , lag=5, resample=1000)
+warnings()
+sea.test <- sea(test, cool.years , lag=2, resample=1000)
+barplot(test)
+barplot(sea.test)
+summary(sea.test)
+?chron
+dom.bai.chron <- chron(dom.bai)
+summary(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, cool.years , lag=2, resample=1000)
+summary(sea.test)
+sea.test <- sea(dom.bai.chron, hot.years , lag=5, resample=1000)
+warnings()
+summary(sea.test)
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+summary(sea.test)
+hot.years
+dom.bai.chron
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+summary(sea.test)
+warnings()
+event.years < - c(1960, 1970)
+c(1960, 1970)
+event.years < - c(1960, 1970)
+meow < - c(1960, 1970)
+meow < - as.vector(c(1960, 1970))
+meow < - c(1960, 1970)
+meow <- c(1960, 1970, 1980)
+sea.test <- sea(dom.bai.chron,meow , lag=2, resample=1000)
+summary(sea.test)
+sea.test <- sea(dom.bai,meow , lag=2, resample=1000)
+hot.years
+cool.years
+wet.years
+sea.test <- sea(dom.bai.chron, wet.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
+summary(sea.test)
+foo <- sea.test$unscaled
+names(foo) <- sea.test$lag
+names(foo)
+sea.test$lag
+foo
+sea.test$unscaled
+foo <- sea.test$se.unscaled
+names(foo) <- sea.test$lag
+barplot(foo, col=ifeslse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+data(cana157)#
+event.years <- c(1631, 1742, 1845)#
+cana157.sea <- sea(cana157, event.years)#
+foo <- cana157.sea$se.unscaled#
+names(foo) <- cana157.sea$lag#
+barplot(foo, col = ifelse(cana157.sea$p < 0.05, "grey30", "grey75"), #
+        ylab = "RWI", xlab = "Superposed Epoch")
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & game.weights$State=="IN", "TreeID"]
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]
+hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])#
+cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])#
+wet.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
+dry.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])#
 #
-# Simple mean-centering on what's left after removing size & year trends#
-# Note: this didn't work because the trend in the data starts post-1950 for many sites#
-for(s in unique(gam1.weights$Site)){#
-	for(c in unique(gam1.weights[gam1.weights$Site==s, "group"])){#
-		x.inc <- mean(gam1.weights[gam1.weights$Site==s & gam1.weights$group==c, "BA.inc.Clim"], na.rm=T)#
-		gam1.weights[gam1.weights$Site==s & gam1.weights$group==c, "Clim.Rel"] <- gam1.weights[gam1.weights$Site==s & gam1.weights$group==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}#
+wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
+wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
+dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
+dry.cool.years <- as.numeric(intersect(cool.years, dry.years))#
 #
-# gam1.weights$Clim.Rel <- gam1.weights#
+dom.bai <- sea.df[,names(sea.df) %in% D.names]#
+head(dom.bai)#
 #
-gam1.dat.summary <- aggregate(gam1.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam1.weights[,c("Year", "Site", "group")],#
-                         FUN=mean)#
-gam1.dat.summary$Site <- factor(gam1.dat.summary$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))#
+dom.bai.chron <- chron(dom.bai)#
+summary(dom.bai.chron)#
 #
-ggplot(gam1.dat.summary[,]) +#
-	facet_grid(group~Site) +#
-	geom_line(aes(x=Year, y=BA.inc), color="black") #
+int.bai <- sea.df[,names(sea.df) %in% I.names]#
 #
-ggplot(gam1.dat.summary[,]) +#
-	facet_grid(group~Site) +#
-	geom_line(aes(x=Year, y=Clim.Rel), color="black") +#
-	geom_hline(yintercept=0, color="red", linetype="dashed")#
-# # getting means of each canopy layer at each site#
-# summary(test)#
+sup.bai <- sea.df[,names(sea.df) %in% S.names]#
 #
-# summary(data.use)#
-# names(data.use)#
-# summary(data.use$Year)#
+test <- as.data.frame(dom.bai["TP2086"])#
+meow <- c(1960, 1970, 1980)
+sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]
+dom.bai <- sea.df[,names(sea.df) %in% D.names]
+dom.bai.chron <- chron(dom.bai)
+sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
+dom.bai
+head(dom.bai)
+dom.bai.chron <- chron(dom.bai)
+dom.bai.chron
+sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
+wet.cool.years
+dom.bai.chron
+sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
+summary(sea.test)
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]
+dom.bai <- sea.df[,names(sea.df) %in% D.names]#
+head(dom.bai)
+dom.bai.chron <- chron(dom.bai)
+summary(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
+meow <- c(1960, 1970, 1980)
+sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
+sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
+dom.bai.chron <- chron(dom.bai)
+summary(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
+summary(sea.test)
+# Scripts for supplemental figure#
+# S1 <- Species Response curves#
+# S2 <- Species weights#
+# S3 <- Site Response curves#
+# S4 <- Site Weights#
+# S5 <- Canopy.Class * Site weights#
+library(ggplot2)#
+library(gridExtra)#
 #
-# # Simple mean-centering#
-# # Note: this didn't work because the trend in the data starts post-1950 for many sites#
-# for(s in unique(data.use$Site)){#
-	# for(c in unique(data.use[data.use$Site==s, "Canopy.Class"])){#
-		# x.inc <- mean(data.use[data.use$Site==s & data.use$Canopy.Class==c, "BA.inc"], na.rm=T)#
-		# data.use[data.use$Site==s & data.use$Canopy.Class==c, "BA.inc.rel"] <- data.use[data.use$Site==s & data.use$Canopy.Class==c, "BA.inc"]/x.inc-1#
-	# }#
-# }#
+################################################################
+# Supplemental Fig. 1 Species GAM response Curves#
+################################################################
+load("processed_data/gam1_response_graph.Rdata")#
+library(RColorBrewer)#
+summary(ci.terms.graph)#
+spp.use <- c("ACSA", "CARYA", "QUAL", "QURU", "TSCA", "PIST")#
 #
-# # Option 2: Using a spline to get the year trend#
-# data.use$Site.CC <- as.factor(paste(data.use$Site, data.use$Canopy.Class, sep="."))#
+spp.colors <- read.csv("spp.Colors.csv", header=T)	#
+summary(spp.colors)	#
 #
-# library(mgcv)#
-# # Making a (more or less) 2/3 cubic smoothing spline#
-# mod.size <- gam(log(BA.inc) ~ s(Year, by=TreeID, bs="cr", k=3) + Site + Canopy.Class + TreeID, data=data.use)#
-# data.use$size.pred <- exp(predict(mod.size, newdata=data.use)) # Add in the predicted size ("mean") line#
-# data.use$BA.inc.rel <- data.use$BA.inc/data.use$size.pred - 1 # find the relative difference#
-# summary(data.use)#
+group.fig <- spp.use#
+group.fig <- group.fig[order(group.fig)]#
+colors.use <- as.vector(c(paste(spp.colors[spp.colors$Species %in% group.fig, "color"])))#
+cbbPalette <- c("#000000", "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")#
 #
-# # test <- predict(mod.size, newdata=data.use, type="response")#
+# Only plotting 2 major species at each site#
+S1.t <-		ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean") & ci.terms.graph$group %in% spp.use,]) + #
+			#facet_grid(~Effect, scales = "free") +#
+			geom_hline(yintercept=0, linetype="dashed")+#
+			geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=group), alpha=0.5) +#
+			geom_line(aes(x=x, y=mean.bai, color=group)) +#
+			scale_color_manual(values=brewer.pal(6, "Dark2")) +#
+			scale_fill_manual(values=brewer.pal(6, "Dark2"))+#
+			labs(x = expression(bold(paste("Temperature ("^"o", "C)"))), y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+#
+			 theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="right",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #theme(axis.text.y=element_blank())	#
+		ylim(0,6) #
 #
-# # ggplot(data=data.use) +#
-	# # facet_grid(Site ~ Canopy.Class, scales="free") +#
-	# # geom_histogram(aes(x=BA.inc.rel))#
-gam1.weights$Temp.Mark <- NA#
-gam1.weights$Precip.Mark <- NA#
-for(s in unique(gam1.weights$Site)){#
-	gam1.weights[gam1.weights$Site==s,"Temp.Mark"] <- ifelse(gam1.weights[gam1.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="hot", "marker.year"]), "hot", ifelse(gam1.weights[gam1.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="cold", "marker.year"]), "cold", "NONE"))#
-	gam1.weights[gam1.weights$Site==s,"Precip.Mark"] <- ifelse(gam1.weights[gam1.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="dry", "marker.year"]), "dry", ifelse(gam1.weights[gam1.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="wet", "marker.year"]), "wet","NONE"))#
-}#
-gam1.weights$Temp.Mark <- as.factor(gam1.weights$Temp.Mark)#
-gam1.weights$Precip.Mark <- as.factor(gam1.weights$Precip.Mark)#
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")#
-gam1.dat.summary <- aggregate(gam1.weights[,cols.use],#
-                         by=gam1.weights[,c("Year", "Site", "group", "Temp.Mark", "Precip.Mark")],#
-                         FUN=mean)#
+S1.p <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("precip") & ci.terms.graph$group %in% spp.use,]) + #
+			#facet_grid(~Effect, scales = "free") +#
+			geom_hline(yintercept=0, linetype="dashed")+#
+			geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=group), alpha=0.5) +#
+			geom_line(aes(x=x, y=mean.bai, color=group)) +#
+			scale_color_manual(values=brewer.pal(6, "Dark2")) +#
+			scale_fill_manual(values=brewer.pal(6, "Dark2"))+#
+			labs(x = "Precipitation (mm)", y = element_blank())+#
+			 theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="none",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #
+        theme(axis.text.y=element_blank())	+#
+		ylim(0,6) #
+S1.size <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("dbh.recon") & ci.terms.graph$group %in% spp.use,]) + #
+			#facet_grid(~Effect, scales = "free") +#
+			geom_hline(yintercept=0, linetype="dashed")+#
+			geom_ribbon(aes(x=x, ymin=lwr.bai, ymax=upr.bai, fill=group), alpha=0.5) +#
+			geom_line(aes(x=x, y=mean.bai, color=group)) +#
+			scale_color_manual(values=brewer.pal(6, "Dark2")) +#
+			scale_fill_manual(values=brewer.pal(6, "Dark2"))+#
+			labs(x = "DBH (cm)", y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+#
+			 theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="right",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #theme(axis.text.y=element_blank())	#
+		scale_y_continuous(expand=c(0,0)) #
 #
-gam1.dat.summary[,paste0(cols.use, ".LB")] <- aggregate(gam1.weights[,cols.use],#
-                         by=gam1.weights[,c("Year", "Site", "group", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.025, na.rm=T)[,cols.use]#
-gam1.dat.summary[,paste0(cols.use, ".UB")] <- aggregate(gam1.weights[,cols.use],#
-                         by=gam1.weights[,c("Year", "Site", "group", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.975, na.rm=T)[,cols.use]#
-summary(gam1.dat.summary)
-lme.temp.spp <- lme(BA.inc ~ Temp.Mark*Site-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(lme.temp.spp)
-summary(lme.temp.spp)
-lsmeans(lme.temp.spp, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")
-lsmeans(lme.temp.spp, pairwise~Temp.Mark*Site, adjust="tukey")
-lsmeans(lme.temp.spp, pairwise~Temp.Mark*Site, adjust="tukey")
-lsmeans(lme.temp.spp, pairwise~Temp.Mark*Site, adjust="tukey")
-gam1.weights$Temp.Mark <- recode(gam1.weights$Temp.Mark, "'NONE'='A'")#
-summary(gam1.weights)#
+pdf("figures/prelim_figures/pub_figs/S1_spp_response.pdf", width= 13, height = 8.5)		#
+	grid.newpage()#
+	pushViewport(viewport(layout=grid.layout(nrow=1, ncol=3, widths=c(1.3,1,2))))#
+	print(S1.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))#
+  	print(S1.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))#
+  	print(S1.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))	#
+dev.off()#
 #
-head(gam1.weights)#
-lme.temp.spp <- lme(BA.inc ~ Temp.Mark*Site-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(lme.temp.spp)#
-summary(lme.temp.spp)#
-lsmeans(lme.temp.spp, pairwise~Temp.Mark*Site, adjust="tukey")
-gam1.weights
-summary(gam1.weights)
-gam2.weights
-summary(gam2.weights)
-wt.stack <- stack(gam1.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])
-summary(wt.stack)
-names(wt.stack) <- c("Weight", "Factor")
-wt.stack$Factor <- as.factor(substr(wt.stack$Factor, 7, nchar(wt.stack$Factor)))
-wt.stack$Factor <- as.factor(substr(wt.stack$Factor, 7, nchar(paste(wt.stack$Factor))))
-summary(wt.stack)
-wt.stack <- stack(gam1.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])
-names(wt.stack) <- c("Weight", "Factor")
-wt.stack$Factor <- as.factor(substr(wt.stack$Factor, 8, nchar(paste(wt.stack$Factor))))
-summary(wt.stack)
-wt.stack[,c("Site", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam1.weights[,c("Site", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]
-summary(wt.stack)
-lme.wts.test <- lme(Weight ~ Factor*Temp.Mark, random=list(Site=~1, PlotID=~1, TreeID=~1), data=wt.stack)
-anova(lme.wts.test)
-summary(lme.wts.test)
-anova(lme.wts.test)
-summary(lme.wts.test)
-load(file="processed_data/gamm_weights/gam4_weights.Rdata") # Loading in Modeled weights from GAM4
-recode(gam1.dat.summary$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'"))
-recode(gam1.dat.summary$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")
-gam1.dat.summary$State <- recode(gam1.dat.summary$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")
-gam1.weights$State <- recode(gam1.summary$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
+png(file.path("figures/Prelim_Figures/pub_figs/", "S1.png"), width=13, height=8.5, units="in", res=180)#
+	grid.newpage()#
+	pushViewport(viewport(layout=grid.layout(nrow=1, ncol=3, widths=c(1.3,1,2))))#
+	print(S1.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))#
+  	print(S1.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))#
+  	print(S1.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))	#
+dev.off()#
+################################################################
+# Supplemental Fig. 2 Site GAM response Curves#
+################################################################
+load("processed_data/gam4_response_graph.Rdata")#
+library(RColorBrewer)#
+summary(ci.terms.graph)#
+cbbPalette <- c("#009E73", "#e79f00", "#9ad0f3", "#0072B2", "#D55E00")#
+S2.t <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("tmean"), ]) + #
+			#facet_wrap(~Effect, scales="free") +#
+			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +#
+			geom_line(aes(x=x, y=exp(mean), color=Site))+#
+			geom_hline(yintercept=0, linetype="dashed") +#
+			scale_colour_manual("", values = cbbPalette) +#
+			scale_fill_manual("", values = cbbPalette) +#
+			theme_bw()+#
+			labs(x = expression(bold(paste("Temperature ("^"o", "C)"))), y = expression(bold(paste("Effect on BAI (mm"^"2","y"^"-1",")"))))+#
+			 theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="none",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #theme(axis.text.y=element_blank())	#
+		ylim(0,3) #
+S2.p <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("precip"), ]) + #
+			#facet_wrap(~Effect, scales="free") +#
+			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +#
+			geom_line(aes(x=x, y=exp(mean), color=Site))+#
+			geom_hline(yintercept=0, linetype="dashed") +#
+			scale_colour_manual("", values = cbbPalette) +#
+			scale_fill_manual("", values = cbbPalette) +#
+			theme_bw()+#
+			labs(x = "Precip (mm)", y = element_blank())+#
+			 theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="none",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #
+		ylim(0,3)+#
+		theme(axis.text.y=element_blank())	 #
+S2.size <- ggplot(data=ci.terms.graph[ci.terms.graph$Effect %in% c("dbh.recon"), ]) + #
+			#facet_wrap(~Effect, scales="free") +#
+			geom_ribbon(aes(x=x, ymin=exp(lwr), ymax=exp(upr), fill=Site), alpha=0.5) +#
+			geom_line(aes(x=x, y=exp(mean), color=Site))+#
+			geom_hline(yintercept=0, linetype="dashed") +#
+			scale_colour_manual("", values = cbbPalette) +#
+			scale_fill_manual("", values = cbbPalette) +#
+			theme_bw()+#
+			labs(x = "DBH (cm)", y = element_blank())+#
+			 theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="right",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #
+		scale_y_continuous(expand=c(0,0))	 #
+pdf("figures/Prelim_Figures/pub_figs/S2_combined.pdf", height = 8, width = 13)#
+	grid.newpage()#
+	pushViewport(viewport(layout=grid.layout(nrow=1, ncol=3, widths=c(1.3,1,2))))#
+	print(S2.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))#
+  	print(S2.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))#
+  	print(S2.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))	#
+dev.off()#
 #
-gam2.weights$State <- recode(gam2.summary$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
+png(file.path("figures/Prelim_Figures/pub_figs/", "S2.png"), width=13, height=8.5, units="in", res=180)#
+	grid.newpage()#
+	pushViewport(viewport(layout=grid.layout(nrow=1,ncol=3, widths=c(1.3,1,2))))#
+	print(S2.t, vp = viewport(layout.pos.row = 1, layout.pos.col=1))#
+  	print(S2.p, vp = viewport(layout.pos.row = 1, layout.pos.col=2))#
+  	print(S2.size, vp = viewport(layout.pos.row = 1, layout.pos.col=3))#
+dev.off()#
+################################################################
+# Supplemental Fig. 3 Spp weights#
+################################################################
+load("processed_data/gam1_weights_graph.R")#
 #
-gam4.weights$State <- recode(gam4.summary$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")
-gam1.weights$State <- recode(gam1.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
+S3 <- ggplot(data.graph[data.graph$group %in% spp.use,]) + facet_grid(group~State) +#
+		geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), fill="red", alpha=0.25) +#
+		geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), fill="blue", alpha=0.25) +#
+		geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2- weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), fill="darkgreen", alpha=0.25) +#
+		geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +#
+		geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +#
+		geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="darkgreen")+#
+		labs(x=expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence")))) +#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="right",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #
+		scale_y_continuous(expand=c(0,0))	 	#
 #
-gam2.weights$State <- recode(gam2.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
+pdf("figures/Prelim_Figures/pub_figs/S3.pdf", height = 8, width = 13)#
+	S3#
+dev.off()#
 #
-gam4.weights$State <- recode(gam4.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")
-summary(gam1.weightes)
-summary(gam1.weights)
-summary(gam4.weights)
-summary(gam4.weights)#
-gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc - exp(gam4.weights$fit.dbh.recon) - exp(gam4.weights$fit.Year)#
-summary(gam4.weights)#
+png(file.path("figures/Prelim_Figures/pub_figs/", "S3.png"), width=13, height=8.5, units="in", res=180)#
+	S3#
 #
-# Simple mean-centering on what's left after removing size & year trends#
-# Note: this didn't work because the trend in the data starts post-1950 for many sites#
-for(s in unique(gam4.weights$Site)){#
-	for(c in unique(gam4.weights[gam4.weights$Site==s, "Canopy.Class"])){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}
-summary(gam4.weights)
-gam4.dat.summary <- aggregate(gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam4.weights[,c("Year", "Site", "Canopy.Class")],#
-                         FUN=mean)
-gam4.dat.summary <- aggregate(gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam4.weights[,c("Year", "Site", "Site")],#
-                         FUN=mean)
-gam4.dat.summary <- aggregate(gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam4.weights[,c("Year", "Site")],#
-                         FUN=mean)
-gam4.weights[,c("Year", "Site")]
-gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")]
-summary(gam4.weights)#
-gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc - exp(gam4.weights$fit.dbh.recon) - exp(gam4.weights$fit.Year)#
-summary(gam4.weights)#
+dev.off()#
+################################################################
+# Supplemental Fig. 4 Site Weights#
+################################################################
+load("processed_data/gam4_weights_graph.Rdata")#
 #
-# Simple mean-centering on what's left after removing size & year trends#
-# Note: this didn't work because the trend in the data starts post-1950 for many sites#
-for(s in unique(gam4.weights$Site)){#
-	for(c in unique(gam4.weights[gam4.weights$Site==s, "Site"])){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}#
+S4 <- ggplot(data.graph) + facet_grid(State~.) +#
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), alpha=0.25, fill="red") +#
+	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), alpha=0.25, fill="blue") +#
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2 - weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), alpha=0.25, fill="darkgreen") +#
+	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +#
+	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +#
+	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="darkgreen")+#
+		labs(x=expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence"))))+#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="right",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #
+		scale_y_continuous(expand=c(0,0))	 	#
+pdf("figures/Prelim_Figures/pub_figs/S4.pdf", height = 8, width = 13)#
+	S4#
+dev.off()#
 #
-# gam4.weights$Clim.Rel <- gam4.weights#
+png(file.path("figures/Prelim_Figures/pub_figs/", "S4.png"), width=13, height=8.5, units="in", res=180)#
+	S4#
 #
-gam4.dat.summary <- aggregate(gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam4.weights[,c("Year", "Site")],#
-                         FUN=mean)
-ggplot(gam4.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=BA.inc), color="black")
-gam4.weights$Temp.Mark <- NA#
-gam4.weights$Precip.Mark <- NA#
-for(s in unique(gam4.weights$Site)){#
-	gam4.weights[gam4.weights$Site==s,"Temp.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="hot", "marker.year"]), "hot", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="cold", "marker.year"]), "cold", "NONE"))#
-	gam4.weights[gam4.weights$Site==s,"Precip.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="dry", "marker.year"]), "dry", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="wet", "marker.year"]), "wet","NONE"))#
-}#
-gam4.weights$Temp.Mark <- as.factor(gam4.weights$Temp.Mark)#
-gam4.weights$Precip.Mark <- as.factor(gam4.weights$Precip.Mark)
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")#
-gam4.dat.summary <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=mean)#
+dev.off()#
 #
-gam4.dat.summary[,paste0(cols.use, ".LB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.025, na.rm=T)[,cols.use]#
-gam4.dat.summary[,paste0(cols.use, ".UB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.975, na.rm=T)[,cols.use]#
-summary(gam4.dat.summary)
-require(car)
-summary(gam4.weights)
-gam1.weights$Temp.Mark <- recode(gam1.weights$Temp.Mark, "'NONE'='A'")#
-summary(gam1.weights)
-require(ggplot2)#
+################################################################
+# Supplemental Fig. 5 Site * Canopy.Class Weights#
+################################################################
+load("processed_data/gam2_weights_graph_withSites.Rdata")#
+data.graph$Canopy.Class <- recode(data.graph$Canopy.Class, "'D'='Dominant';'I'='Intermediate';'S'='Suppressed'")#
+#
+S5 <- ggplot(data.graph) + facet_grid(Canopy.Class~State) +#
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), alpha=0.25, fill="red") +#
+	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), alpha=0.25, fill="blue") +#
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2 - weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), alpha=0.25, fill="darkgreen") +#
+	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +#
+	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +#
+	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="darkgreen")+#
+		labs(x=expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence"))))+#
+	theme(axis.line=element_line(color="black"), #
+		panel.grid.major=element_blank(), #
+		panel.grid.minor=element_blank(), #
+		panel.border=element_blank(),  #
+		panel.background=element_blank(), #
+		axis.text.x=element_text(angle=0, color="black", size=rel(1)), #
+		#axis.text.y=element_text(angle=0, color="black", size=rel(1)), #
+		strip.text=element_text(face="bold", size=rel(1.0)),#
+		axis.line.x = element_line(color="black", size = 0.5),#
+        axis.line.y = element_line(color="black", size = 0.5),#
+        legend.position="right",#
+        legend.key.size = unit(0.75, "cm"),#
+        legend.text = element_text(size=rel(1.1)),#
+        legend.key = element_rect(fill = "white")) + #
+        guides(color=guide_legend(ncol=1)) +#
+        theme(axis.title.x = element_text(size=rel(1.1), face="bold"),#
+        axis.title.y= element_text(size=rel(1.1), face="bold"))+#
+        scale_x_continuous(expand=c(0,0)) +       #
+		scale_y_continuous(expand=c(0,0))	 	#
+#
+pdf("figures/Prelim_Figures/pub_figs/S5.pdf", height = 8, width = 13)#
+	S5#
+dev.off()#
+#
+png(file.path("figures/Prelim_Figures/pub_figs/", "S5.png"), width=13, height=8.5, units="in", res=180)#
+	S5#
+#
+dev.off()
+library(ggplot2)#
 require(mgcv)#
 require(lsmeans)#
 require(car)#
-load("processed_data/climate_markeryears.Rdata") # Loading in Climate Marker Years#
-load("ch2_combined_data_use.Rdata") # Loading in Raw data used in GAMs#
-summary(climate.markers)#
-load(file="processed_data/gamm_weights/gam1_weights.Rdata") # Loading in Modeled weights from GAM1#
-load(file="processed_data/gamm_weights/gam2_weights.Rdata") # Loading in Modeled weights from GAM2#
-load(file="processed_data/gamm_weights/gam4_weights.Rdata") # Loading in Modeled weights from GAM4#
-#
-# Recoding Site as State for simplicity later#
-gam1.weights$State <- recode(gam1.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
-#
-gam2.weights$State <- recode(gam2.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
-#
-gam4.weights$State <- recode(gam4.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
-# Looking at the non-Size & Time BAI#
-summary(gam1.weights)#
-gam1.weights$BA.inc.Clim <- gam1.weights$BA.inc - exp(gam1.weights$fit.dbh.recon) - exp(gam1.weights$fit.Year)#
-summary(gam1.weights)#
-# Species Level Model--GAM1#
-#
-# Simple mean-centering on what's left after removing size & year trends#
-# Note: this didn't work because the trend in the data starts post-1950 for many sites#
-for(s in unique(gam1.weights$Site)){#
-	for(c in unique(gam1.weights[gam1.weights$Site==s, "group"])){#
-		x.inc <- mean(gam1.weights[gam1.weights$Site==s & gam1.weights$group==c, "BA.inc.Clim"], na.rm=T)#
-		gam1.weights[gam1.weights$Site==s & gam1.weights$group==c, "Clim.Rel"] <- gam1.weights[gam1.weights$Site==s & gam1.weights$group==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}#
-#
-# gam1.weights$Clim.Rel <- gam1.weights#
-#
-gam1.dat.summary <- aggregate(gam1.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam1.weights[,c("Year", "Site", "group")],#
-                         FUN=mean)#
-gam1.dat.summary$Site <- factor(gam1.dat.summary$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))#
-gam1.weights$Temp.Mark <- NA#
-gam1.weights$Precip.Mark <- NA#
-for(s in unique(gam1.weights$Site)){#
-	gam1.weights[gam1.weights$Site==s,"Temp.Mark"] <- ifelse(gam1.weights[gam1.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="hot", "marker.year"]), "hot", ifelse(gam1.weights[gam1.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="cold", "marker.year"]), "cold", "NONE"))#
-	gam1.weights[gam1.weights$Site==s,"Precip.Mark"] <- ifelse(gam1.weights[gam1.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="dry", "marker.year"]), "dry", ifelse(gam1.weights[gam1.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="wet", "marker.year"]), "wet","NONE"))#
-}#
-gam1.weights$Temp.Mark <- as.factor(gam1.weights$Temp.Mark)#
-gam1.weights$Precip.Mark <- as.factor(gam1.weights$Precip.Mark)#
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")#
-gam1.dat.summary <- aggregate(gam1.weights[,cols.use],#
-                         by=gam1.weights[,c("Year", "Site", "group", "Temp.Mark", "Precip.Mark")],#
-                         FUN=mean)#
-#
-gam1.dat.summary[,paste0(cols.use, ".LB")] <- aggregate(gam1.weights[,cols.use],#
-                         by=gam1.weights[,c("Year", "Site", "group", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.025, na.rm=T)[,cols.use]#
-gam1.dat.summary[,paste0(cols.use, ".UB")] <- aggregate(gam1.weights[,cols.use],#
-                         by=gam1.weights[,c("Year", "Site", "group", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.975, na.rm=T)[,cols.use]#
-summary(gam1.dat.summary)#
-gam1.dat.summary$Site <- factor(gam1.dat.summary$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))#
-# Fixed Scales#
-save(gam1.dat.summary, file="processed_data/gam1_relative_growth.Rdata")#
-# Temp#
-pdf("figures/Prelim_Figures/gam1_rel_growth_hot_dry.pdf", width= 13, height = 8.5)#
-ggplot(gam1.dat.summary) +#
-	facet_grid(Site~group, scales="free") +#
-	geom_ribbon(aes(x=Year, ymin=Clim.Rel.LB, ymax=Clim.Rel.UB, fill=group), alpha=0.35) +#
-	geom_line(aes(x=Year, y=Clim.Rel,color=group),size=0.75) +#
-		geom_hline(yintercept=0, color="gray50", linetype="dashed") +#
-	geom_vline(data=gam1.dat.summary[gam1.dat.summary$Temp.Mark=="hot",], aes(xintercept=Year), alpha=0.3, color="red") +#
-	geom_vline(data=gam1.dat.summary[gam1.dat.summary$Precip.Mark=="dry",], aes(xintercept=Year), alpha=0.3, color="brown", linetype="dashed") +#
-	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),#
-panel.background = element_blank())+#
-	theme(axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5))+#
-        scale_x_continuous(expand=c(0,0))+#
-        scale_y_continuous(expand=c(0,0))#
-dev.off()#
-#
-pdf("figures/Prelim_Figures/gam1_rel_growth_cold_wet.pdf", width= 13, height = 8.5)#
-ggplot(gam1.dat.summary) +#
-	facet_grid(Site~group, scales="free") +#
-	geom_ribbon(aes(x=Year, ymin=Clim.Rel.LB, ymax=Clim.Rel.UB, fill=group), alpha=0.35) +#
-	geom_line(aes(x=Year, y=Clim.Rel,color=group),size=0.75) +#
-		geom_hline(yintercept=0, color="gray50", linetype="dashed") +#
-	geom_vline(data=gam1.dat.summary[gam1.dat.summary$Temp.Mark=="cold",], aes(xintercept=Year), alpha=0.3, color="blue") +#
-	geom_vline(data=gam1.dat.summary[gam1.dat.summary$Precip.Mark=="wet",], aes(xintercept=Year), alpha=0.3, color="darkgreen", linetype="dashed") +#
-	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),#
-panel.background = element_blank())+#
-	theme(axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5))+#
-        scale_x_continuous(expand=c(0,0))+#
-        scale_y_continuous(expand=c(0,0))#
-dev.off()#
-##########################################################
-# Canopy Class Model--GAM2#
-##########################################################
-#
-# Looking at the non-Size & Time BAI#
-summary(gam2.weights)#
-gam2.weights$BA.inc.Clim <- gam2.weights$BA.inc - exp(gam2.weights$fit.dbh.recon) - exp(gam2.weights$fit.Year)#
+require(moments)#
+# Running ANOVA between Extreme years and normal years BAI for Canopy.Class#
+load("processed_data/gam2_weights_processed.Rdata")#
 summary(gam2.weights)#
 #
-# Simple mean-centering on what's left after removing size & year trends#
-# Note: this didn't work because the trend in the data starts post-1950 for many sites#
-for(s in unique(gam2.weights$Site)){#
-	for(c in unique(gam2.weights[gam2.weights$Site==s, "Canopy.Class"])){#
-		x.inc <- mean(gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)#
-		gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "Clim.Rel"] <- gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}#
+# Running ANOVA's to determine differences between ambient years and extreme years#
+# Using a lme here to take into account the differences between sites as random effeects#
+summary(gam2.weights)#
+# Truncating to 1950 becasue that's the extent of the climate analysis#
+gam2.weights <- gam2.weights[gam2.weights$Year >=1950,]#
+# cr.test <- lme(log(BA.inc) ~ Precip.Mark*Canopy.Class, random=list(group=~1, Site=~1, PlotID=~1, TreeID=~1), data=gam2.weights)#
+# lsmeans(cr.test, pairwise~Precip.Mark*Canopy.Class, adjust="tukey")	#
+# cr.test2 <- lme(log(BA.inc) ~ Temp.Mark*Canopy.Class, random=list(TreeID=~1), data=gam2.weights)#
+# lsmeans(cr.test2, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")	#
 #
-# gam2.weights$Clim.Rel <- gam2.weights#
+# Same fixed effects structure as the gams; add an interaction between temp & precip #
+# because we fit those jointly in the gam#
+cr.testD <- aov(log(BA.inc) ~ Precip.Mark*Temp.Mark + Site + PlotID + TreeID + group, data=gam2.weights[gam2.weights$Canopy.Class=="D",])#
+cr.testI <- aov(log(BA.inc) ~ Precip.Mark*Temp.Mark + Site + PlotID + TreeID + group, data=gam2.weights[gam2.weights$Canopy.Class=="I",])#
+cr.testS <- aov(log(BA.inc) ~ Precip.Mark*Temp.Mark + Site + PlotID + TreeID + group, data=gam2.weights[gam2.weights$Canopy.Class=="S",])#
+plot(resid(cr.testD) ~ predict(cr.testD))#
+plot(resid(cr.testI) ~ predict(cr.testI))#
+plot(resid(cr.testS) ~ predict(cr.testS))#
 #
-gam2.dat.summary <- aggregate(gam2.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam2.weights[,c("Year", "Site", "Canopy.Class")],#
-                         FUN=mean)#
+summary(cr.testD)#
+tukey.d <- TukeyHSD(cr.testD)#
+# tukey.d["Precip.Mark:Temp.Mark"] # not significant, so we won't look at it#
+tukey.d["Precip.Mark"]#
+tukey.d["Temp.Mark"]#
+# Saving table to publication folder#
+#write.table(summary(cr.testD), file="~/PhD/publications/2016/Ch2_multiple_limiting_factors/D_anova.txt")#
 #
-ggplot(gam2.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=BA.inc), color="black") #
+summary(cr.testI)#
+tukey.i <- TukeyHSD(cr.testI)#
+# tukey.i["Precip.Mark:Temp.Mark"] # not significant, so we won't look at it#
+tukey.i["Precip.Mark"]#
+tukey.i["Temp.Mark"]#
 #
-ggplot(gam2.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=Clim.Rel), color="black") +#
-	geom_hline(yintercept=0, color="red", linetype="dashed")#
+summary(cr.testS)#
+tukey.s <- TukeyHSD(cr.testS)#
+tukey.s["Precip.Mark:Temp.Mark"] # Significant (for better or worse)#
+tukey.s["Precip.Mark"]#
+tukey.s["Temp.Mark"]#
+# lsmeans(cr.testD, pairwise~Precip.Mark, adjust="tukey")	#
+# lsmeans(cr.testD, pairwise~Temp.Mark, adjust="tukey")	#
+# lsmeans(cr.testI, pairwise~Precip.Mark, adjust="tukey")	#
+# lsmeans(cr.testS, pairwise~Precip.Mark, adjust="tukey")	#
 #
-gam2.weights$Temp.Mark <- NA#
-gam2.weights$Precip.Mark <- NA#
-for(s in unique(gam2.weights$Site)){#
-	gam2.weights[gam2.weights$Site==s,"Temp.Mark"] <- ifelse(gam2.weights[gam2.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="hot", "marker.year"]), "hot", ifelse(gam2.weights[gam2.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="cold", "marker.year"]), "cold", "NONE"))#
-	gam2.weights[gam2.weights$Site==s,"Precip.Mark"] <- ifelse(gam2.weights[gam2.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="dry", "marker.year"]), "dry", ifelse(gam2.weights[gam2.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="wet", "marker.year"]), "wet","NONE"))#
-}#
-gam2.weights$Temp.Mark <- as.factor(gam2.weights$Temp.Mark)#
-gam2.weights$Precip.Mark <- as.factor(gam2.weights$Precip.Mark)#
+############################################################
+# Attemping an SEA analysis#
+############################################################
 #
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")#
-gam2.dat.summary <- aggregate(gam2.weights[,cols.use],#
-                         by=gam2.weights[,c("Year", "Site", "Canopy.Class", "Temp.Mark", "Precip.Mark")],#
-                         FUN=mean)#
+summary(gam2.weights)#
+gam2.weights$Year <- as.factor(gam2.weights$Year)#
 #
-gam2.dat.summary[,paste0(cols.use, ".LB")] <- aggregate(gam2.weights[,cols.use],#
-                         by=gam2.weights[,c("Year", "Site", "Canopy.Class", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.025, na.rm=T)[,cols.use]#
-gam2.dat.summary[,paste0(cols.use, ".UB")] <- aggregate(gam2.weights[,cols.use],#
-                         by=gam2.weights[,c("Year", "Site", "Canopy.Class", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.975, na.rm=T)[,cols.use]#
-summary(gam2.dat.summary)#
-gam2.dat.summary$Site <- factor(gam2.dat.summary$Site, levels=c("Missouri Ozark", "Morgan Monroe State Park", "Oak Openings Toledo", "Harvard", "Howland"))#
-pdf("figures/Prelim_Figures/gam2_rel_growth_hot_dry.pdf", width= 13, height = 8.5)#
-# Hot and Dry#
-ggplot(gam2.dat.summary) +#
-	facet_grid(Site~., scales="free") +#
-	geom_ribbon(aes(x=Year, ymin=Clim.Rel.LB, ymax=Clim.Rel.UB, fill=Canopy.Class), alpha=0.35) +#
-	geom_line(aes(x=Year, y=Clim.Rel,color=Canopy.Class),size=0.75) +#
-		geom_hline(yintercept=0, color="gray50", linetype="dashed") +#
-	geom_vline(data=gam2.dat.summary[gam2.dat.summary$Temp.Mark=="hot",], aes(xintercept=Year), alpha=0.3, color="red") +#
-	geom_vline(data=gam2.dat.summary[gam2.dat.summary$Precip.Mark=="dry",], aes(xintercept=Year), alpha=0.5, color="brown", linetype="dashed") +#
-	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),#
-panel.background = element_blank())+#
-	theme(axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5)) +#
-    scale_x_continuous(expand=c(0,0)) +#
-    scale_y_continuous(expand=c(0,0))#
-dev.off()#
+sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc")], Year~TreeID)#
+summary(sea.df)#
+row.names(sea.df) <- sea.df$Year#
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]#
+I.names <- gam2.weights[gam2.weights$Canopy.Class=="I", "TreeID"]#
+S.names <- gam2.weights[gam2.weights$Canopy.Class=="S", "TreeID"]#
 #
-# Cool and Wet#
+hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])#
+cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])#
+wet.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
+dry.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])#
 #
-pdf("figures/Prelim_Figures/gam2_rel_growth_cool_wet.pdf", width= 13, height = 8.5)#
-ggplot(gam2.dat.summary) +#
-	facet_grid(Site~., scales="free") +#
-	geom_ribbon(aes(x=Year, ymin=Clim.Rel.LB, ymax=Clim.Rel.UB, fill=Canopy.Class), alpha=0.35) +#
-	geom_line(aes(x=Year, y=Clim.Rel,color=Canopy.Class),size=0.75) +#
-		geom_hline(yintercept=0, color="gray50", linetype="dashed") +#
-	geom_vline(data=gam2.dat.summary[gam2.dat.summary$Temp.Mark=="cold",], aes(xintercept=Year), alpha=0.3, color="blue") +#
+wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
+wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
+dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
+dry.cool.years <- as.numeric(intersect(cool.years, dry.years))#
 #
-	geom_vline(data=gam2.dat.summary[gam2.dat.summary$Precip.Mark=="wet",], aes(xintercept=Year), alpha=0.5, color="darkgreen", linetype="dashed") +#
-	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),#
-panel.background = element_blank())+#
-	theme(axis.line.x = element_line(color="black", size = 0.5),#
-        axis.line.y = element_line(color="black", size = 0.5)) +#
-    scale_x_continuous(expand=c(0,0)) +#
-    scale_y_continuous(expand=c(0,0))#
-dev.off#
-##########################################################
-# Site Model--GAM4#
-##########################################################
+dom.bai <- sea.df[,names(sea.df) %in% D.names]#
+head(dom.bai)#
 #
-# Looking at the non-Size & Time BAI#
-summary(gam4.weights)#
-gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc - exp(gam4.weights$fit.dbh.recon) - exp(gam4.weights$fit.Year)#
-summary(gam4.weights)#
+dom.bai.chron <- chron(dom.bai)#
+summary(dom.bai.chron)#
 #
-# Simple mean-centering on what's left after removing size & year trends#
-# Note: this didn't work because the trend in the data starts post-1950 for many sites#
-for(s in unique(gam4.weights$Site)){#
-	for(c in unique(gam4.weights[gam4.weights$Site==s, "Site"])){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}#
+int.bai <- sea.df[,names(sea.df) %in% I.names]#
 #
-# gam4.weights$Clim.Rel <- gam4.weights#
+sup.bai <- sea.df[,names(sea.df) %in% S.names]#
 #
-gam4.dat.summary <- aggregate(gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam4.weights[,c("Year", "Site")],#
-                         FUN=mean)#
+test <- as.data.frame(dom.bai["TP2086"])#
+meow <- c(1960, 1970, 1980)#
 #
-ggplot(gam4.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=BA.inc), color="black") #
+sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)#
+summary(sea.test)#
 #
-ggplot(gam4.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=Clim.Rel), color="black") +#
-	geom_hline(yintercept=0, color="red", linetype="dashed")#
+foo <- sea.test$se.unscaled#
+names(foo) <- sea.test$lag#
 #
-gam4.weights$Temp.Mark <- NA#
-gam4.weights$Precip.Mark <- NA#
-for(s in unique(gam4.weights$Site)){#
-	gam4.weights[gam4.weights$Site==s,"Temp.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="hot", "marker.year"]), "hot", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="cold", "marker.year"]), "cold", "NONE"))#
-	gam4.weights[gam4.weights$Site==s,"Precip.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="dry", "marker.year"]), "dry", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="wet", "marker.year"]), "wet","NONE"))#
-}#
-gam4.weights$Temp.Mark <- as.factor(gam4.weights$Temp.Mark)#
-gam4.weights$Precip.Mark <- as.factor(gam4.weights$Precip.Mark)#
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+summary(gam2.weights)#
+gam2.weights$Year <- as.factor(gam2.weights$Year)#
 #
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")#
-gam4.dat.summary <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=mean)#
+sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc")], Year~TreeID)#
+summary(sea.df)#
+row.names(sea.df) <- sea.df$Year
+library(reshape)
+sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc")], Year~TreeID)
+summary(sea.df)#
+row.names(sea.df) <- sea.df$Year#
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D", "TreeID"]#
+I.names <- gam2.weights[gam2.weights$Canopy.Class=="I", "TreeID"]#
+S.names <- gam2.weights[gam2.weights$Canopy.Class=="S", "TreeID"]
+hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot"])#
+cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])#
+wet.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
+dry.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])#
 #
-gam4.dat.summary[,paste0(cols.use, ".LB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.025, na.rm=T)[,cols.use]#
-gam4.dat.summary[,paste0(cols.use, ".UB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.975, na.rm=T)[,cols.use]#
-summary(gam4.dat.summary)
-gam1.weights$Temp.Mark <- recode(gam1.weights$Temp.Mark, "'NONE'='A'")
-summary(gam1.weights)
-gam1.weights$Precip.Mark <- recode(gam1.weights$Precip.Mark, "'NONE'='A'")
-gam1.weights$Temp.Mark <- recode(gam1.weights$Temp.Mark, "'NONE'='A'")
-gam1.weights$Precip.Mark <- recode(gam1.weights$Precip.Mark, "'NONE'='A'")
-summary(gam1.weights)
-gam1.lme.temp <- lme(BA.inc ~ Temp.Mark*Site-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(gam1.lme.temp)
-summary(gam1.lme.temp)
-lsmeans(gam1.lme.temp, pairwise~Temp.Mark*Site, adjust="tukey")
-gam1.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(gam1.lme.temp)
-summary(gam1.lme.temp)
-lsmeans(gam1.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam1.wt.stack <- stack(gam1.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])
-names(wt.stack) <- c("Weight", "Factor")
-wt.stack$Factor <- as.factor(substr(wt.stack$Factor, 8, nchar(paste(wt.stack$Factor))))
-wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam1.weights[,c("Site", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]
-gam1.wt.stack <- stack(gam1.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])
-gam1.wt.stack <- stack(gam1.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])
-names(gam1.wt.stack) <- c("Weight", "Factor")
-gam1.wt.stack$Factor <- as.factor(substr(gam1.wt.stack$Factor, 8, nchar(paste(gam1.wt.stack$Factor))))
-gam1.wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam1.weights[,c("Site", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]
-summary(gam1.wt.stack)
-gam1.lme.wts <- lme(Weight ~ Factor*Temp.Mark, random=list(Site=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)#
-anova(gam1.lme.wts)#
-summary(gam1.lme.wts)
-gam1.lme.wts <- lme(Weight ~ Factor*Temp.Mark, random=list(Site=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)
-gam1.lme.wts <- lme(Weight ~ Factor*Temp.Mark, random=list(State=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)
-anova(gam1.lme.wts)
-summary(gam1.lme.wts)
-lsmeans(gam1.lme.wts, pairwise~Factor*Temp.Mark, adjust="tukey")
-gam1.lme.wts <- lme(Weight ~ Factor*Temp.Mark-Factor, random=list(State=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)#
-anova(gam1.lme.wts)#
-summary(gam1.lme.wts)
-gam1.lme.wts <- lme(Weight ~ Factor*Temp.Mark-Temp.Mark, random=list(State=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)
-anova(gam1.lme.wts)
-summary(gam1.lme.wts)
-lsmeans(gam1.lme.wts, pairwise~Factor*Temp.Mark, adjust="tukey")
-gam1.lme.temp <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(gam1.lme.temp)#
-summary(gam1.lme.temp)#
-lsmeans(gam1.lme.temp, pairwise~Temp.Mark*group, adjust="tukey")
-gam1.lme.temp <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(gam1.lme.temp)
-gam2.weights$Temp.Mark <- recode(gam2.weights$Temp.Mark, "'NONE'='A'")
-gam2.weights$Precip.Mark <- recode(gam2.weights$Precip.Mark, "'NONE'='A'")
-gam2.wt.stack <- stack(gam2.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])#
-names(gam2.wt.stack) <- c("Weight", "Factor")#
-gam2.wt.stack$Factor <- as.factor(substr(gam2.wt.stack$Factor, 8, nchar(paste(gam2.wt.stack$Factor))))#
-gam2.wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam2.weights[,c("Site", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]#
-summary(gam2.wt.stack)
-lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam4.weights); anova(lme.temp)#
+wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
+wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
+dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
+dry.cool.years <- as.numeric(intersect(cool.years, dry.years))#
 #
-gam4.wt.stack <- stack(gam4.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])#
-names(gam4.wt.stack) <- c("Weight", "Factor")#
-gam4.wt.stack$Factor <- as.factor(substr(gam4.wt.stack$Factor, 8, nchar(paste(gam4.wt.stack$Factor))))#
-gam4.wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam4.weights[,c("Site", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]#
-summary(gam4.wt.stack)
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-summary(gam4.lme.temp)
-summary(gam4.weights)
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-summary(gam4.lme.temp)
-gam4.weights$Temp.Mark <- recode(gam4.weights$Temp.Mark, "'NONE'='A'")
-gam4.weights$Precip.Mark <- recode(gam4.weights$Precip.Mark, "'NONE'='A'")
-summary(gam4.weights)
-head(gam4.weights)#
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-summary(gam4.lme.temp)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-summary(gam4.lme.temp)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam4.lme.wts.temp <- lme(Weight ~ Factor*State, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.wt.stack); anova(gam4.lme.temp)
-summary(gam4.lme.temp)
-summary(gam4.lme.wts.temp)
-lsmeans(gam4.lme.wts.temp, pairwise~Temp.Mark*State, adjust="tukey")
-lsmeans(gam4.lme.wts.temp, pairwise~Factor*State, adjust="tukey")
-gam4.wt.stack <- stack(gam4.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])#
-names(gam4.wt.stack) <- c("Weight", "Factor")#
-gam4.wt.stack$Factor <- as.factor(substr(gam4.wt.stack$Factor, 8, nchar(paste(gam4.wt.stack$Factor))))#
-gam4.wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam4.weights[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]#
-summary(gam4.wt.stack)
-gam4.lme.wts.temp <- lme(Weight ~ Factor*State, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.wt.stack); anova(gam4.lme.temp)#
-summary(gam4.lme.wts.temp)	#
-lsmeans(gam4.lme.wts.temp, pairwise~Factor*State, adjust="tukey")
-gam1.weights$Temp.Mark <- recode(gam1.weights$Temp.Mark, "'NONE'='A'")#
-gam1.weights$Precip.Mark <- recode(gam1.weights$Precip.Mark, "'NONE'='A'")#
-summary(gam1.weights)#
-gam1.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(gam1.lme.temp)#
-summary(gam1.lme.temp)#
-lsmeans(gam1.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")#
-gam1.wt.stack <- stack(gam1.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])#
-names(gam1.wt.stack) <- c("Weight", "Factor")#
-gam1.wt.stack$Factor <- as.factor(substr(gam1.wt.stack$Factor, 8, nchar(paste(gam1.wt.stack$Factor))))#
-gam1.wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam1.weights[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]#
-summary(gam1.wt.stack)
-gam1.lme.wts <- lme(Weight ~ Factor*Temp.Mark-Temp, random=list(State=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)
-anova(gam1.lme.wts)
-summary(gam1.lme.wts)#
-lsmeans(gam1.lme.wts, pairwise~Factor*Temp.Mark, adjust="tukey")
-gam2.lme.temp <- lme(BA.inc ~ Temp.Mark*Canopy.Class-Temp.Mark, #
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam2.weights); anova(gam2.lme.temp)
-lsmeans(gam2.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-lsmeans(gam2.lme.temp, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")
-gam2.lme.wt.temp <- lme(Weight~Factor*Temp.Mark*Canopy.Class-Temp.Mark,#
-						random=list(State=~1,PlotID=~1, TreeID=~1)); anova(gam2.lme.wt.temp)
-gam2.lme.wt.temp <- lme(Weight~Factor*Temp.Mark*Canopy.Class-Temp.Mark,#
-						random=list(State=~1,PlotID=~1, TreeID=~1), data=gam2.wt.stack); anova(gam2.lme.wt.temp)
-gam2.wt.stack <- stack(gam2.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])#
-names(gam2.wt.stack) <- c("Weight", "Factor")#
-gam2.wt.stack$Factor <- as.factor(substr(gam2.wt.stack$Factor, 8, nchar(paste(gam2.wt.stack$Factor))))#
-gam2.wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "Canopy.Class", "BA.inc")] <- gam2.weights[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "Canopy.Class", "BA.inc")]#
-summary(gam2.wt.stack)
-gam2.lme.wt.temp <- lme(Weight~Factor*Temp.Mark*Canopy.Class-Temp.Mark,#
-						random=list(State=~1,PlotID=~1, TreeID=~1), data=gam2.wt.stack); anova(gam2.lme.wt.temp)
-summary(gm2.lme.wt.temp)
-summary(gam2.lme.wt.temp)
-lsmeans(gam2.lme.wt.temp, pairwise~Factor*Temp.Mark*Canopy.Class, adjust="tukey")
-gam1.lme.temp <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights); anova(gam1.lme.temp)
-gam1.wt.stack <- stack(gam1.weights[,c("weight.precip", "weight.tmean", "weight.dbh.recon")])#
-names(gam1.wt.stack) <- c("Weight", "Factor")#
-gam1.wt.stack$Factor <- as.factor(substr(gam1.wt.stack$Factor, 8, nchar(paste(gam1.wt.stack$Factor))))#
-gam1.wt.stack[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")] <- gam1.weights[,c("State", "PlotID", "TreeID", "Temp.Mark", "Precip.Mark", "group", "BA.inc")]#
-summary(gam1.wt.stack)
-gam1.lme.wts <- lme(Weight ~ Factor*Temp.Mark*group-Temp.Mark, random=list(State=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)
-anova(gam1.lme.wts)
-summary(gam1.lme.wts)
-gam1.lme.wts.temp <- lme(Weight ~ Factor*Temp.Mark*group-Temp.Mark, random=list(State=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)#
-anova(gam1.lme.wts.temp)#
-summary(gam1.lme.wts.temp)#
-lsmeans(gam1.lme.wts.temp, pairwise~Factor*Temp.Mark*group, adjust="tukey")
-lsmeans(gam1.lme.wts.temp, pairwise~Factor*Temp.Mark*group, adjust="tukey")
-gam1.lme.temp <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="MO"]); anova(gam1.lme.temp)
-gam1.lme.temp <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="MO",]); anova(gam1.lme.temp)
-gam1.lme.temp.mo <- lme(BA.inc ~ Temp.Mark*group-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="MO",]); anova(gam1.lme.temp)#
-summary(gam1.lme.temp.mo)
-lsmeans(gam1.lme.temp.mo, pairwise~Temp.Mark*State, adjust="tukey")
-lsmeans(gam1.lme.temp.mo, pairwise~Temp.Mark*group, adjust="tukey")
-gam1.lme.precip.mo <- lme(BA.inc ~ Precip.Mark*group-Precip.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam1.weights[gam1.weights$State=="MO",]); anova(gam1.lme.precip)#
-summary(gam1.lme.precip.mo)#
-lsmeans(gam1.lme.precip.mo, pairwise~Precip.Mark*group, adjust="tukey")
-gam1.lme.wts.precip <- lme(Weight ~ Factor*Precip.Mark*group-Temp.Mark, random=list(State=~1, PlotID=~1, TreeID=~1), data=gam1.wt.stack)#
-anova(gam1.lme.wts.precip)#
-summary(gam1.lme.wts.precip)#
-lsmeans(gam1.lme.wts.precip, pairwise~Factor*Precip.Mark*group, adjust="tukey")
-anova(gam1.lme.wts.precip)
-summary(gam1.lme.wts.precip)
-lsmeans(gam1.lme.wts.precip, pairwise~Factor*Precip.Mark*group, adjust="tukey")
-gam2.lme.precip <- lme(BA.inc ~ Precip.Mark*Canopy.Class-Temp.Mark, #
-			random=list(State=~1,PlotID=~1, TreeID=~1), data=gam2.weights); anova(gam2.lme.precip)
-summary(gam2.lme.temp)
-summary(gam2.lme.precip)
-lsmeans(gam2.lme.precip, pairwise~Precip.Mark*Canopy.Class, adjust="tukey")
-lsmeans(gam2.lme.temp, pairwise~Temp.Mark*Canopy.Class, adjust="tukey")
-gam4.lme.precip <- lme(BA.inc ~ Precip.Mark*State, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.precip)#
-summary(gam4.lme.precip)	#
-lsmeans(gam4.lme.precip, pairwise~Temp.Mark*State, adjust="tukey")
-lsmeans(gam4.lme.precip, pairwise~Precip.Mark*State, adjust="tukey")
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)#
-summary(gam4.lme.temp)	#
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark,
-random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-summary(gam4.weights)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark, adjust="tukey")
-lsmeans(gam4.lme.temp, pairwise~State, adjust="tukey")
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-summary(gam4.lme.temp)
-summary(gam4.lme.temp)
-anova(gam4.lme.temp)
-length(gam4.weights$Year)
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(State=~1,PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(Site=~1,PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-summary(gam4.lme.temp)
-gam4.weights <- na.omit(gam4.weights)
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-summary(gam4.weights)
-load(file="processed_data/gamm_weights/gam4_weights.Rdata") # Loading in Modeled weights from GAM4
-summary(gam4.weights)#
-gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc - exp(gam4.weights$fit.dbh.recon) - exp(gam4.weights$fit.Year)#
-summary(gam4.weights)#
+dom.bai <- sea.df[,names(sea.df) %in% D.names]#
+head(dom.bai)#
 #
-# Simple mean-centering on what's left after removing size & year trends#
-# Note: this didn't work because the trend in the data starts post-1950 for many sites#
-for(s in unique(gam4.weights$Site)){#
-	for(c in unique(gam4.weights[gam4.weights$Site==s, "Site"])){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}#
+dom.bai.chron <- chron(dom.bai)#
+summary(dom.bai.chron)#
 #
-# gam4.weights$Clim.Rel <- gam4.weights#
+int.bai <- sea.df[,names(sea.df) %in% I.names]#
 #
-gam4.dat.summary <- aggregate(gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam4.weights[,c("Year", "Site")],#
-                         FUN=mean)
-gam4.weights$Temp.Mark <- NA#
-gam4.weights$Precip.Mark <- NA#
-for(s in unique(gam4.weights$Site)){#
-	gam4.weights[gam4.weights$Site==s,"Temp.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="hot", "marker.year"]), "hot", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="cold", "marker.year"]), "cold", "NONE"))#
-	gam4.weights[gam4.weights$Site==s,"Precip.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="dry", "marker.year"]), "dry", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="wet", "marker.year"]), "wet","NONE"))#
-}#
-gam4.weights$Temp.Mark <- as.factor(gam4.weights$Temp.Mark)#
-gam4.weights$Precip.Mark <- as.factor(gam4.weights$Precip.Mark)#
+sup.bai <- sea.df[,names(sea.df) %in% S.names]#
 #
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")#
-gam4.dat.summary <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=mean)#
+test <- as.data.frame(dom.bai["TP2086"])#
+meow <- c(1960, 1970, 1980)
+library(dplR)
+dom.bai <- sea.df[,names(sea.df) %in% D.names]#
+head(dom.bai)#
 #
-gam4.dat.summary[,paste0(cols.use, ".LB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.025, na.rm=T)[,cols.use]#
-gam4.dat.summary[,paste0(cols.use, ".UB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.975, na.rm=T)[,cols.use]#
-summary(gam4.dat.summary)
-gam4.weights$Temp.Mark <- recode(gam4.weights$Temp.Mark, "'NONE'='A'")
-gam4.weights$Precip.Mark <- recode(gam4.weights$Precip.Mark, "'NONE'='A'")
-summary(gam4.weights)
-for(s in unique(gam4.weights$Site)){#
-	for(c in unique(gam4.weights[gam4.weights$Site==s, "State"])){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}
-summary(gam4.weights)
-for(s in unique(gam4.weights$State)){#
-	for(c in unique(gam4.weights[gam4.weights$Site==s, "State"])){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}
-summary(gam4.weights)
-load(file="processed_data/gamm_weights/gam4_weights.Rdata") # Loading in Modeled weights from GAM4
-gam4.weights$State <- recode(gam4.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")
-summary(gam4.weights)#
-gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc - exp(gam4.weights$fit.dbh.recon) - exp(gam4.weights$fit.Year)#
-summary(gam4.weights)#
+dom.bai.chron <- chron(dom.bai)#
+summary(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
+head(dom.bai)
+dom.bai.chron <- chron(dom.bai[,1:10])
+summary(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, wet.cool.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, wet.hot.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+summary(sea.test)
+foo <- sea.test$se.unscaled#
+names(foo) <- sea.test$lag
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+sea.test <- sea(dom.bai.chron, cool.years , lag=2, resample=1000)
+warnings()
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot" & gam2.weights$State=="IN"])
+hot.years
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]
+hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot" & gam2.weights$State=="IN"])
+dom.bai <- sea.df[,names(sea.df) %in% D.names]#
+head(dom.bai)#
 #
-# Simple mean-centering on what's left after removing size & year trends#
-# Note: this didn't work because the trend in the data starts post-1950 for many sites#
-for(s in unique(gam4.weights$Site)){#
-	for(c in unique(gam4.weights[gam4.weights$Site==s, "Site"])){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}#
+dom.bai.chron <- chron(dom.bai[,1:10])#
+summary(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+hot.years
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+summary(sea.test)
+foo <- sea.test$se.unscaled#
+names(foo) <- sea.test$lag#
 #
-# gam4.weights$Clim.Rel <- gam4.weights#
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+hot.years
+meow <- c(1955, 1959)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+summary(sea.test)
+foo <- sea.test$se.unscaled#
+names(foo) <- sea.test$lag#
 #
-gam4.dat.summary <- aggregate(gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam4.weights[,c("Year", "Site")],#
-                         FUN=mean)#
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+line(x=sea.test, y = sea.test$se.unscaled)
+sea.test$se.unscaled
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+line(x=sea.test$lag, y = sea.test$se.unscaled)
+lines(x=sea.test$lag, y = sea.test$se.unscaled)
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch", ylim = c) 0, 10)#
+	lines(x=sea.test$lag, y = sea.test$se.unscaled)
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch", ylim = c(0, 10))
+lines(x=sea.test$lag, y = sea.test$se.unscaled)
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]#
+I.names <- gam2.weights[gam2.weights$Canopy.Class=="I" & gam2.weights$State=="IN", "TreeID", "TreeID"]#
+S.names <- gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$State=="IN", "TreeID", "TreeID"]
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+I.names <- gam2.weights[gam2.weights$Canopy.Class=="I" & gam2.weights$State=="IN", "TreeID"]
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="IN", "TreeID"]#
+I.names <- gam2.weights[gam2.weights$Canopy.Class=="I" & gam2.weights$State=="IN", "TreeID"]#
+S.names <- gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$State=="IN", "TreeID"]
+dom.bai.chron <- chron(dom.bai)
+summary(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+summary(dom.bai.chron)
+dim(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+summary(sea.test)
+foo <- sea.test$se.unscaled#
+names(foo) <- sea.test$lag#
 #
-ggplot(gam4.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=BA.inc), color="black") #
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="ME", "TreeID"]
+hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot" & gam2.weights$State=="ME"])
+dom.bai <- sea.df[,names(sea.df) %in% D.names]#
+head(dom.bai)
+head(dom.bai)#
 #
-ggplot(gam4.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=Clim.Rel), color="black") +#
-	geom_hline(yintercept=0, color="red", linetype="dashed")#
+dom.bai.chron <- chron(dom.bai)#
+summary(dom.bai.chron)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+summary(sea.test)
+foo <- sea.test$se.unscaled
+names(foo) <- sea.test$lag
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+5*3*8
+D.names <- gam2.weights[gam2.weights$Canopy.Class=="D" & gam2.weights$State=="MO", "TreeID"]#
+I.names <- gam2.weights[gam2.weights$Canopy.Class=="I" & gam2.weights$State=="IN", "TreeID"]#
+S.names <- gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$State=="IN", "TreeID"]#
 #
-gam4.weights$Temp.Mark <- NA#
-gam4.weights$Precip.Mark <- NA#
-for(s in unique(gam4.weights$Site)){#
-	gam4.weights[gam4.weights$Site==s,"Temp.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="hot", "marker.year"]), "hot", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="cold", "marker.year"]), "cold", "NONE"))#
-	gam4.weights[gam4.weights$Site==s,"Precip.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="dry", "marker.year"]), "dry", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="wet", "marker.year"]), "wet","NONE"))#
-}#
-gam4.weights$Temp.Mark <- as.factor(gam4.weights$Temp.Mark)#
-gam4.weights$Precip.Mark <- as.factor(gam4.weights$Precip.Mark)#
+hot.years <- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "hot" & gam2.weights$State=="MO"])#
+cool.years<- unique(gam2.weights$Year[gam2.weights$Temp.Mark == "cold"])#
+wet.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "wet"])#
+dry.years <- unique(gam2.weights$Year[gam2.weights$Precip.Mark == "dry"])#
 #
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")#
-gam4.dat.summary <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=mean)#
+wet.hot.years <- as.numeric(intersect(hot.years, wet.years))#
+wet.cool.years <- as.numeric(intersect(cool.years, wet.years))#
+dry.hot.years <- as.numeric(intersect(hot.years, dry.years))#
+dry.cool.years <- as.numeric(intersect(cool.years, dry.years))#
 #
-gam4.dat.summary[,paste0(cols.use, ".LB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.025, na.rm=T)[,cols.use]#
-gam4.dat.summary[,paste0(cols.use, ".UB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.975, na.rm=T)[,cols.use]#
-summary(gam4.dat.summary)
-gam4.weights$Temp.Mark <- recode(gam4.weights$Temp.Mark, "'NONE'='A'")
-gam4.weights$Precip.Mark <- recode(gam4.weights$Precip.Mark, "'NONE'='A'")
-summary(gam4.weights)
-gam4.weights <- gam4.weights[!gam4.weights$Climate.Rel]
-gam4.weights <- gam4.weights[!gam4.weights$Climate.Rel,]
-gam4.weights <- gam4.weights[,!gam4.weights$Climate.Rel]
-gam4.weights[,!gam4.weights$Climate.Rel]
-summary(gam4.weights[,!gam4.weights$Climate.Rel])
-gam4.weights <- gam4.weights[,!gam4.weights$Clim.Rel]
-gam4.weights <- gam4.weights[!,gam4.weights$Clim.Rel]
-gam4.weights <- gam4.weights[!gam4.weights$Clim.Rel]
-gam4.weights <- gam4.weights[,"Clim.Rel"]
-summary(gam4.weights)
-load(file="processed_data/gamm_weights/gam4_weights.Rdata") # Loading in Modeled weights from GAM4
-# Recoding Site as State for simplicity later#
-gam1.weights$State <- recode(gam1.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
+dom.bai <- sea.df[,names(sea.df) %in% D.names]#
+head(dom.bai)#
 #
-gam2.weights$State <- recode(gam2.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")#
+dom.bai.chron <- chron(dom.bai)#
+summary(dom.bai.chron)#
 #
-gam4.weights$State <- recode(gam4.weights$Site, "'Missouri Ozark'='MO'; 'Morgan Monroe State Park'='IN'; 'Oak Openings Toledo'='OH'; 'Harvard'= 'MA'; 'Howland'='ME'")
-summary(gam4.weights)
-gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc - exp(gam4.weights$fit.dbh.recon) - exp(gam4.weights$fit.Year)
-summary(gam4.weights)
-for(s in unique(gam4.weights$Site)){#
-	for(c in unique(gam4.weights[gam4.weights$Site==s, "Site"])){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s"Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-	}#
-}
-for(s in unique(gam4.weights$Site)){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s"Clim.Rel"] <- gam4.weights[gam4.weights$Site==s & gam4.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1#
-}
-for(s in unique(gam4.weights$Site)){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s"Clim.Rel"] <- gam4.weights[gam4.weights$Site==s, "BA.inc.Clim"]/x.inc-1#
-}
-s
-mean(gam4.weights[gam4.weights$Site==s, "BA.inc.Clim"], na.rm=T)
-for(s in unique(gam4.weights$Site)){#
-		x.inc <- mean(gam4.weights[gam4.weights$Site==s, "BA.inc.Clim"], na.rm=T)#
-		gam4.weights[gam4.weights$Site==s,"Clim.Rel"] <- gam4.weights[gam4.weights$Site==s, "BA.inc.Clim"]/x.inc-1#
-}
-summary(gam4.weights)
-# gam4.weights$Clim.Rel <- gam4.weights#
+int.bai <- sea.df[,names(sea.df) %in% I.names]#
+int.bai.chron <- chron(int.bai)#
+sup.bai <- sea.df[,names(sea.df) %in% S.names]#
 #
-gam4.dat.summary <- aggregate(gam4.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],#
-                         by=gam4.weights[,c("Year", "Site")],#
-                         FUN=mean)#
+test <- as.data.frame(dom.bai["TP2086"])#
+meow <- c(1955, 1959)#
 #
-ggplot(gam4.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=BA.inc), color="black") #
+sea.test <- sea(dom.bai.chron, meow , lag=2, resample=1000)
+summary(sea.test)
+foo <- sea.test$se.unscaled#
+names(foo) <- sea.test$lag#
 #
-ggplot(gam4.dat.summary[,]) +#
-	facet_grid(Site~Canopy.Class) +#
-	geom_line(aes(x=Year, y=Clim.Rel), color="black") +#
-	geom_hline(yintercept=0, color="red", linetype="dashed")#
-#
-gam4.weights$Temp.Mark <- NA#
-gam4.weights$Precip.Mark <- NA#
-for(s in unique(gam4.weights$Site)){#
-	gam4.weights[gam4.weights$Site==s,"Temp.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="hot", "marker.year"]), "hot", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="cold", "marker.year"]), "cold", "NONE"))#
-	gam4.weights[gam4.weights$Site==s,"Precip.Mark"] <- ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="dry", "marker.year"]), "dry", ifelse(gam4.weights[gam4.weights$Site==s, "Year"] %in% unique(climate.markers[climate.markers$Site==s & climate.markers$marker=="wet", "marker.year"]), "wet","NONE"))#
-}#
-gam4.weights$Temp.Mark <- as.factor(gam4.weights$Temp.Mark)#
-gam4.weights$Precip.Mark <- as.factor(gam4.weights$Precip.Mark)#
-#
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")#
-gam4.dat.summary <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=mean)#
-#
-gam4.dat.summary[,paste0(cols.use, ".LB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.025, na.rm=T)[,cols.use]#
-gam4.dat.summary[,paste0(cols.use, ".UB")] <- aggregate(gam4.weights[,cols.use],#
-                         by=gam4.weights[,c("Year", "Site", "Temp.Mark", "Precip.Mark")],#
-                         FUN=quantile, 0.975, na.rm=T)[,cols.use]#
-summary(gam4.dat.summary)
-gam4.weights$Temp.Mark <- recode(gam4.weights$Temp.Mark, "'NONE'='A'")
-gam4.weights$Precip.Mark <- recode(gam4.weights$Precip.Mark, "'NONE'='A'")
-summary(gam4.weights)
-gam4.lme.temp <- lme(BA.inc ~ Temp.Mark*State-Temp.Mark, #
-			random=list(TreeID=~1), data=gam4.weights); anova(gam4.lme.temp)
-summary(gam4.lme.temp)
-lsmeans(gam4.lme.temp, pairwise~Temp.Mark*State, adjust="tukey")
-gam4.lme.precip <- lme(BA.inc ~ Precip.Mark*State-Precip.Mark, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.weights); anova(gam4.lme.precip)#
-summary(gam4.lme.precip)	#
-lsmeans(gam4.lme.precip, pairwise~Precip.Mark*State, adjust="tukey")
-gam4.lme.wts.precip <- lme(Weight ~ Factor*State, #
-			random=list(PlotID=~1, TreeID=~1), data=gam4.wt.stack); anova(gam4.lme.precip)
-summary(gam4.lme.wts.precip)
-lsmeans(gam4.lme.wts.precip, pairwise~Factor*State, adjust="tukey")
+barplot(foo, col=ifelse(sea.test$p < 0.05, "grey30", "grey75"), ylab = "BAI", xlab="Superposed Epoch")
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)
+sea.test <- sea(dom.bai.chron, hot.years , lag=2, resample=1000)

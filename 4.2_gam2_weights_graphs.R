@@ -1,6 +1,11 @@
 library(ggplot2)
 require(car)
 
+se <- function(x){
+  sd(x, na.rm=TRUE) / sqrt((length(!is.na(x))))}
+
+
+
 load(file="processed_data/gamm_weights/gam2_weights.Rdata")
 
 summary(gam2.weights)
@@ -13,7 +18,8 @@ gam2.weights[,c("weight.tmean2", "weight.precip2", "weight.dbh.recon2")] <- gam2
 # Transforming things back to BA.inc rather than log
 gam2.weights[,which(substr(names(gam2.weights),1,3)=="fit")] <- exp(gam2.weights[,which(substr(names(gam2.weights),1,3)=="fit")] )
 
-othervars <- c("Year", "Site", "Canopy.Class", "Model")
+# othervars <- c("Year", "Site", "Canopy.Class", "Model")
+othervars <- c("Year", "Canopy.Class", "Model")
 
 data.graph1 <- aggregate(gam2.weights[,factors.fits], by = gam2.weights[,othervars], FUN= mean, na.rm=T)
 
@@ -29,6 +35,10 @@ data.graph2[,paste(factors.weights, "upr", sep=".")] <- aggregate(abs(gam2.weigh
 
 data.graph2[,paste(factors.weights, "lwr", sep=".")] <- aggregate(abs(gam2.weights[,factors.weights]), by = gam2.weights[,othervars], FUN= quantile, prob= 0.025, na.rm=T)[,factors.weights]
 
+data.graph2[,paste(factors.weights, "SD", sep=".")] <- aggregate(abs(gam2.weights[,factors.weights]), by = gam2.weights[,othervars], FUN= sd, na.rm=T)[,factors.weights]
+
+data.graph2[,paste(factors.weights, "SE", sep=".")] <- aggregate(abs(gam2.weights[,factors.weights]), by = gam2.weights[,othervars], FUN= se)[,factors.weights]
+
 summary(data.graph2)
 
 data.graph <- merge(data.graph1, data.graph2, all.x=T, all.y=T)
@@ -43,8 +53,9 @@ summary(data.graph)
 
 # Ordering the data for graphing
 
-data.graph<- data.graph[order(data.graph$Year, data.graph$Canopy.Class, data.graph$Site, decreasing=F),]
-
+# Removing the site aggregation for now
+# data.graph<- data.graph[order(data.graph$Year, data.graph$Canopy.Class, data.graph$Site, decreasing=F),]
+data.graph<- data.graph[order(data.graph$Year, data.graph$Canopy.Class,decreasing=F),]
 
 plot.rgb <- function(STATE, CC, SIZE){	geom_point(data=data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,],aes(x=Year, y=fit.full), size=SIZE,
   		        color=rgb(abs(data.graph[data.graph$State==STATE & data.graph$Canopy.Class==CC,"weight.tmean2"     ]), # red
@@ -55,10 +66,11 @@ plot.rgb <- function(STATE, CC, SIZE){	geom_point(data=data.graph[data.graph$Sta
 # Plotting the Obs and modeled with influence coloring
 data.graph$State <- recode(data.graph$Site, "'Howland' = 'ME';'Harvard' = 'MA';'Morgan Monroe State Park' = 'IN';'Missouri Ozark' = 'MO';'Oak Openings Toledo' = 'OH'")
 data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "ME"))
+# save(data.graph, file="processed_data/gam2_weights_graph_withSites.Rdata")
 
 # Plotting the Obs and modeled with influence coloring
 pdf("figures/Prelim_Figures/gam2_canopyclass_BAI_limiting_factors.pdf", width= 13, height = 8.5)
-ggplot(data.graph) + facet_grid(State~Canopy.Class, scale="free") +
+ggplot(data.graph) + facet_grid(Canopy.Class~State, scale="free") +
 	scale_x_continuous(expand=c(0,0)) +
 	scale_y_continuous(expand=c(0,0)) +
 	# facet_wrap(~TreeID, scales="free_y", space="free") +
@@ -272,29 +284,35 @@ dev.off()
 # Plotting the Effects
 data.graph$State <- factor(data.graph$State, levels=c("MO", "IN", "OH", "MA", "ME"))
 
-pdf("figures/Prelim_Figures/gam2_influence_in_time.pdf", width= 13, height = 8.5)
-ggplot(data.graph) + facet_grid(State ~ Canopy.Class, scale="free") +
-	# facet_wrap(~TreeID, scales="free_y", space="free") +
-	# geom_ribbon(data=gam2.weights[gam2.weights$data.type=="Model",], aes(x=Year, ymin=Y.rel.10.lo*100, ymax=Y.rel.10.hi*100), 	alpha=0.5) +
-	geom_vline(data=climate.markers[climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.35)+
-	geom_line(aes(x=Year, y=fit.tmean), size=1, color="red") +
-	geom_line(aes(x=Year, y=fit.precip), size=1, color="blue") +
-	geom_line(aes(x=Year, y=fit.dbh.recon), size=1, color="green")+
+data.graph$Canopy.Class <- recode(data.graph$Canopy.Class,"'D'='Dominant';'I'='Intermediate';'S'='Suppressed'")
+
+save(data.graph, file="processed_data/gam2_weights_graph.Rdata")
+pdf("figures/Prelim_Figures/gam2_weights_No-site.pdf", width= 13, height = 8.5)
+ggplot(data.graph) + facet_grid(~Canopy.Class) +
+		
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), alpha=0.25, fill="red") +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), alpha=0.25, fill="blue") +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2 - weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), alpha=0.25, fill="green") +
+
+	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
+	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
+	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="green")+
 	theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
 panel.background = element_blank())+
 	theme(axis.line.x = element_line(color="black", size = 0.5),
-        axis.line.y = element_line(color="black", size = 0.5))
+        axis.line.y = element_line(color="black", size = 0.5))+
+	labs(title= "Canopy model", x= expression(bold(paste("Year"))), y = expression(bold(paste("Limiting Factor Influence"))))
 
-	labs(title= "Canopy model", x= expression(bold(paste("Year"))), y = expression(bold(paste("Effect on BAI (mm"^"2", "y"^"-1",")"))))
 dev.off()	
 
 pdf("figures/Prelim_Figures/gam2_influence_in_time_weights_temp.pdf", width= 13, height = 8.5)
-ggplot(data.graph) + facet_grid(State~Canopy.Class) +
+ggplot(data.graph) + facet_grid(Canopy.Class~State) +
 	geom_vline(data=climate.markers[climate.markers$type=="tmean",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
 	scale_color_manual(values=c("red", "blue"))+
-	geom_ribbon(aes(x=Year, ymin=weight.tmean2.lwr, ymax=weight.tmean2.upr), alpha=0.25, fill="red") +
-	geom_ribbon(aes(x=Year, ymin=weight.precip2.lwr, ymax=weight.precip2.upr), alpha=0.25, fill="blue") +
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2.lwr, ymax=weight.dbh.recon2.upr), alpha=0.25, fill="green") +
+	
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), alpha=0.25, fill="red") +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), alpha=0.25, fill="blue") +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2 - weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), alpha=0.25, fill="green") +
 
 	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
 	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
@@ -307,13 +325,14 @@ panel.background = element_blank())+
 dev.off()	
 
 pdf("figures/Prelim_Figures/gam2_influence_in_time_weights_precip.pdf", width= 13, height = 8.5)
-ggplot(data.graph) + facet_grid(State~Canopy.Class) +
+ggplot(data.graph) + facet_grid(Canopy.Class~State) +
 	geom_vline(data=climate.markers[climate.markers$type=="precip",],aes(xintercept=marker.year, color=marker), alpha=0.5)+
 	scale_color_manual(values=c("dodgerblue", "brown"))+
-	geom_ribbon(aes(x=Year, ymin=weight.tmean2.lwr, ymax=weight.tmean2.upr), alpha=0.25, fill="red") +
-	geom_ribbon(aes(x=Year, ymin=weight.precip2.lwr, ymax=weight.precip2.upr), alpha=0.25, fill="blue") +
-	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2.lwr, ymax=weight.dbh.recon2.upr), alpha=0.25, fill="green") +
-
+	
+	geom_ribbon(aes(x=Year, ymin=weight.tmean2 - weight.tmean2.SE, ymax=weight.tmean2 + weight.tmean2.SE), alpha=0.25, fill="red") +
+	geom_ribbon(aes(x=Year, ymin=weight.precip2 - weight.precip2.SE, ymax=weight.precip2 + weight.precip2.SE), alpha=0.25, fill="blue") +
+	geom_ribbon(aes(x=Year, ymin=weight.dbh.recon2 - weight.dbh.recon2.SE, ymax=weight.dbh.recon2 + weight.dbh.recon2.SE), alpha=0.25, fill="green") +
+	
 	geom_line(aes(x=Year, y=weight.tmean2), size=1, color="red") +
 	geom_line(aes(x=Year, y=weight.precip2), size=1, color="blue") +
 	geom_line(aes(x=Year, y=weight.dbh.recon2), size=1, color="green")+
