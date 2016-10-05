@@ -1008,9 +1008,6 @@ ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% 
 ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry"),]) + facet_grid(Canopy.Class~.) +#
 	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
 	scale_x_continuous(expand=c(0,0))
-ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry"),]) + facet_grid(Canopy.Class~.) +#
-	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
-	scale_x_continuous(expand=c(0,0))
 ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
 	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
 	scale_x_continuous(expand=c(0,0))
@@ -1021,9 +1018,6 @@ ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% 
 summary(gam2.weights)
 ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
 	geom_density(aes(x=log(BA.inc.Clim),color=mix.mark,fill=mix.mark), alpha=0.1)+#
-	scale_x_continuous(expand=c(0,0))
-ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
-	geom_density(aes(x=BA.inc.Clim,color=mix.mark,fill=mix.mark), alpha=0.1)+#
 	scale_x_continuous(expand=c(0,0))
 ggplot(gam2.weights[gam2.weights$Canopy.Class=="S" & gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
 	geom_density(aes(x=BA.inc.Clim,color=mix.mark,fill=mix.mark), alpha=0.1)+#
@@ -1052,9 +1046,6 @@ ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
 ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
 	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
 	scale_x_continuous(expand=c(0,0))
-ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
-	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
-	xlim(0,25)
 ggplot(gam2.weights[gam2.weights$mix.mark %in% c("A-A", "hot-wet", "hot-dry", "hot-A"),]) + facet_grid(Canopy.Class~.) +#
 	geom_density(aes(x=BA.inc,color=mix.mark,fill=mix.mark), alpha=0.1)+#
 	xlim(0,25)
@@ -1158,10 +1149,6 @@ ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
 ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
 	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
 	xlim(0,25)
-ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
-	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
-	scale_x_continuous(expand=c(0,0)) +#
-		xlim(0,25)
 ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
 	geom_density(aes(x=BA.inc,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +#
 	scale_x_continuous(expand=c(0,0)) +#

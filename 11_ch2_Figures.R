@@ -453,52 +453,51 @@ dev.off()
 # Probability density functions for diameter
 #############################################################################
 
-load("ch2_combined_data_use.Rdata")
-summary(test)
+load("processed_data/gam2_weights_graph.Rdata")
+summary(gam2.weights)
 
-ggplot(data=test) + facet_grid(~Site) + 
-	geom_density(aes(x=DBH..cm.,fill=Canopy.Class), position="stack", alpha=0.9) +
-	
-	
-		
-	theme(axis.line=element_line(color="black"), 
-		panel.grid.major=element_blank(), 
-		panel.grid.minor=element_blank(), 
-		panel.border=element_blank(),  
-		panel.background=element_blank(), 
-		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
-		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
-		strip.text=element_text(face="bold", size=rel(1.0)),
-		axis.line.x = element_line(color="black", size = 0.5),
+load("processed_data/median_temp.Rdata")
+load("processed_data/median_precip.Rdata")
+
+summary(median.temp)
+
+median.temp$clim.type <- as.factor("Temperature")
+median.precip$clim.type <- as.factor("Precipitation")
+
+median.clim <- rbind(median.temp, median.precip)
+
+gam2.weights1 <- gam2.weights
+gam2.weights1$clim.type <- as.factor("Temperature")
+gam2.weights1$clim.mark <- gam2.weights1$Temp.Mark
+
+gam2.weights2 <- gam2.weights
+gam2.weights2$clim.type <- as.factor("Precipitation")
+gam2.weights2$clim.mark <- gam2.weights2$Precip.Mark
+
+gam2.graph <- rbind(gam2.weights1, gam2.weights2)
+
+ggplot(gam2.graph) + facet_grid(Canopy.Class~clim.type) +
+  geom_density(aes(x=BA.inc.Clim,color=clim.mark, fill=clim.mark), alpha=0.1) +
+  geom_vline(data=median.clim, aes(xintercept=median, color=type)) +
+  scale_color_manual(values=c("grey50", "blue", "red", "brown", "darkgreen")) +
+  scale_fill_manual(values=c("grey50", "blue", "red", "brown", "darkgreen")) +
+  scale_x_continuous(limits = c(-20,20), expand=c(0,0)) +
+  labs(x= "BAI", y="Density") +
+  theme(axis.line=element_line(color="black"), 
+        panel.grid.major=element_blank(), 
+        panel.grid.minor=element_blank(), 
+        panel.border=element_blank(),  
+        panel.background=element_blank(), 
+        axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+        axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+        strip.text=element_text(face="bold", size=rel(1.0)),
+        axis.line.x = element_line(color="black", size = 0.5),
         axis.line.y = element_line(color="black", size = 0.5),
         legend.position="top",
         legend.key.size = unit(0.75, "cm"),
         legend.text = element_text(size=rel(1.1)),
         legend.key = element_rect(fill = "white")) + 
-        guides(color=guide_legend(nrow=1)) +
-	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
-	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
-	labs(x="DBH (cm)", y="Density")
+  guides(color=guide_legend(nrow=1)) +
+  theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+  theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
 
-load("processed_data/dbh_recon_graph.Rdata")
-summary(dbh.recon)
-ggplot(data=dbh.recon[dbh.recon$Year >= 1950,]) + facet_grid(Canopy.Class~Site) +
-	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + 
-	geom_line(aes(x=Year, y = Mean, color=Canopy.Class)) +theme(axis.line=element_line(color="black"), 
-		panel.grid.major=element_blank(), 
-		panel.grid.minor=element_blank(), 
-		panel.border=element_blank(),  
-		panel.background=element_blank(), 
-		axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
-		axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
-		strip.text=element_text(face="bold", size=rel(1.0)),
-		axis.line.x = element_line(color="black", size = 0.5),
-        axis.line.y = element_line(color="black", size = 0.5),
-        legend.position="top",
-        legend.key.size = unit(0.75, "cm"),
-        legend.text = element_text(size=rel(1.1)),
-        legend.key = element_rect(fill = "white")) + 
-        guides(color=guide_legend(nrow=1)) +
-	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
-	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
-	labs(x="Year", y="DBH (cm)")
