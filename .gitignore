@@ -6,3 +6,8 @@ figures/*
 
 *.Rdata
 *.pdf
+ (Ross Alexander's conflicted copy 2016-03-13).Rhistory
+
+.Rhistory
+
+*.Rhistory
