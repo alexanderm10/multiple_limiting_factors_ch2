@@ -23,7 +23,7 @@ gam4.weights$State <- recode(gam4.weights$Site, "'Missouri Ozark'='MO'; 'Morgan 
 summary(gam1.weights)
 #gam1.weights$BA.inc.Clim <- gam1.weights$BA.inc - exp(gam1.weights$fit.dbh.recon) - exp(gam1.weights$fit.Year)
 # # After you re-run script 3.1, change to the following
-gam1.weights$BA.inc.Clim <- gam1.weights$BA.inc - exp(gam1.weights$fit.dbh.recon) - exp(gam1.weights$fit.Year) - exp(gam1.weights$fit.intercept)
+gam1.weights$BA.inc.Clim <- gam1.weights$BA.inc / (exp(gam1.weights$fit.dbh.recon) * exp(gam1.weights$fit.Year) * exp(gam1.weights$fit.intercept))
 summary(gam1.weights)
 
 
@@ -126,20 +126,22 @@ dev.off()
 #########################################################
 # Canopy Class Model--GAM2
 #########################################################
+# Out Model: log(BAI) ~ A + B + C
+# BAI ~ exp(A + B + C)
+# BAI ~ exp(A) * exp(B) * exp(C)
+# BAI/exp(B) = exp(A + C)
 
 # Looking at the non-Size & Time BAI
 summary(gam2.weights)
 #gam2.weights$BA.inc.Clim <- gam2.weights$BA.inc - exp(gam2.weights$fit.dbh.recon) - exp(gam2.weights$fit.Year)
 # # After you re-run script 3.2, change to the following
-gam2.weights$BA.inc.Clim <- gam2.weights$BA.inc - exp(gam2.weights$fit.dbh.recon) - exp(gam2.weights$fit.Year) - exp(gam2.weights$fit.intercept)
-gam2.weights$BA.inc.Clim.log <- log(gam2.weights$BA.inc) - gam2.weights$fit.dbh.recon - gam2.weights$fit.Year - gam2.weights$fit.intercept
-gam2.weights$BA.inc.Clim2 <- exp(gam2.weights$BA.inc.Clim.log)
-
-gam2.weights$BA.inc.Clim3 <- exp(log(gam2.weights$BA.inc) - gam2.weights$fit.dbh.recon - gam2.weights$fit.Year - gam2.weights$fit.intercept)
+gam2.weights$BA.inc.Clim <- gam2.weights$BA.inc / (exp(gam2.weights$fit.dbh.recon) * exp(gam2.weights$fit.Year) * exp(gam2.weights$fit.intercept))
+# gam2.weights$BA.inc.Clim.log <- log(gam2.weights$BA.inc) - gam2.weights$fit.dbh.recon - gam2.weights$fit.Year - gam2.weights$fit.intercept
+# gam2.weights$BA.inc.Clim2 <- exp(gam2.weights$BA.inc.Clim.log)
+# gam2.weights$BA.inc.Clim3 <- exp(log(gam2.weights$BA.inc) - gam2.weights$fit.dbh.recon - gam2.weights$fit.Year - gam2.weights$fit.intercept)
 summary(gam2.weights)
 
-#log(BAI) ~ A + B + C
-# log(A + B + C) != log(A) + log(B) + log(C)
+
 
 # Simple mean-centering on what's left after removing size & year trends
 # Note: this didn't work because the trend in the data starts post-1950 for many sites
@@ -273,7 +275,7 @@ dev.off()
 summary(gam4.weights)
 # gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc - exp(gam4.weights$fit.dbh.recon) - exp(gam4.weights$fit.Year)
 # # After you re-run script 3.4, change to the following
-gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc - exp(gam4.weights$fit.dbh.recon) - exp(gam4.weights$fit.Year) - exp(gam4.weights$fit.intercept)
+gam4.weights$BA.inc.Clim <- gam4.weights$BA.inc / (exp(gam4.weights$fit.dbh.recon) * exp(gam4.weights$fit.Year) * exp(gam4.weights$fit.intercept))
 summary(gam4.weights)
 
 # Simple mean-centering on what's left after removing size & year trends
