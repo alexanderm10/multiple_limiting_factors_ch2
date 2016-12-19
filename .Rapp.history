@@ -1,150 +1,3 @@
-ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
-	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
-	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
-library(mgcv)#
-library(ggplot2)#
-library(car)#
-# Christy's GAMM code#
-#
-# gam1 <- gamm(Y ~  s(Biomass, bs="cr", k=3, by=PFT) + s(tair, k=k, by=PFT) + s(precipf, k=k, by=PFT) + s(CO2, k=k, by=PFT), random=list(PlotID=~1), data=data) #
-#
-# Loading in my data#
-#
-data.use <- read.csv("processed_data/AllSites_tree_plus_climate_and_BA.csv", header=T)#
-#
-data.use$group <- data.use$Species#
-data.use$group <- recode(data.use$group, "'CAOV' = 'CARYA'; 'CACO' = 'CARYA'; #
-  							'CATE' = 'CARYA'; 'ACSAC' = 'ACSA'; 'BEAL' = 'BETULA'; 'BELE' = 'BETULA'; 'QUMU' = 'QUAL'")#
-#
-data.use$group.plot <- as.factor(paste(data.use$group, data.use$PlotID, sep="."))
-# reducing the amount of data for the test runs#
-sites.use <- c("Harvard", "Howland", "Morgan Monroe State Park", "Oak Openings Toledo", "Missouri Ozark")#
-#
-test <- data.use[data.use$Site %in% sites.use & !is.na(data.use$RW) & !is.na(data.use$BA.inc),]#
-summary(test)#
-#
-test$group.cc <- as.factor(paste(test$group, test$Canopy.Class, sep="."))#
-summary(test)#
-# Get a list of what predictors & responses I'm using#
-predictors.all <- c("tmean", "precip", "Species", "dbh.recon", "Canopy.Class", "spp.plot", "group", "group.plot", "group.cc", "Site", "Year", "PlotID") #
-#
-# Getting rid of observations that have NAs in the important variables#
-test <- test[complete.cases(test[,predictors.all]),]#
-test <- test[test$Live.Dead=="LIVE" & !test$Canopy.Class=="F",]#
-#
-# Subsetting to a set of species that we have enough data to feel good about#
-#species.use <- c("TSCA", "QURU", "ACRU", "BEAL", "ACSA", "LITU", "QUAL", "CAOV", "CACO", "CATE", "JUVI", "QUVE", "PCRU", "THOC", "PIST")#
-group.use <- c("ACRU", "ACSA", "BETULA", "CARYA", "FAGR", "FRAX", "PIST", "QUAL", "QURU", "QUVE", "SAAL", "TSCA", "ULRU", "PCRU", "THOC", "LITU", "JUVI")#
-#
-test <- test[test$group %in% group.use,]#
-#
-summary(test)#
-#
-par(new=F)#
-plot(test[test$TreeID=="MMA003", "BA.inc"]~ test[test$TreeID=="MMA003","Year"], type="l")#
-test$log.dbh <- log(test$dbh.recon)#
-summary(test)#
-#
-summary(test)#
-summary(test$Live.Dead)#
-summary(test$Canopy.Class)#
-# RW <- test$RW#
-# temp <- test$tmean#
-# precip <- test$precip#
-# canopy <- test$Canopy.Class#
-# size <- test$DBH..cm.#
-# species <- unique(test$Species)#
-# library(ggplot2)#
-# ggplot(data=test) +#
-   # facet_wrap(~PlotID) +#
-   # geom_histogram(aes(x=dbh.recon))#
-# ggplot(data=test) +#
-   # facet_wrap(~Species) +#
-   # geom_histogram(aes(x=dbh.recon))#
-# hist(test$dbh.recon)#
-# test2 <- test[test$group %in% c("QURU", "ACRU") & test$Year>=1980,]#
-# test2 <- test[test$group %in% c("QURU", "ACRU"),]#
-test2 <- test[test$Site %in% c("Morgan Monroe State Park", "Harvard"), ]#
-# test2$log.dbh <- log(test2$dbh.recon)#
-# summary(test2)#
-summary(test)#
-test[test$BA.inc==0, "BA.inc"] <- 1e-6#
-save(test, file="ch2_combined_data_use.Rdata")
-library(ggplot2)#
-require(mgcv)#
-require(lsmeans)#
-require(car)#
-require(moments)#
-#
-# calculating competition indices#
-load("processed_data/gam2_weights_processed.Rdata")#
-summary(gam2.weights)#
-#
-load("ch2_combined_data_use.Rdata")#
-summary(test)#
-#
-# Going to calculat the comptition index based on the maximum BA in a given plot#
-# making a variable for the basal area at the time of sampling#
-#
-plots <- unique(test$PlotID)#
-#
-for(y in unique(test$Year)){#
-	for(p in unique(test$PlotID)){#
-		BA.max <- max(test[test$PlotID==p & test$Year==y, "BA"], na.rm=T)#
-		for(i in unique(test[test$PlotID==p & test$Year==y,"TreeID"])){#
-			test[test$TreeID==i & test$Year==y, "comp.index"] <- test[test$TreeID==i & test$Year==y,"BA"] / BA.max		#
-		}#
-	}#
-}#
-#
-summary(test)#
-#
-mean(test[test$Canopy.Class=="D", "BA"]); sd(test[test$Canopy.Class=="D", "BA"])#
-mean(test[test$Canopy.Class=="I", "BA"]); sd(test[test$Canopy.Class=="I", "BA"])#
-mean(test[test$Canopy.Class=="S", "BA"]); sd(test[test$Canopy.Class=="S", "BA"])#
-#
-# By Canopy Class only#
-#
-othervars <- c("Year", "Canopy.Class")#
-comp.index.mean <- aggregate(test$comp.index, by= test[,othervars], FUN=mean, na.rm=T)#
-names(comp.index.mean) <- c("Year", "Canopy.Class", "Mean")#
-comp.index.UB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
-summary(comp.index.UB)#
-names(comp.index.UB) <- c("Year", "Canopy.Class", "UB")#
-#
-comp.index.LB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
-names(comp.index.LB) <- c("Year", "Canopy.Class", "LB")#
-summary(comp.index.LB)#
-#
-comp.index <- cbind(comp.index.mean, comp.index.UB$UB, comp.index.LB$LB)#
-summary(comp.index)#
-names(comp.index) <- c("Year", "Canopy.Class", "Mean", "UB", "LB")#
-#
-ggplot(data=comp.index) + facet_grid(Canopy.Class~.) +#
-	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
-	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
-# By Canopy Class and State#
-othervars <- c("Year", "Site","Canopy.Class")#
-site.ci.mean <- aggregate(test$comp.index, by= test[,othervars], FUN=mean, na.rm=T)#
-names(site.ci.mean) <- c("Year", "Site", "Canopy.Class", "Mean")#
-site.ci.UB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.975, na.rm=T)#
-summary(site.ci.UB)#
-names(site.ci.UB) <- c("Year", "Site","Canopy.Class", "UB")#
-#
-site.ci.LB <- aggregate(test$comp.index, by = test[,othervars], FUN= quantile, prob= 0.025, na.rm=T)#
-names(site.ci.LB) <- c("Year", "Site", "Canopy.Class", "LB")#
-summary(site.ci.LB)#
-#
-comp.index.site <- cbind(site.ci.mean, site.ci.UB$UB, site.ci.LB$LB)#
-summary(comp.index.site)#
-names(comp.index.site) <- c("Year", "Site", "Canopy.Class", "Mean", "UB", "LB")	#
-ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
-	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
-	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
-comp.index.site$Canopy.Class <- factor(comp.index.site$Canopy.Class, levels= c("D", "C", "I", "S"))
-ggplot(data=comp.index.site) + facet_grid(Canopy.Class~Site) +#
-	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
-	geom_line(aes(x=Year, y = Mean, color=Canopy.Class))
 comp.index$Canopy.Class <- factor(comp.index$Canopy.Class, levels=c("D", "C", "I", "S"))
 ggplot(data=comp.index) + facet_grid(Canopy.Class~.) +#
 	geom_ribbon(aes(x=Year, ymin=LB, ymax=UB, fill=Canopy.Class), alpha= 0.45) + #
@@ -1518,3 +1371,88 @@ ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +#
         guides(color=guide_legend(nrow=1)) +#
 	theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+#
 	theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+c(years, rep(NA, nrow(cold.years)-length(years)))
+############################################################
+# Attemping an SEA analysis#
+############################################################
+library(ggplot2)#
+require(mgcv)#
+require(lsmeans)#
+require(car)#
+require(moments)#
+require(reshape)#
+require(dplR)#
+#
+load("processed_data/gam2_weights_processed.Rdata")#
+summary(gam2.weights)#
+#
+summary(gam2.weights)#
+gam2.weights <- gam2.weights[gam2.weights$Year >=1950,]#
+gam2.weights$Year <- as.factor(gam2.weights$Year)#
+#
+sea.df <- recast(gam2.weights[,c("Year", "TreeID", "BA.inc.Clim")], Year~TreeID)#
+summary(sea.df)#
+row.names(sea.df) <- sea.df$Year#
+names(sea.df)#
+sea.df <- sea.df[,!names(sea.df)%in% "Year"]
+load("processed_data/sea_output_LB.Rdata")#
+load("processed_data/sea_output_UB.Rdata")#
+load("processed_data/sea_output_chron.Rdata")#
+sea.output.chron$type <- as.factor("chron")#
+sea.output.UB$type <- as.factor("UB")#
+sea.output.LB$type <- as.factor("LB")#
+#
+sea.output.chron$lag <- as.factor(sea.output.chron$lag)#
+sea.output.chron$sig <- as.factor(ifelse(sea.output.chron$p < 0.05, "Y", "N"))#
+#
+sea.output.UB$lag <- as.factor(sea.output.UB$lag)#
+sea.output.UB$sig <- as.factor(ifelse(sea.output.UB$p < 0.05, "Y", "N"))#
+#
+sea.output.LB$lag <- as.factor(sea.output.LB$lag)#
+sea.output.LB$sig <- as.factor(ifelse(sea.output.LB$p < 0.05, "Y", "N"))#
+#
+sea.output.ci <- rbind(sea.output.UB, sea.output.LB)#
+summary(sea.output.ci)#
+#
+summary(sea.output.UB)#
+summary(sea.output.LB)#
+#
+sea.output.all <- rbind(sea.output.chron, sea.output.UB, sea.output.LB)
+ggplot(data=sea.output.chron) + facet_grid(Mark~State) +#
+  geom_point(aes(x=lag, y=se, color=sig, shape=Canopy.Class), size=5)+#
+  geom_errorbar(aes(x=lag, ymin=sea.output.LB[,"se"], ymax=sea.output.UB[,"se"]))+#
+  geom_hline(yintercept=0, linetype="dashed")+#
+  scale_color_manual(values=c("grey", "red"))+#
+  theme_bw()
+ggplot(data=sea.output.chron[sea.output.chron$Canopy.Class=="dom"]) + facet_grid(Mark~State) +#
+  geom_point(aes(x=lag, y=se, color=sig, shape=Canopy.Class), size=5)+#
+  geom_errorbar(aes(x=lag, ymin=sea.output.LB[sea.output.LB$Canopy.Class=="dom","se"], ymax=sea.output.UB[sea.output.UB$Canopy.Class=="dom","se"]))+#
+  geom_hline(yintercept=0, linetype="dashed")+#
+  scale_color_manual(values=c("grey", "red"))+#
+  theme_bw()
+ggplot(data=sea.output.chron[sea.output.chron$Canopy.Class=="dom",]) + facet_grid(Mark~State) +#
+  geom_point(aes(x=lag, y=se, color=sig, shape=Canopy.Class), size=5)+#
+  geom_errorbar(aes(x=lag, ymin=sea.output.LB[sea.output.LB$Canopy.Class=="dom","se"], ymax=sea.output.UB[sea.output.UB$Canopy.Class=="dom","se"]))+#
+  geom_hline(yintercept=0, linetype="dashed")+#
+  scale_color_manual(values=c("grey", "red"))+#
+  theme_bw()
+ggplot(data=sea.output.all) + facet_grid(Canopy.Class~State) +#
+  geom_jitter(aes(x=lag, y=se, color=Mark, shape=type, position="identity"), size=5, height=0, width=0.1)+#
+  geom_hline(yintercept=0, linetype="dashed")+#
+  scale_color_manual(values=c("red", "burlywood3", "darkgreen", "blue")) +#
+  theme_bw()
+ggplot(data=sea.output.all[sea.output.all$type %in% c("UB", "LB"),]) + facet_grid(Canopy.Class~State) +#
+  geom_jitter(aes(x=lag, y=se, color=Mark, shape=type, position="identity"), size=5, height=0, width=0.1)+#
+  geom_hline(yintercept=0, linetype="dashed")+#
+  scale_color_manual(values=c("red", "burlywood3", "darkgreen", "blue")) +#
+  theme_bw()
+ggplot(data=sea.output.all[sea.output.all$type %in% c("UB", "LB"),]) + facet_grid(Mark~State) +#
+  geom_jitter(aes(x=lag, y=se, color=Canopy.Class, shape=type, position="identity"), size=5, height=0, width=0.1)+
+geom_hline(yintercept=0, linetype="dashed")+#
+  scale_color_manual(values=c("red", "burlywood3", "darkgreen", "blue")) +#
+  theme_bw()
+ggplot(data=sea.output.all[sea.output.all$type %in% c("UB", "LB"),]) + facet_grid(Mark*Canopy.Class~State) +#
+  geom_jitter(aes(x=lag, y=se, color=Canopy.Class, shape=type, position="identity"), size=5, height=0, width=0.1)+#
+  geom_hline(yintercept=0, linetype="dashed")+#
+  scale_color_manual(values=c("red", "burlywood3", "darkgreen", "blue")) +#
+  theme_bw()

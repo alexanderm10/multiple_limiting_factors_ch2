@@ -132,21 +132,29 @@ summary(gam2.weights)
 #gam2.weights$BA.inc.Clim <- gam2.weights$BA.inc - exp(gam2.weights$fit.dbh.recon) - exp(gam2.weights$fit.Year)
 # # After you re-run script 3.2, change to the following
 gam2.weights$BA.inc.Clim <- gam2.weights$BA.inc - exp(gam2.weights$fit.dbh.recon) - exp(gam2.weights$fit.Year) - exp(gam2.weights$fit.intercept)
+gam2.weights$BA.inc.Clim.log <- log(gam2.weights$BA.inc) - gam2.weights$fit.dbh.recon - gam2.weights$fit.Year - gam2.weights$fit.intercept
+gam2.weights$BA.inc.Clim2 <- exp(gam2.weights$BA.inc.Clim.log)
 
+gam2.weights$BA.inc.Clim3 <- exp(log(gam2.weights$BA.inc) - gam2.weights$fit.dbh.recon - gam2.weights$fit.Year - gam2.weights$fit.intercept)
 summary(gam2.weights)
+
+#log(BAI) ~ A + B + C
+# log(A + B + C) != log(A) + log(B) + log(C)
 
 # Simple mean-centering on what's left after removing size & year trends
 # Note: this didn't work because the trend in the data starts post-1950 for many sites
 for(s in unique(gam2.weights$Site)){
 	for(c in unique(gam2.weights[gam2.weights$Site==s, "Canopy.Class"])){
 		x.inc <- mean(gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "BA.inc.Clim"], na.rm=T)
+		x.inc.log <- mean(gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "BA.inc.Clim.log"], na.rm=T)
 		gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "Clim.Rel"] <- gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc-1
+		gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "Clim.Rel.log"] <- gam2.weights[gam2.weights$Site==s & gam2.weights$Canopy.Class==c, "BA.inc.Clim"]/x.inc.log-1
 	}
 }
 
 # gam2.weights$Clim.Rel <- gam2.weights
 
-gam2.dat.summary <- aggregate(gam2.weights[,c("BA.inc", "BA.inc.Clim", "Clim.Rel")],
+gam2.dat.summary <- aggregate(gam2.weights[,c("BA.inc", "BA.inc.Clim", "BA.inc.Clim.log", "Clim.Rel", "Clim.Rel.log")],
                          by=gam2.weights[,c("Year", "Site", "Canopy.Class")],
                          FUN=mean)
 
@@ -159,6 +167,12 @@ ggplot(gam2.dat.summary[,]) +
 	geom_line(aes(x=Year, y=Clim.Rel), color="black") +
 	geom_hline(yintercept=0, color="red", linetype="dashed")
 
+ggplot(gam2.dat.summary[,]) +
+  facet_grid(Site~Canopy.Class) +
+  geom_line(aes(x=Year, y=Clim.Rel.log), color="black") +
+  geom_hline(yintercept=0, color="red", linetype="dashed")
+
+
 gam2.weights$Temp.Mark <- NA
 gam2.weights$Precip.Mark <- NA
 for(s in unique(gam2.weights$Site)){
@@ -168,7 +182,7 @@ for(s in unique(gam2.weights$Site)){
 gam2.weights$Temp.Mark <- as.factor(gam2.weights$Temp.Mark)
 gam2.weights$Precip.Mark <- as.factor(gam2.weights$Precip.Mark)
 
-cols.use <- c("BA.inc", "BA.inc.Clim", "Clim.Rel")
+cols.use <- c("BA.inc", "BA.inc.Clim", "BA.inc.Clim.log", "Clim.Rel", "Clim.Rel.log")
 gam2.dat.summary <- aggregate(gam2.weights[,cols.use],
                          by=gam2.weights[,c("Year", "Site", "Canopy.Class", "Temp.Mark", "Precip.Mark")],
                          FUN=mean)
