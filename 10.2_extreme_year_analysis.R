@@ -31,17 +31,25 @@ gam2.weights <- gam2.weights[gam2.weights$Year >=1950,]
 # summary(gam2.weights)
 
 # Going to run the anova's on the model detrended data
-cr.testD <- aov(BA.inc.Clim ~ Precip.Mark+Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="D",])
-cr.testI <- aov(BA.inc.Clim ~ Precip.Mark+Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="I",])
-cr.testS <- aov(BA.inc.Clim ~ Precip.Mark+Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="S",])
+cr.testD <- aov(log(BA.inc.Clim) ~ Precip.Mark*Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="D",])
+cr.testI <- aov(log(BA.inc.Clim) ~ Precip.Mark*Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="I",])
+cr.testS <- aov(log(BA.inc.Clim) ~ Precip.Mark*Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="S",])
+
+# lm.testD <- lm(log(BA.inc.Clim) ~ Precip.Mark + Temp.Mark + Site, data=gam2.weights[gam2.weights$Canopy.Class=="D",])
+# lm.testD2 <- lme(log(BA.inc.Clim) ~ Precip.Mark + Temp.Mark, random=list(Site=~1), data=gam2.weights[gam2.weights$Canopy.Class=="D",])
+# summary(lm.testD)
+# summary(lm.testD2)
+# anova(lm.testD2)
+
 
 # Comparing the log-transformed
 # cr.testD2 <- aov(BA.inc.Clim.log ~ Precip.Mark+Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="D",])
 # cr.testI2 <- aov(BA.inc.Clim.log ~ Precip.Mark+Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="I",])
 # cr.testS2 <- aov(BA.inc.Clim.log ~ Precip.Mark+Temp.Mark, data=gam2.weights[gam2.weights$Canopy.Class=="S",])
-# summary(cr.testD2)
+summary(cr.testD2)
 # summary(cr.testI2)
 # summary(cr.testS2)
+# hist(resid(cr.testD2))
 
 plot(resid(cr.testD) ~ predict(cr.testD))
 plot(resid(cr.testI) ~ predict(cr.testI))
@@ -54,25 +62,23 @@ hist(resid(cr.testS))
 
 summary(cr.testD)
 tukey.d <- TukeyHSD(cr.testD)
-# tukey.d["Precip.Mark:Temp.Mark"] # not significant, so we won't look at it
-tukey.d["Precip.Mark"]
-tukey.d["Temp.Mark"]
-tukey.d["Precip.Mark:Temp.Mark"]
+tukey.d["Precip.Mark:Temp.Mark"] # not significant, so we won't look at it
+tukey.d["Precip.Mark"] # Wet grows more than ambient
+tukey.d["Temp.Mark"] # cold & hot grow more than ambient??
 # Saving table to publication folder
 #write.table(summary(cr.testD), file="~/PhD/publications/2016/Ch2_multiple_limiting_factors/D_anova.txt")
 
 summary(cr.testI)
-
 tukey.i <- TukeyHSD(cr.testI)
-# tukey.i["Precip.Mark:Temp.Mark"] # not significant, so we won't look at it
+tukey.i["Precip.Mark:Temp.Mark"] # not significant, so we won't look at it
 tukey.i["Precip.Mark"]
 tukey.i["Temp.Mark"]
 
 summary(cr.testS)
 tukey.s <- TukeyHSD(cr.testS)
 tukey.s["Precip.Mark:Temp.Mark"] # Significant (for better or worse)
-tukey.s["Precip.Mark"]
-tukey.s["Temp.Mark"]
+tukey.s["Precip.Mark"] # No dif
+tukey.s["Temp.Mark"] # hot grows less
 
 
 # lsmeans(cr.testD, pairwise~Precip.Mark, adjust="tukey")	
@@ -145,14 +151,14 @@ save(median.temp, file="processed_data/median_temp.Rdata")
 save(median.precip, file="processed_data/median_precip.Rdata")
 
 save(gam2.weights, file="processed_data/gam2_weights_graph.Rdata")
-
-ggplot(gam2.weights) + facet_grid(Canopy.Class~.) +
-	geom_density(aes(x=BA.inc.Clim,color=Temp.Mark, fill=Temp.Mark), alpha=0.1) +
-  geom_vline(data=median.temp, aes(xintercept=median, color=type)) +
-  scale_color_manual(values=c("grey50", "blue", "red")) +
-	scale_fill_manual(values=c("grey50", "blue", "red")) +
-	xlim(-20,20) +
-	labs(x= "BAI", y="Density") +
+interact <- c("A-A", "hot-wet", "A-wet", "A-dry")
+ggplot(gam2.weights[gam2.weights$mix.mark %in% interact,]) + facet_grid(Canopy.Class~.) +
+	geom_density(aes(x=log(BA.inc.Clim),color=mix.mark, fill=mix.mark), alpha=0.1) +
+  #geom_vline(data=median.temp, aes(xintercept=median, color=type)) +
+  # scale_color_manual(values=c("grey50", "blue", "red")) +
+	# scale_fill_manual(values=c("grey50", "blue", "red")) +
+	xlim(-2,2) +
+	labs(x= "log(BAI)", y="Density") +
 	theme(axis.line=element_line(color="black"), 
 		panel.grid.major=element_blank(), 
 		panel.grid.minor=element_blank(), 

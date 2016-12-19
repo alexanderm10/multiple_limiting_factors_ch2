@@ -717,6 +717,8 @@ summary(median.clim)
 median.clim$type <- recode(median.clim$type, "'A'='Ambient';'cold'='Cool';'hot'='Hot';'dry'='Dry';'wet'='Wet'")
 median.clim$Canopy.Class <- recode(median.clim$Canopy.Class, "'D'='Dominant'; 'I'='Intermediate';'S'='Understory'")
 
+#interact <- c("A-A", "hot-wet", "A-wet", "A-dry")
+
 
 # median-centering the data so that the ambient line is *always* on 0
 summary(gam2.graph)
@@ -737,15 +739,21 @@ for(i in unique(gam2.graph$Canopy.Class)){
 
 save(gam2.graph, file="processed_data/gam2_density_graph_data.Rdata")
 
-dens.plot <- ggplot(gam2.graph) + facet_grid(Canopy.Class~clim.type) +
-                # geom_density(aes(x=BA.inc.Clim,color=clim.mark, fill=clim.mark), alpha=0.1) +
+gam2.graph$mix.mark <- recode(gam2.graph$mix.mark, "'A-A'='Ambient';'A-wet'='Ambient Temp - Wet';'A-dry'='Ambient Temp - Dry';'hot-wet'='Hot-Wet'")
+
+# Set interactions to graph
+interact.T <- c("Ambient", "Hot-Wet", "hot-A", "cold-A", "hot-dry")
+interact.P <- c("Ambient", "Hot-Wet", "Ambient Temp - Wet", "Ambient Temp - Dry")
+dens.plot <- ggplot(gam2.graph[gam2.graph$mix.mark %in% interact.P,]) + facet_grid(Canopy.Class~.) +
+                geom_density(aes(x=log(BA.inc.Clim),color=mix.mark, fill=mix.mark), alpha=0.1) +
                 # geom_vline(data=median.clim, aes(xintercept=median, color=type)) +
-                geom_density(aes(x=Clim.Dev,color=clim.mark, fill=clim.mark), alpha=0.1) +
-                geom_vline(data=median.clim, aes(xintercept=median.dev, color=type)) +
-                scale_x_continuous(limits = c(-20,20), expand=c(0,0), breaks = seq(-15,15, by=5)) +
-                scale_color_manual(values=c("grey50", "blue", "burlywood3", "red", "darkgreen")) +
-                scale_fill_manual(values=c("grey50", "blue", "burlywood3", "red", "darkgreen")) +
-                labs(x= "BAI-Index", y="Density") +
+                # geom_density(aes(x=log(Clim.Dev),color=clim.mark, fill=clim.mark), alpha=0.1) +
+                #geom_vline(data=median.clim, aes(xintercept=median.dev, color=type)) +
+                #scale_x_continuous(limits = c(-20,20), expand=c(0,0), breaks = seq(-15,15, by=5)) +
+                scale_color_manual(values=c("grey50", "burlywood3", "blue", "darkgreen")) +
+                scale_fill_manual(values=c("grey50", "burlywood3", "blue", "darkgreen")) +
+                labs(x= "log(BAI-Index)", y="Density") +
+                coord_cartesian(xlim=c(-2, 2)) +
                 theme(axis.line=element_line(color="black"), 
                       panel.grid.major=element_blank(), 
                       panel.grid.minor=element_blank(), 
