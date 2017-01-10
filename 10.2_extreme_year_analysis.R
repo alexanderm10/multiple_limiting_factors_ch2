@@ -12,7 +12,7 @@ summary(gam2.weights)
 # Using a lme here to take into account the differences between sites as random effeects
 summary(gam2.weights)
 # Truncating to 1950 becasue that's the extent of the climate analysis
-gam2.weights <- gam2.weights[gam2.weights$Year >=1950,]
+gam2.weights <- gam2.weights[gam2.weights$Year >=1950 & gam2.weights$Year <=2012,]
 
 
 # cr.test <- lme(log(BA.inc) ~ Precip.Mark*Canopy.Class, random=list(group=~1, Site=~1, PlotID=~1, TreeID=~1), data=gam2.weights)

@@ -128,7 +128,7 @@ data.use$Site <- factor(data.use$Site, levels = c("Missouri Ozark", "Morgan Monr
 
 
 summary(data.use)
-data.use <- data.use[data.use$Year >=1950,]
+data.use <- data.use[data.use$Year >=1950 & data.use$Year<= 2012,]
 
 # data.use <- na.omit(data.use)
 # data.use <- droplevels(data.use)
@@ -739,20 +739,28 @@ for(i in unique(gam2.graph$Canopy.Class)){
 
 save(gam2.graph, file="processed_data/gam2_density_graph_data.Rdata")
 
-gam2.graph$mix.mark <- recode(gam2.graph$mix.mark, "'A-A'='Ambient';'A-wet'='Ambient Temp - Wet';'A-dry'='Ambient Temp - Dry';'hot-wet'='Hot-Wet'")
+gam2.graph$mix.mark <- recode(gam2.graph$mix.mark, "'A-A'='Ambient';'A-wet'='Wet';'A-dry'='Dry';
+                                                    'hot-wet'='Hot-Wet'; 'hot-dry' = 'Hot-Dry'; 'hot-A'='Hot'; 'cold-A'='Cool'")
 
+gam2.graph2 <- gam2.graph
+gam2.graph2$BA.inc.Clim.log <- log(gam2.graph$BA.inc.Clim)
+
+
+gam2.graph2$BA.inc.Clim.log <- ifelse(gam2.graph2$BA.inc.Clim.log < -2, -2, gam2.graph2$BA.inc.Clim.log)
+gam2.graph2$BA.inc.Clim.log <- ifelse(gam2.graph2$BA.inc.Clim.log > 2, 2, gam2.graph2$BA.inc.Clim.log)
 # Set interactions to graph
-interact.T <- c("Ambient", "Hot-Wet", "hot-A", "cold-A", "hot-dry")
-interact.P <- c("Ambient", "Hot-Wet", "Ambient Temp - Wet", "Ambient Temp - Dry")
-dens.plot <- ggplot(gam2.graph[gam2.graph$mix.mark %in% interact.P,]) + facet_grid(Canopy.Class~.) +
-                geom_density(aes(x=log(BA.inc.Clim),color=mix.mark, fill=mix.mark), alpha=0.1) +
+interact.T <- c("Ambient", "Hot", "Cool")
+interact.P <- c("Ambient", "Wet", "Dry")
+interact.mix <- c("Ambient", "Hot-Wet", "Hot-Dry")
+temp.dens.plot <- ggplot(gam2.graph2[gam2.graph2$mix.mark %in% interact.T,]) + facet_grid(Canopy.Class~.) +
+                geom_density(aes(x=BA.inc.Clim.log,color=mix.mark, fill=mix.mark), alpha=0.1) +
                 # geom_vline(data=median.clim, aes(xintercept=median, color=type)) +
                 # geom_density(aes(x=log(Clim.Dev),color=clim.mark, fill=clim.mark), alpha=0.1) +
                 #geom_vline(data=median.clim, aes(xintercept=median.dev, color=type)) +
                 #scale_x_continuous(limits = c(-20,20), expand=c(0,0), breaks = seq(-15,15, by=5)) +
-                scale_color_manual(values=c("grey50", "burlywood3", "blue", "darkgreen")) +
-                scale_fill_manual(values=c("grey50", "burlywood3", "blue", "darkgreen")) +
-                labs(x= "log(BAI-Index)", y="Density") +
+                scale_color_manual(values=c("grey50","blue", "red")) +
+                scale_fill_manual(values=c("grey50","blue", "red")) +
+                labs(x= "", y="Density") +
                 coord_cartesian(xlim=c(-2, 2)) +
                 theme(axis.line=element_line(color="black"), 
                       panel.grid.major=element_blank(), 
@@ -761,7 +769,7 @@ dens.plot <- ggplot(gam2.graph[gam2.graph$mix.mark %in% interact.P,]) + facet_gr
                       panel.background=element_blank(), 
                       axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
                       axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
-                      strip.text=element_text(face="bold", size=rel(1.0)),
+                      strip.text=element_blank(),
                       axis.line.x = element_line(color="black", size = 0.5),
                       axis.line.y = element_line(color="black", size = 0.5),
                       legend.position="top",
@@ -770,13 +778,93 @@ dens.plot <- ggplot(gam2.graph[gam2.graph$mix.mark %in% interact.P,]) + facet_gr
                       legend.key = element_rect(fill = "white")) + 
                 guides(color=guide_legend(nrow=1, title=""), fill=guide_legend(title="")) +
                 theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
-                theme(axis.title.x= element_text(size=rel(1.1), face="bold"))
+                theme(axis.title.x= element_text(size=rel(1.1), face="bold")) +
+                scale_x_continuous(expand=c(0,0))
 
-dens.plot
+
+precip.dens.plot <- ggplot(gam2.graph2[gam2.graph2$mix.mark %in% interact.P,]) + facet_grid(Canopy.Class~.) +
+                        geom_density(aes(x=BA.inc.Clim.log,color=mix.mark, fill=mix.mark), alpha=0.1) +
+                        # geom_vline(data=median.clim, aes(xintercept=median, color=type)) +
+                        # geom_density(aes(x=log(Clim.Dev),color=clim.mark, fill=clim.mark), alpha=0.1) +
+                        #geom_vline(data=median.clim, aes(xintercept=median.dev, color=type)) +
+                        #scale_x_continuous(limits = c(-20,20), expand=c(0,0), breaks = seq(-15,15, by=5)) +
+                        scale_color_manual(values=c("grey50","burlywood", "darkgreen")) +
+                        scale_fill_manual(values=c("grey50","burlywood", "darkgreen")) +
+                        labs(x= "log(BAI-Index)", y="") +
+                        coord_cartesian(xlim=c(-2, 2)) +
+                        theme(axis.line=element_line(color="black"), 
+                              panel.grid.major=element_blank(), 
+                              panel.grid.minor=element_blank(), 
+                              panel.border=element_blank(),  
+                              panel.background=element_blank(), 
+                              axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+                              axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+                              strip.text=element_blank(),
+                              axis.line.x = element_line(color="black", size = 0.5),
+                              axis.line.y = element_line(color="black", size = 0.5),
+                              legend.position="top",
+                              legend.key.size = unit(0.75, "cm"),
+                              legend.text = element_text(size=rel(1.1)),
+                              legend.key = element_rect(fill = "white")) + 
+                        guides(color=guide_legend(nrow=1, title=""), fill=guide_legend(title="")) +
+                        theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+                        theme(axis.title.x= element_text(size=rel(1.1), face="bold")) +
+                        theme(axis.text.y=element_blank()) +
+                        scale_x_continuous(expand=c(0,0))
+
+int.dens.plot <- ggplot(gam2.graph2[gam2.graph2$mix.mark %in% interact.mix,]) + facet_grid(Canopy.Class~.) +
+                        geom_density(aes(x=BA.inc.Clim.log,color=mix.mark, fill=mix.mark), alpha=0.1) +
+                        # geom_vline(data=median.clim, aes(xintercept=median, color=type)) +
+                        # geom_density(aes(x=log(Clim.Dev),color=clim.mark, fill=clim.mark), alpha=0.1) +
+                        #geom_vline(data=median.clim, aes(xintercept=median.dev, color=type)) +
+                        #scale_x_continuous(limits = c(-20,20), expand=c(0,0), breaks = seq(-15,15, by=5)) +
+                        scale_color_manual(values=c("grey50","darkorange", "darkorchid")) +
+                        scale_fill_manual(values=c("grey50","darkorange", "darkorchid")) +
+                        labs(x= "", y="") +
+                        coord_cartesian(xlim=c(-2, 2)) +
+                        theme(axis.line=element_line(color="black"), 
+                              panel.grid.major=element_blank(), 
+                              panel.grid.minor=element_blank(), 
+                              panel.border=element_blank(),  
+                              panel.background=element_blank(), 
+                              axis.text.x=element_text(angle=0, color="black", size=rel(1)), 
+                              axis.text.y=element_text(angle=0, color="black", size=rel(1)), 
+                              strip.text=element_text(face="bold", size=rel(1.0)),
+                              axis.line.x = element_line(color="black", size = 0.5),
+                              axis.line.y = element_line(color="black", size = 0.5),
+                              legend.position="top",
+                              legend.key.size = unit(0.75, "cm"),
+                              legend.text = element_text(size=rel(1.1)),
+                              legend.key = element_rect(fill = "white")) + 
+                        guides(color=guide_legend(nrow=1, title=""), fill=guide_legend(title="")) +
+                        theme(axis.title.y= element_text(size=rel(1.1), face="bold"))+
+                        theme(axis.title.x= element_text(size=rel(1.1), face="bold")) +
+                          theme(axis.text.y=element_blank()) +
+                        scale_x_continuous(expand=c(0,0))
+#dens.plot
 # pdf("figures/Prelim_Figures/pub_figs/Figure6_density.pdf", height = 8, width = 13)
-pdf("figures/submission1_figs/Figure6.pdf", height = 8, width = 13)
-  dens.plot
+pdf("figures/submission1_figs/Figure6_temp.pdf", height = 8, width = 13)
+  temp.dens.plot
 dev.off()
+
+pdf("figures/submission1_figs/Figure6_precip.pdf", height = 8, width = 13)
+precip.dens.plot
+dev.off()
+
+pdf("figures/submission1_figs/Figure6_mix.pdf", height = 8, width = 13)
+int.dens.plot
+dev.off()
+
+
+png(file.path("figures/submission1_figs/", "Figure6_combined.png"), width=13, height=8.5, units="in", res=300)
+	grid.newpage()
+	pushViewport(viewport(layout=grid.layout(nrow=1,ncol=3, widths=c(1.3,1.3,1.3))))
+	print(temp.dens.plot, vp = viewport(layout.pos.row = 1, layout.pos.col=1))
+  	print(precip.dens.plot, vp = viewport(layout.pos.row = 1, layout.pos.col=2))
+  	print(int.dens.plot, vp = viewport(layout.pos.row = 1, layout.pos.col=3))
+dev.off()
+
+
 
 # Figure 6 sub A--AGU
 dens.plot.agu <- ggplot(gam2.graph) + facet_grid(Canopy.Class~clim.type) +

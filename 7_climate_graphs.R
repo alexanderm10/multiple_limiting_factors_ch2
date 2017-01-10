@@ -28,7 +28,7 @@ data.use$Site <- factor(data.use$Site, levels = c("Missouri Ozark", "Morgan Monr
 
 
 summary(data.use)
-data.use <- data.use[data.use$Year >=1950,]
+data.use <- data.use[data.use$Year >=1950 & data.use$Year <= 2012,]
 
 # data.use <- na.omit(data.use)
 # data.use <- droplevels(data.use)
@@ -104,7 +104,7 @@ dev.off()
 clim.data <- read.csv("processed_data/climate_growing_season.csv", header=T)
 summary(clim.data)
 
-clim.data <- clim.data[clim.data$Site %in% data.use$Site & clim.data$Year >= 1950,]
+clim.data <- clim.data[clim.data$Site %in% data.use$Site & clim.data$Year >= 1950 & clim.data$Year<=2012,]
 clim.data$Site <- droplevels(clim.data$Site)
 
 # Hottest Years
